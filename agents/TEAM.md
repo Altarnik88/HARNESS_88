@@ -65,7 +65,7 @@ If `multi_agent_v1` is unavailable, the current agent may temporarily take the n
 
 Fallback production-code changes are allowed only when the agent follows the harness protocol:
 
-- Confirm `STACK.md`, `PRODUCT.md`, and `DESIGN.md` are ready or record the remaining blocker.
+- Confirm `STACK.md` is selected and `PRODUCT.md`/`DESIGN.md` are `Status: approved`, or record the remaining blocker.
 - Create or update the task file for the work.
 - Create or update the linked progress and checkpoint files.
 - Respect ownership and do-not-edit scopes from the task.

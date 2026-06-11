@@ -1,8 +1,10 @@
 # Design Brief
 
-Status: draft-required-before-implementation
+Status: draft
 
-This file is the durable design contract for website or product UI work. Agents must not begin frontend implementation until this file, `PRODUCT.md`, `STACK.md`, or equivalent wiki decisions define the visual direction, UX constraints, and selected stack/fullstack profile.
+This file is the durable design contract for website or product UI work. Agents must not begin frontend implementation until this file is `Status: approved`, `PRODUCT.md` is `Status: approved`, and `STACK.md` records a selected stack/fullstack profile.
+
+Allowed statuses: `draft`, `approved`, `needs-review`.
 
 Start new projects from `START_HERE.md`. The optional bundled Next.js starter/template in `frontend/` is not a selected design or stack decision.
 

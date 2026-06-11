@@ -8,7 +8,7 @@ Production implementation must not begin until a stack profile is selected here 
 
 ## Available Profiles
 
-See `agents/harness/stack-options.md`.
+See `agents/harness/stack-options.md` for the human summary and `agents/harness/stack-profiles.json` for CLI-readable profile metadata.
 
 ## Selection Notes
 

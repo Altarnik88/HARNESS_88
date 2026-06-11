@@ -2,6 +2,8 @@
 
 Status: draft
 
+Allowed statuses: draft, approved, needs-review
+
 This template becomes a concrete PRD when copied into a dated or named file and completed for a specific product, website, or feature.
 
 ## Product Goal

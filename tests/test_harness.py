@@ -77,6 +77,11 @@ Expected result:
 - Verification evidence: `python tools/llm_wiki.py lint --strict` exited 0.
 """
 
+SECOND_VALID_TASK = VALID_TASK.replace("# Task: Validate Harness", "# Task: Validate Harness Two").replace(
+    "Owned files: agents/tasks/example.md",
+    "Owned files: agents/tasks/example.md",
+)
+
 
 class HarnessValidationTests(unittest.TestCase):
     def write_minimal_harness(self, root: Path) -> None:
@@ -84,9 +89,18 @@ class HarnessValidationTests(unittest.TestCase):
             path = root / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(f"# {path.stem}\n", encoding="utf-8")
-        (root / "agents" / "tasks" / "2026-06-11-valid-task.md").write_text(
-            VALID_TASK, encoding="utf-8"
-        )
+        self.write_task_bundle(root, "2026-06-11-valid-task", VALID_TASK)
+
+    def write_task_bundle(self, root: Path, stem: str, task_text: str) -> None:
+        task_rel = Path("agents") / "tasks" / f"{stem}.md"
+        progress_rel = Path("agents") / "tasks" / "progress" / f"{stem}.md"
+        checkpoint_rel = Path("agents") / "tasks" / "checkpoints" / f"{stem}.md"
+        (root / task_rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / task_rel).write_text(task_text, encoding="utf-8")
+        (root / progress_rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / progress_rel).write_text(f"# Progress\n\nLinked task: `{task_rel.as_posix()}`\n", encoding="utf-8")
+        (root / checkpoint_rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / checkpoint_rel).write_text(f"# Checkpoint\n\nLinked task: `{task_rel.as_posix()}`\n", encoding="utf-8")
 
     def messages(self, root: Path) -> list[str]:
         return [issue.message for issue in validate_harness(root)]
@@ -137,6 +151,30 @@ class HarnessValidationTests(unittest.TestCase):
             messages = self.messages(root)
 
             self.assertEqual(messages, [])
+
+    def test_missing_linked_progress_file_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_minimal_harness(root)
+            (root / "agents" / "tasks" / "progress" / "2026-06-11-valid-task.md").unlink()
+
+            messages = self.messages(root)
+
+            self.assertTrue(any("Missing linked progress file" in message for message in messages))
+
+    def test_open_task_owned_file_conflict_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for rel in REQUIRED_HARNESS_FILES:
+                path = root / rel
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f"# {path.stem}\n", encoding="utf-8")
+            self.write_task_bundle(root, "2026-06-11-valid-task", VALID_TASK.replace("Status: verified", "Status: ready"))
+            self.write_task_bundle(root, "2026-06-11-second-task", SECOND_VALID_TASK.replace("Status: verified", "Status: ready"))
+
+            messages = self.messages(root)
+
+            self.assertTrue(any("Owned file conflict" in message for message in messages))
 
     def test_current_project_harness_is_valid(self) -> None:
         messages = self.messages(ROOT)

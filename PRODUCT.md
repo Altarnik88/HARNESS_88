@@ -1,8 +1,10 @@
 # Product Brief
 
-Status: draft-required-before-implementation
+Status: draft
 
-This file is the durable product contract for website or product work. Agents must not begin production implementation until this file, `DESIGN.md`, `STACK.md`, or equivalent wiki decisions define the product goal, design direction, selected stack/fullstack profile, and acceptance criteria.
+This file is the durable product contract for website or product work. Agents must not begin production implementation until this file is `Status: approved`, `DESIGN.md` is `Status: approved`, and `STACK.md` records a selected stack/fullstack profile.
+
+Allowed statuses: `draft`, `approved`, `needs-review`.
 
 Start new projects from `START_HERE.md`. The stack is not selected by default.
 

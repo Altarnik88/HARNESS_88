@@ -1,0 +1,77 @@
+[
+  {
+    "name": "next-static",
+    "description": "Next.js App Router + TypeScript + Tailwind for landing pages, marketing sites, and frontend-first sites.",
+    "commands": {
+      "install": "cd frontend && npm ci",
+      "dev": "cd frontend && npm run dev",
+      "lint": "cd frontend && npm run lint",
+      "build": "cd frontend && npm run build"
+    },
+    "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
+    "ci_policy": "Core CI remains stack-neutral. Run optional frontend CI when frontend/package.json is present and this profile is selected or under review.",
+    "frontend": true,
+    "backend": false,
+    "deploy_notes": "Deploy as a static or frontend-first Next.js site after product/design approval and task verification."
+  },
+  {
+    "name": "next-fullstack",
+    "description": "Next.js App Router + TypeScript + Tailwind, with backend and data decisions made later, for SaaS or app-like sites.",
+    "commands": {
+      "install": "cd frontend && npm ci",
+      "dev": "cd frontend && npm run dev",
+      "lint": "cd frontend && npm run lint",
+      "build": "cd frontend && npm run build"
+    },
+    "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
+    "ci_policy": "Core CI remains stack-neutral. Add backend/data checks only after concrete backend decisions are recorded.",
+    "frontend": true,
+    "backend": true,
+    "deploy_notes": "Choose hosting, database, auth, and environment handling in a later approved task before release."
+  },
+  {
+    "name": "astro-content",
+    "description": "Astro for SEO/content-heavy sites, blogs, and documentation.",
+    "commands": {
+      "install": "npm ci",
+      "dev": "npm run dev",
+      "lint": "npm run lint",
+      "build": "npm run build"
+    },
+    "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
+    "ci_policy": "Core CI remains stack-neutral. Add Astro checks after the Astro project is scaffolded.",
+    "frontend": true,
+    "backend": false,
+    "deploy_notes": "Deploy as static content unless an approved task adds server behavior."
+  },
+  {
+    "name": "sveltekit",
+    "description": "SvelteKit for interactive applications.",
+    "commands": {
+      "install": "npm ci",
+      "dev": "npm run dev",
+      "lint": "npm run lint",
+      "build": "npm run build"
+    },
+    "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
+    "ci_policy": "Core CI remains stack-neutral. Add SvelteKit checks after the SvelteKit project is scaffolded.",
+    "frontend": true,
+    "backend": true,
+    "deploy_notes": "Choose adapter and runtime after the product/design brief confirms deployment needs."
+  },
+  {
+    "name": "custom",
+    "description": "A user-defined stack selected after clarification.",
+    "commands": {
+      "install": "Record the selected stack install command in STACK.md.",
+      "dev": "Record the selected stack dev command in STACK.md.",
+      "lint": "Record the selected stack lint command in STACK.md.",
+      "build": "Record the selected stack build command in STACK.md."
+    },
+    "required_tools": ["python>=3.11"],
+    "ci_policy": "Core CI remains stack-neutral until custom stack checks are explicitly documented.",
+    "frontend": false,
+    "backend": false,
+    "deploy_notes": "Record deploy notes in STACK.md or an approved task before release."
+  }
+]

@@ -8,7 +8,7 @@ on:
       - harness-engineering-execution-layer
 
 jobs:
-  quality:
+  core-quality:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +19,23 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Run stack-neutral core quality
+        run: python tools/llm_wiki.py quality --skip-frontend
+
+      - name: Validate task queue
+        run: python tools/llm_wiki.py task validate --strict
+
+      - name: Run generated starter self-test
+        run: python tools/llm_wiki.py site self-test
+
+  optional-frontend:
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('frontend/package.json') != '' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -31,18 +48,6 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Run Python tests
-        run: python -m unittest discover -s tests
-
-      - name: Rebuild wiki index
-        run: python tools/llm_wiki.py rebuild
-
-      - name: Lint wiki and harness
-        run: python tools/llm_wiki.py lint --strict
-
-      - name: Validate task queue
-        run: python tools/llm_wiki.py task validate --strict
-
       - name: Lint frontend
         working-directory: frontend
         run: npm run lint
@@ -50,3 +55,7 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: npm run build
+
+      - name: Non-blocking frontend security audit
+        continue-on-error: true
+        run: python tools/llm_wiki.py security audit --json --no-record

@@ -2,6 +2,8 @@
 
 Status: draft
 
+Allowed statuses: draft, approved, needs-review
+
 ## Linked Artifacts
 
 - PRD:

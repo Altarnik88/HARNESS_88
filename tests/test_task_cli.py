@@ -124,8 +124,8 @@ class TaskCliTests(unittest.TestCase):
     def test_task_readiness_reports_pending_product_design(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "PRODUCT.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
-            (root / "DESIGN.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
+            (root / "PRODUCT.md").write_text("Status: draft\n", encoding="utf-8")
+            (root / "DESIGN.md").write_text("Status: needs-review\n", encoding="utf-8")
             (root / "STACK.md").write_text("status: unselected\nselected_profile: none\n", encoding="utf-8")
 
             code, output = self.run_cli("--root", str(root), "task", "readiness", "--json")
@@ -134,6 +134,38 @@ class TaskCliTests(unittest.TestCase):
             payload = json.loads(output)
             self.assertFalse(payload["product_design_ready"])
             self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md"])
+            self.assertIn("blockers", payload)
+            self.assertEqual(payload["briefs"]["PRODUCT.md"]["status"], "draft")
+
+    def test_task_set_status_requires_force_for_invalid_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_task(root, "alpha", "planned")
+
+            code, output = self.run_cli(
+                "--root",
+                str(root),
+                "task",
+                "set-status",
+                "agents/tasks/2026-06-11-alpha.md",
+                "done",
+            )
+
+            self.assertNotEqual(code, 0)
+            self.assertIn("Invalid task status transition", output)
+
+            code, output = self.run_cli(
+                "--root",
+                str(root),
+                "task",
+                "set-status",
+                "agents/tasks/2026-06-11-alpha.md",
+                "done",
+                "--force",
+            )
+
+            self.assertEqual(code, 0)
+            self.assertIn("done", output)
 
 
 if __name__ == "__main__":

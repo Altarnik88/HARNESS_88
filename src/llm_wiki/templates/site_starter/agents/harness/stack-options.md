@@ -16,4 +16,3 @@ Detailed machine-readable profile metadata lives in `agents/harness/stack-profil
 
 - Do not scaffold every profile.
 - Do not treat the bundled `frontend/` directory as the selected stack.
-- Use `custom` only after the user confirms the approach or answers enough questions for a clear recommendation.

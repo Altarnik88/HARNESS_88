@@ -215,8 +215,8 @@ class TaskQueueTests(unittest.TestCase):
     def test_readiness_report_marks_draft_product_and_design_as_pending(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "PRODUCT.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
-            (root / "DESIGN.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
+            (root / "PRODUCT.md").write_text("Status: draft\n", encoding="utf-8")
+            (root / "DESIGN.md").write_text("Status: needs-review\n", encoding="utf-8")
             (root / "STACK.md").write_text("status: unselected\nselected_profile: none\n", encoding="utf-8")
 
             report = readiness_report(root)
@@ -225,6 +225,36 @@ class TaskQueueTests(unittest.TestCase):
             self.assertIn("PRODUCT.md", report["pending_decisions"])
             self.assertIn("DESIGN.md", report["pending_decisions"])
             self.assertIn("STACK.md", report["pending_decisions"])
+            self.assertIn("blockers", report)
+            self.assertIn("next_command", report)
+            self.assertIn("files_to_edit", report)
+            self.assertEqual(report["briefs"]["PRODUCT.md"]["status"], "draft")
+            self.assertEqual(report["briefs"]["DESIGN.md"]["status"], "needs-review")
+
+    def test_readiness_report_requires_explicit_approved_status(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "PRODUCT.md").write_text("Status: approved\n", encoding="utf-8")
+            (root / "DESIGN.md").write_text("Status: approved\n", encoding="utf-8")
+            (root / "STACK.md").write_text("status: selected\nselected_profile: next-static\n", encoding="utf-8")
+
+            report = readiness_report(root)
+
+            self.assertTrue(report["product_design_ready"])
+            self.assertTrue(report["stack_ready"])
+            self.assertTrue(report["implementation_ready"])
+            self.assertEqual(report["pending_decisions"], [])
+
+    def test_set_task_status_rejects_invalid_transition_without_force(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_task(root, "alpha", "Alpha", "planned")
+
+            with self.assertRaises(ValueError):
+                set_task_status(root, "agents/tasks/2026-06-11-alpha.md", "done")
+
+            updated = set_task_status(root, "agents/tasks/2026-06-11-alpha.md", "done", force=True)
+            self.assertEqual(updated.status, "done")
 
 
 if __name__ == "__main__":

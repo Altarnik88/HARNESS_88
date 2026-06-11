@@ -47,6 +47,9 @@ REQUIRED_TASK_SECTIONS = [
 STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
 ROLE_OWNER_RE = re.compile(r"^Role owner:\s*(?P<owner>.+?)\s*$", re.MULTILINE)
 HEADING_RE = re.compile(r"^##\s+(?P<title>.+?)\s*$", re.MULTILINE)
+OWNED_FILES_BLOCK_RE = re.compile(r"Owned files:\s*\n(?P<body>.*?)(?=\n\S|^##\s+|\Z)", re.MULTILINE | re.DOTALL)
+INLINE_OWNED_FILES_RE = re.compile(r"^\s*-\s*Owned files:\s*(?P<value>.+?)\s*$", re.MULTILINE)
+OPEN_TASK_STATUSES = {"planned", "ready", "in_progress", "blocked", "review"}
 
 
 def validate_harness(root: Path) -> list[LintIssue]:
@@ -63,6 +66,7 @@ def validate_harness(root: Path) -> list[LintIssue]:
         if task_path.name in {"README.md", "_template.md"}:
             continue
         issues.extend(validate_task_file(root, task_path))
+    issues.extend(validate_owned_file_conflicts(root, sorted(tasks_dir.glob("*.md"))))
     return issues
 
 
@@ -97,7 +101,105 @@ def validate_task_file(root: Path, task_path: Path) -> list[LintIssue]:
     if status in {"verified", "done"} and not has_verification_evidence(text):
         issues.append(LintIssue("warning", rel, "Verified task lacks verification evidence."))
 
+    issues.extend(validate_linked_support_files(root, task_path))
     return issues
+
+
+def validate_linked_support_files(root: Path, task_path: Path) -> list[LintIssue]:
+    rel = relative_posix(task_path, root)
+    task_rel = relative_posix(task_path, root)
+    stem = task_path.stem
+    issues: list[LintIssue] = []
+    for label, support_path in [
+        ("progress", root / "agents" / "tasks" / "progress" / f"{stem}.md"),
+        ("checkpoint", root / "agents" / "tasks" / "checkpoints" / f"{stem}.md"),
+    ]:
+        if not support_path.exists():
+            issues.append(LintIssue("warning", rel, f"Missing linked {label} file: {relative_posix(support_path, root)}"))
+            continue
+        try:
+            support_text = support_path.read_text(encoding="utf-8")
+        except OSError as exc:
+            issues.append(LintIssue("warning", relative_posix(support_path, root), f"Cannot read linked {label} file: {exc}"))
+            continue
+        if task_rel not in support_text:
+            issues.append(
+                LintIssue(
+                    "warning",
+                    relative_posix(support_path, root),
+                    f"Linked {label} file must reference task: {task_rel}",
+                )
+            )
+    return issues
+
+
+def validate_owned_file_conflicts(root: Path, task_paths: list[Path]) -> list[LintIssue]:
+    ownership: list[tuple[Path, str]] = []
+    for task_path in task_paths:
+        if task_path.name in {"README.md", "_template.md"}:
+            continue
+        try:
+            text = task_path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        status = task_status(text)
+        if status not in OPEN_TASK_STATUSES:
+            continue
+        for owned in owned_files(text):
+            ownership.append((task_path, owned))
+
+    issues: list[LintIssue] = []
+    for index, (left_path, left_owned) in enumerate(ownership):
+        for right_path, right_owned in ownership[index + 1 :]:
+            if left_path == right_path:
+                continue
+            if paths_overlap(left_owned, right_owned):
+                issues.append(
+                    LintIssue(
+                        "warning",
+                        relative_posix(right_path, root),
+                        "Owned file conflict: "
+                        f"{right_owned} overlaps {left_owned} in {relative_posix(left_path, root)}.",
+                    )
+                )
+    return issues
+
+
+def owned_files(text: str) -> list[str]:
+    values: list[str] = []
+    block_match = OWNED_FILES_BLOCK_RE.search(text)
+    if block_match is not None:
+        for line in block_match.group("body").splitlines():
+            stripped = line.strip()
+            if stripped.startswith("-"):
+                values.extend(split_owned_value(stripped[1:].strip()))
+    for match in INLINE_OWNED_FILES_RE.finditer(text):
+        values.extend(split_owned_value(match.group("value")))
+    return [value for value in values if is_concrete_owned_file(value)]
+
+
+def split_owned_value(value: str) -> list[str]:
+    return [item.strip().strip("`") for item in value.split(",") if item.strip()]
+
+
+def is_concrete_owned_file(value: str) -> bool:
+    lowered = value.casefold()
+    if lowered in {"none", "none assigned yet", "n/a"}:
+        return False
+    if lowered.startswith("no "):
+        return False
+    return True
+
+
+def paths_overlap(left: str, right: str) -> bool:
+    left_norm = normalize_owned_path(left)
+    right_norm = normalize_owned_path(right)
+    return left_norm == right_norm or left_norm.startswith(right_norm + "/") or right_norm.startswith(left_norm + "/")
+
+
+def normalize_owned_path(value: str) -> str:
+    normalized = value.replace("\\", "/").strip().strip("/")
+    return re.sub(r"/+", "/", normalized)
 
 
 def task_status(text: str) -> str | None:
@@ -111,10 +213,9 @@ def normalize_heading(value: str) -> str:
 
 def has_verification_evidence(text: str) -> bool:
     normalized = re.sub(r"\s+", " ", text.casefold())
-    evidence_markers = [
-        "verification evidence",
-        "verification passed",
-        "verification run",
-        "tests passed",
-    ]
-    return any(marker in normalized for marker in evidence_markers)
+    if "no verification run yet" in normalized or "no verification evidence recorded yet" in normalized:
+        return False
+    has_evidence_label = "verification evidence" in normalized or "verification run" in normalized
+    has_command = re.search(r"\b(python|npm|pytest|unittest|node|npx|pnpm|yarn|git)\b", normalized) is not None
+    has_success = re.search(r"\b(exited 0|exit 0|passes|passed|no .*issues|0 failures|ok)\b", normalized) is not None
+    return has_evidence_label and has_command and has_success

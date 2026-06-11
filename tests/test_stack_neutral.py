@@ -11,6 +11,10 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 
+def is_source_project() -> bool:
+    return (ROOT / "README.md").read_text(encoding="utf-8").lstrip().startswith("# HARNESS_88")
+
+
 class StackNeutralDocsTests(unittest.TestCase):
     def read(self, rel: str) -> str:
         return (ROOT / rel).read_text(encoding="utf-8")
@@ -89,6 +93,9 @@ class StackNeutralDocsTests(unittest.TestCase):
         self.assertIn("Created: YYYY-MM-DD", text)
 
     def test_review_records_next_postcss_audit_item(self) -> None:
+        if not is_source_project():
+            self.skipTest("Known Next/PostCSS audit item is source-project review history.")
+
         text = self.read("wiki/review.md").casefold()
 
         for needle in ["next@16.2.9", "postcss@8.4.31", "npm audit", "auto-fix"]:

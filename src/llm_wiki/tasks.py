@@ -14,6 +14,18 @@ from .stack import stack_is_selected
 TASK_TITLE_RE = re.compile(r"^#\s+Task:\s*(?P<title>.+?)\s*$", re.MULTILINE)
 CREATED_RE = re.compile(r"^Created:\s*(?P<created>.+?)\s*$", re.MULTILINE)
 OBJECTIVE_RE = re.compile(r"^##\s+Objective\s*$\n(?P<body>.*?)(?=^##\s+|\Z)", re.MULTILINE | re.DOTALL)
+BRIEF_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
+ALLOWED_BRIEF_STATUSES = {"draft", "approved", "needs-review"}
+
+ALLOWED_STATUS_TRANSITIONS = {
+    "planned": {"ready", "blocked"},
+    "ready": {"in_progress", "blocked"},
+    "in_progress": {"review", "blocked"},
+    "blocked": {"planned", "ready", "in_progress"},
+    "review": {"in_progress", "verified", "blocked"},
+    "verified": {"done", "in_progress"},
+    "done": set(),
+}
 
 
 @dataclass(frozen=True)
@@ -76,14 +88,25 @@ def next_task(root: Path) -> TaskRecord | None:
     return planned[0] if planned else None
 
 
-def set_task_status(root: Path, raw_path: str, status: str) -> TaskRecord:
+def set_task_status(root: Path, raw_path: str, status: str, force: bool = False) -> TaskRecord:
     if status not in ALLOWED_TASK_STATUSES:
         allowed = ", ".join(sorted(ALLOWED_TASK_STATUSES))
         raise ValueError(f"Invalid task status: {status}. Allowed: {allowed}.")
     path = resolve_task_path(root, raw_path)
     text = path.read_text(encoding="utf-8")
-    if STATUS_RE.search(text) is None:
+    match = STATUS_RE.search(text)
+    if match is None:
         raise ValueError(f"Task file has no Status line: {relative_posix(path, root)}")
+    current = match.group("status").strip()
+    if current not in ALLOWED_TASK_STATUSES:
+        raise ValueError(f"Cannot transition from invalid task status: {current}. Use --force after repair.")
+    allowed_next = ALLOWED_STATUS_TRANSITIONS.get(current, set())
+    if not force and status != current and status not in allowed_next:
+        allowed_text = ", ".join(sorted(allowed_next)) or "none"
+        raise ValueError(
+            f"Invalid task status transition: {current} -> {status}. "
+            f"Allowed next statuses: {allowed_text}. Use --force for queue repair."
+        )
     updated = STATUS_RE.sub(f"Status: {status}", text, count=1)
     path.write_text(updated, encoding="utf-8")
     return parse_task_file(root, path)
@@ -171,14 +194,19 @@ def readiness_report(root: Path) -> dict[str, object]:
     issues = validate_harness(root)
     pending_decisions: list[str] = []
     product_design_pending: list[str] = []
-    if not brief_is_approved(root / "PRODUCT.md"):
-        product_design_pending.append("PRODUCT.md")
-    if not brief_is_approved(root / "DESIGN.md"):
-        product_design_pending.append("DESIGN.md")
+    briefs = {
+        "PRODUCT.md": brief_status(root / "PRODUCT.md"),
+        "DESIGN.md": brief_status(root / "DESIGN.md"),
+    }
+    for name, status in briefs.items():
+        if not status["approved"]:
+            product_design_pending.append(name)
     pending_decisions.extend(product_design_pending)
     stack_ready = stack_is_selected(root)
     if not stack_ready:
         pending_decisions.append("STACK.md")
+    blockers = readiness_blockers(root, issues, briefs, stack_ready)
+    files_to_edit = sorted({blocker["path"] for blocker in blockers if blocker.get("path")})
     return {
         "environment_ready": not issues,
         "product_design_ready": not product_design_pending,
@@ -187,19 +215,130 @@ def readiness_report(root: Path) -> dict[str, object]:
         "pending_decisions": pending_decisions,
         "harness_issue_count": len(issues),
         "task_metrics": task_metrics(root),
+        "briefs": briefs,
+        "blockers": blockers,
+        "files_to_edit": files_to_edit,
+        "next_command": next_readiness_command(blockers),
+        "suggested_tasks": suggested_readiness_tasks(pending_decisions),
     }
 
 
 def brief_is_approved(path: Path) -> bool:
+    return bool(brief_status(path)["approved"])
+
+
+def brief_status(path: Path) -> dict[str, object]:
+    rel = path.name
     if not path.exists():
-        return False
-    text = path.read_text(encoding="utf-8", errors="replace").casefold()
-    draft_markers = [
-        "draft-required-before-implementation",
-        "no approved",
-        "has not been recorded yet",
-    ]
-    return not any(marker in text for marker in draft_markers)
+        return {
+            "path": rel,
+            "exists": False,
+            "status": "missing",
+            "approved": False,
+            "allowed_statuses": sorted(ALLOWED_BRIEF_STATUSES),
+            "message": f"{rel} is missing.",
+        }
+    text = path.read_text(encoding="utf-8", errors="replace")
+    match = BRIEF_STATUS_RE.search(text)
+    if match is None:
+        return {
+            "path": rel,
+            "exists": True,
+            "status": "missing",
+            "approved": False,
+            "allowed_statuses": sorted(ALLOWED_BRIEF_STATUSES),
+            "message": f"{rel} must declare Status: draft, approved, or needs-review.",
+        }
+    status = match.group("status").strip().casefold()
+    if status not in ALLOWED_BRIEF_STATUSES:
+        return {
+            "path": rel,
+            "exists": True,
+            "status": status,
+            "approved": False,
+            "allowed_statuses": sorted(ALLOWED_BRIEF_STATUSES),
+            "message": f"{rel} has invalid status '{status}'. Use draft, approved, or needs-review.",
+        }
+    return {
+        "path": rel,
+        "exists": True,
+        "status": status,
+        "approved": status == "approved",
+        "allowed_statuses": sorted(ALLOWED_BRIEF_STATUSES),
+        "message": f"{rel} is approved." if status == "approved" else f"{rel} is {status}; set Status: approved after decisions are accepted.",
+    }
+
+
+def readiness_blockers(root: Path, issues, briefs: dict[str, dict[str, object]], stack_ready: bool) -> list[dict[str, str]]:
+    blockers: list[dict[str, str]] = []
+    for issue in issues:
+        blockers.append(
+            {
+                "area": "harness",
+                "path": issue.path,
+                "message": issue.message,
+                "next_command": "python tools/llm_wiki.py task validate --strict",
+            }
+        )
+    for name, status in briefs.items():
+        if not status["approved"]:
+            blockers.append(
+                {
+                    "area": "brief",
+                    "path": name,
+                    "message": str(status["message"]),
+                    "next_command": f"Edit {name}, then set Status: approved when accepted.",
+                }
+            )
+    if not stack_ready:
+        blockers.append(
+            {
+                "area": "stack",
+                "path": "STACK.md",
+                "message": "Stack profile is not selected.",
+                "next_command": "python tools/llm_wiki.py stack list",
+            }
+        )
+    if not list_tasks(root):
+        blockers.append(
+            {
+                "area": "task",
+                "path": "agents/tasks/",
+                "message": "No concrete task file exists yet.",
+                "next_command": 'python tools/llm_wiki.py task create --title "First Implementation Slice" --objective "Build the first approved site slice."',
+            }
+        )
+    return blockers
+
+
+def next_readiness_command(blockers: list[dict[str, str]]) -> str:
+    return blockers[0]["next_command"] if blockers else "python tools/llm_wiki.py quality --skip-frontend"
+
+
+def suggested_readiness_tasks(pending_decisions: list[str]) -> list[dict[str, str]]:
+    suggestions: list[dict[str, str]] = []
+    if "PRODUCT.md" in pending_decisions:
+        suggestions.append(
+            {
+                "title": "Approve Product Brief",
+                "objective": "Capture the product goal, audience, scope, and acceptance criteria, then set PRODUCT.md to Status: approved.",
+            }
+        )
+    if "DESIGN.md" in pending_decisions:
+        suggestions.append(
+            {
+                "title": "Approve Design Brief",
+                "objective": "Capture visual direction, UX constraints, accessibility, and component rules, then set DESIGN.md to Status: approved.",
+            }
+        )
+    if "STACK.md" in pending_decisions:
+        suggestions.append(
+            {
+                "title": "Select Stack Profile",
+                "objective": "Choose a stack/fullstack profile and record it with python tools/llm_wiki.py stack select <profile>.",
+            }
+        )
+    return suggestions
 
 
 def validate_task_queue(root: Path):

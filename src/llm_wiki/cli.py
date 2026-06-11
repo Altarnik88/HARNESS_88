@@ -4,11 +4,14 @@ import argparse
 import json
 from pathlib import Path
 
+from .doctor import build_doctor_report
 from .quality import quality_exit_code, run_quality
+from .security import run_security_audit
 from .site_generator import create_site_project
+from .site_self_test import run_generated_site_self_test, run_site_init_self_test
 from .stack import (
-    STACK_PROFILES,
     allowed_profile_text,
+    load_stack_profiles,
     read_stack_status,
     select_stack_profile,
 )
@@ -100,6 +103,22 @@ def build_parser() -> argparse.ArgumentParser:
     site_subparsers = site_parser.add_subparsers(dest="site_command", required=True)
     site_init_parser = site_subparsers.add_parser("init", help="Create a clean generated site project.")
     site_init_parser.add_argument("target", help="Target directory for the new site project.")
+    site_init_parser.add_argument("--self-test", action="store_true", help="Run generated project core self-test after creation.")
+    site_init_parser.add_argument("--json", action="store_true", help="Emit JSON init result.")
+    site_self_test_parser = site_subparsers.add_parser("self-test", help="Create a temporary starter and run core self-test.")
+    site_self_test_parser.add_argument("--json", action="store_true", help="Emit JSON self-test results.")
+    site_doctor_parser = site_subparsers.add_parser("doctor", help="Report unified project health and next actions.")
+    site_doctor_parser.add_argument("--json", action="store_true", help="Emit JSON doctor report.")
+    site_doctor_parser.add_argument("--skip-self-test", action="store_true", help="Skip generated-project self-test.")
+    site_doctor_parser.add_argument("--run-security", action="store_true", help="Run non-recording frontend npm audit when available.")
+
+    security_parser = subparsers.add_parser("security", help="Run non-blocking security review helpers.")
+    security_subparsers = security_parser.add_subparsers(dest="security_command", required=True)
+    security_audit_parser = security_subparsers.add_parser("audit", help="Run optional frontend npm audit.")
+    security_audit_parser.add_argument("--json", action="store_true", help="Emit JSON audit results.")
+    security_audit_parser.add_argument("--blocking", action="store_true", help="Exit 1 when unresolved security items are found.")
+    security_audit_parser.add_argument("--no-record", action="store_true", help="Do not record unresolved items in wiki/review.md.")
+    security_audit_parser.add_argument("--allowlist", default="", help="JSON allowlist path for accepted audit items.")
 
     task_parser = subparsers.add_parser("task", help="Inspect and update Harness Engineering task files.")
     task_subparsers = task_parser.add_subparsers(dest="task_command", required=True)
@@ -118,6 +137,7 @@ def build_parser() -> argparse.ArgumentParser:
     task_status_parser = task_subparsers.add_parser("set-status", help="Update the Status line for one task file.")
     task_status_parser.add_argument("path", help="Concrete task file path.")
     task_status_parser.add_argument("status", help="New task status.")
+    task_status_parser.add_argument("--force", action="store_true", help="Bypass transition rules for queue repair.")
     task_status_parser.add_argument("--json", action="store_true", help="Emit JSON updated task record.")
 
     task_create_parser = task_subparsers.add_parser("create", help="Create a task with progress and checkpoint files.")
@@ -240,11 +260,12 @@ def cmd_quality(root: Path, full: bool, skip_frontend: bool, as_json: bool) -> i
 
 def cmd_stack(args: argparse.Namespace, root: Path) -> int:
     if args.stack_command == "list":
+        profiles = load_stack_profiles(root)
         if args.json:
-            print(json.dumps([profile.to_json() for profile in STACK_PROFILES], ensure_ascii=False, indent=2))
+            print(json.dumps([profile.to_json() for profile in profiles], ensure_ascii=False, indent=2))
         else:
             print("Available stack profiles:")
-            for profile in STACK_PROFILES:
+            for profile in profiles:
                 print(f"- {profile.name}: {profile.description}")
         return 0
 
@@ -264,7 +285,7 @@ def cmd_stack(args: argparse.Namespace, root: Path) -> int:
             status = select_stack_profile(root, args.profile)
         except ValueError as exc:
             print(str(exc))
-            print(f"Allowed profiles: {allowed_profile_text()}")
+            print(f"Allowed profiles: {allowed_profile_text(root)}")
             return 2
         if args.json:
             print(json.dumps(status, ensure_ascii=False, indent=2))
@@ -279,11 +300,56 @@ def cmd_stack(args: argparse.Namespace, root: Path) -> int:
 def cmd_site(args: argparse.Namespace, root: Path) -> int:
     if args.site_command == "init":
         result = create_site_project(root, Path(args.target))
+        self_test = run_site_init_self_test(root, result.target) if args.self_test else None
+        if args.json:
+            payload = {
+                "target": str(result.target),
+                "copied_files": result.copied_files,
+                "self_test": self_test.to_json() if self_test else None,
+            }
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            return 0 if self_test is None or self_test.status == "passed" else 1
         print(f"Created clean site project: {result.target}")
         print(f"Copied files: {result.copied_files}")
+        if self_test is not None:
+            print_self_test_result(self_test.to_json())
+            return 0 if self_test.status == "passed" else 1
         print("Next: fill PRODUCT.md and DESIGN.md, then run python tools/llm_wiki.py task readiness")
         return 0
+    if args.site_command == "self-test":
+        result = run_generated_site_self_test(root)
+        if args.json:
+            print(json.dumps(result.to_json(), ensure_ascii=False, indent=2))
+        else:
+            print_self_test_result(result.to_json())
+        return 0 if result.status == "passed" else 1
+    if args.site_command == "doctor":
+        report = build_doctor_report(root, skip_self_test=args.skip_self_test, run_security=args.run_security)
+        if args.json:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+        else:
+            print_doctor_report(report)
+        return 0 if report["status"] == "ok" else 1
     raise ValueError(f"Unknown site command: {args.site_command}")
+
+
+def cmd_security(args: argparse.Namespace, root: Path) -> int:
+    if args.security_command == "audit":
+        allowlist_path = Path(args.allowlist) if args.allowlist else None
+        if allowlist_path is not None and not allowlist_path.is_absolute():
+            allowlist_path = root / allowlist_path
+        result = run_security_audit(
+            root,
+            blocking=args.blocking,
+            no_record=args.no_record,
+            allowlist_path=allowlist_path,
+        )
+        if args.json:
+            print(json.dumps(result.to_json(), ensure_ascii=False, indent=2))
+        else:
+            print_security_result(result.to_json())
+        return 1 if args.blocking and result.unresolved_count else 0
+    raise ValueError(f"Unknown security command: {args.security_command}")
 
 
 def cmd_task(args: argparse.Namespace, root: Path) -> int:
@@ -320,7 +386,11 @@ def cmd_task(args: argparse.Namespace, root: Path) -> int:
         return 1 if args.strict and issues else 0
 
     if args.task_command == "set-status":
-        record = set_task_status(root, args.path, args.status)
+        try:
+            record = set_task_status(root, args.path, args.status, force=args.force)
+        except ValueError as exc:
+            print(str(exc))
+            return 2
         if args.json:
             print(json.dumps(record.to_json(), ensure_ascii=False, indent=2))
         else:
@@ -374,6 +444,7 @@ def cmd_task(args: argparse.Namespace, root: Path) -> int:
                 print("Pending decisions:")
                 for item in pending:
                     print(f"- {item}")
+            print(f"Next command: {report['next_command']}")
         return 0
 
     raise ValueError(f"Unknown task command: {args.task_command}")
@@ -383,6 +454,36 @@ def print_task_record(record) -> None:
     print(f"{record.status:11} {record.path} | {record.title}")
     if record.objective:
         print(f"  {record.objective}")
+
+
+def print_self_test_result(payload: dict[str, object]) -> None:
+    print(f"Generated project self-test: {payload['status']}")
+    print(f"Target: {payload['target']}")
+    for result in payload["quality_results"]:
+        assert isinstance(result, dict)
+        status = "PASS" if result["exit_code"] == 0 else "FAIL"
+        print(f"{status} {result['name']} ({result['exit_code']})")
+
+
+def print_doctor_report(report: dict[str, object]) -> None:
+    print(f"Doctor status: {report['status']}")
+    readiness = report["readiness"]
+    assert isinstance(readiness, dict)
+    print(f"Implementation ready: {readiness['implementation_ready']}")
+    print(f"Next command: {readiness['next_command']}")
+    blockers = readiness.get("blockers", [])
+    if blockers:
+        print("Blockers:")
+        for blocker in blockers:
+            assert isinstance(blocker, dict)
+            print(f"- {blocker['path']}: {blocker['message']}")
+
+
+def print_security_result(payload: dict[str, object]) -> None:
+    print(f"Security audit: {payload['status']}")
+    print(f"Unresolved items: {payload['unresolved_count']}")
+    if payload.get("message"):
+        print(str(payload["message"]))
 
 
 def cmd_ingest(args: argparse.Namespace, root: Path) -> int:
@@ -475,6 +576,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_stack(args, root)
     if args.command == "site":
         return cmd_site(args, root)
+    if args.command == "security":
+        return cmd_security(args, root)
     if args.command == "task":
         return cmd_task(args, root)
     if args.command == "ingest":

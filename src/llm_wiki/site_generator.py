@@ -66,6 +66,8 @@ TEXT_SUFFIXES = {
     ".yml",
 }
 
+SITE_STARTER_TEMPLATE_ROOT = Path(__file__).resolve().parent / "templates" / "site_starter"
+
 
 @dataclass(frozen=True)
 class SiteProjectCreateResult:
@@ -124,15 +126,11 @@ def copy_directory(source: Path, target: Path) -> int:
 
 def reset_clean_state(target: Path) -> None:
     remove_path(target / "agents" / "tasks")
-    (target / "agents" / "tasks").mkdir(parents=True, exist_ok=True)
-    write_text(target / "agents" / "tasks" / "README.md", TASKS_README)
-    write_text(target / "agents" / "tasks" / "_template.md", TASK_TEMPLATE)
-
     remove_path(target / "raw")
+    remove_path(target / "wiki")
+
     write_text(target / "raw" / "sources" / ".gitkeep", "")
     write_text(target / "raw" / "assets" / ".gitkeep", "")
-
-    remove_path(target / "wiki")
     for rel in [
         "comparisons/.gitkeep",
         "concepts/.gitkeep",
@@ -142,25 +140,27 @@ def reset_clean_state(target: Path) -> None:
         "synthesis/.gitkeep",
     ]:
         write_text(target / "wiki" / rel, "")
-    write_text(target / "wiki" / "index.md", WIKI_INDEX)
-    write_text(target / "wiki" / "log.md", WIKI_LOG)
-    write_text(target / "wiki" / "review.md", WIKI_REVIEW)
-    write_text(target / "wiki" / "templates" / "page.md", WIKI_PAGE_TEMPLATE)
 
-    write_text(target / "START_HERE.md", START_HERE)
-    write_text(target / "STACK.md", STACK_MD)
-    write_text(target / "README.md", STARTER_README)
-    write_text(target / "AGENT_SITE_TOOLING.md", STARTER_TOOLING)
-    write_text(target / "agents" / "harness" / "stack-options.md", STACK_OPTIONS)
-    write_text(target / "frontend" / "README.md", FRONTEND_README)
-    write_text(target / "frontend" / "src" / "app" / "page.tsx", FRONTEND_PAGE)
-    write_text(target / "frontend" / "src" / "app" / "layout.tsx", FRONTEND_LAYOUT)
+    copy_template_tree(target)
 
     remove_path(target / "data")
     remove_path(target / ".agents")
     remove_path(target / ".codex")
     remove_path(target / "docs" / "presentations")
     remove_path(target / "skills-lock.json")
+
+
+def copy_template_tree(target: Path) -> int:
+    copied = 0
+    for path in sorted(SITE_STARTER_TEMPLATE_ROOT.rglob("*")):
+        if path.is_dir():
+            continue
+        rel = path.relative_to(SITE_STARTER_TEMPLATE_ROOT)
+        destination = target / rel
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, destination)
+        copied += 1
+    return copied
 
 
 def remove_path(path: Path) -> None:
@@ -193,323 +193,3 @@ def sanitize_text_files(root: Path, source_root: Path) -> None:
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
-
-
-START_HERE = """# START HERE
-
-Use this file after a fresh clone of HARNESS_88. It is a practical first-chat script for turning the repository into a site project.
-
-## First Chat
-
-Open Codex or another coding-agent chat in the root of this repository and start with something like:
-
-```text
-Read START_HERE.md, AGENTS.md, PRODUCT.md, DESIGN.md, STACK.md, and agents/harness/stack-options.md.
-Check readiness with python tools/llm_wiki.py task readiness --json.
-The stack is not selected yet. Help me choose a stack/fullstack profile, then update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness.
-```
-
-If you are not sure, ask the agent to ask 3-5 short questions and recommend a profile.
-
-## First-Run Checklist
-
-```powershell
-python tools/llm_wiki.py task readiness --json
-python tools/llm_wiki.py stack list
-python tools/llm_wiki.py stack status
-```
-
-After selecting a profile, update `PRODUCT.md`, `DESIGN.md`, and `STACK.md`, create the first task, and begin development from that task.
-"""
-
-STACK_MD = """# Stack Selection
-
-status: unselected
-selected_profile: none
-note: stack is selected in the first project chat
-
-Production implementation must not begin until a stack profile is selected here or the user explicitly confirms a custom approach.
-
-## Available Profiles
-
-See `agents/harness/stack-options.md`.
-"""
-
-STACK_OPTIONS = """# Stack Options
-
-These are selection profiles, not pre-scaffolded projects. Choose one during the first project chat, then record the choice in `STACK.md`.
-
-## Profiles
-
-- `next-static`: Next.js App Router + TypeScript + Tailwind for landing pages, marketing sites, and frontend-first sites.
-- `next-fullstack`: Next.js App Router + TypeScript + Tailwind, with backend and data decisions made later, for SaaS or app-like sites.
-- `astro-content`: Astro for SEO/content-heavy sites, blogs, and documentation.
-- `sveltekit`: SvelteKit for interactive applications.
-- `custom`: A user-defined stack selected after clarification.
-
-## Rules
-
-- Do not scaffold every profile.
-- Do not treat the bundled `frontend/` directory as the selected stack.
-"""
-
-STARTER_README = """# Autonomous Site Starter
-
-This project is a clean generated site workspace built from the HARNESS_88 autonomous core. It includes:
-
-- stack-neutral first-run guidance in `START_HERE.md`;
-- stack selection state in `STACK.md`;
-- Codex agent roles and harness templates in `agents/`;
-- durable product and design briefs in `PRODUCT.md` and `DESIGN.md`;
-- a local Markdown + SQLite LLM Wiki toolchain under `src/llm_wiki/`.
-- an optional bundled Next.js starter/template in `frontend/`.
-
-## First Run
-
-```powershell
-python -m unittest discover -s tests
-python tools/llm_wiki.py task readiness --json
-python tools/llm_wiki.py stack list
-python tools/llm_wiki.py stack status
-python tools/llm_wiki.py quality --skip-frontend
-```
-
-## Development Flow
-
-1. Start with `START_HERE.md`.
-2. Choose a stack/fullstack profile and record it in `STACK.md`.
-3. Fill in `PRODUCT.md` with the website goal, audience, scope, and acceptance criteria.
-4. Fill in `DESIGN.md` with the visual direction, UX constraints, and component rules.
-5. Create atomic task files with `python tools/llm_wiki.py task create ...`.
-6. Implement only from approved briefs, selected stack state, and task ownership.
-7. Run core checks with `python tools/llm_wiki.py quality --skip-frontend`.
-
-SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.
-"""
-
-STARTER_TOOLING = """# Agent Site Tooling
-
-This clean project starts with the portable, stack-neutral site-development harness only.
-
-## Current Project State
-
-- Workspace: `<project-root>`
-- Stack state: `STACK.md` starts unselected and must be updated before production implementation.
-- Optional frontend template: `frontend/` contains a bundled Next.js starter/template.
-- Canonical LLM Wiki: `wiki/`
-- Generated SQLite state: `data/wiki.sqlite`
-
-## Hard Rules
-
-- Do not begin website implementation until `STACK.md` has a selected profile or the user explicitly confirms a custom approach.
-- Do not begin website implementation until `PRODUCT.md`, `DESIGN.md`, or equivalent approved wiki decisions define the product and design direction.
-- Keep secrets in environment variables only.
-- Treat `data/wiki.sqlite` as generated state.
-- Preserve files under `raw/` during ingest.
-- For multi-agent website work, read `agents/TEAM.md` before delegation.
-- Real implementation requires a concrete task file in `agents/tasks/` or an equivalent approved plan.
-
-## Optional Resources
-
-Project-local design and AI skill packs are intentionally not bundled in this generated starter. Install or copy them only when a task explicitly needs them, then record the decision in the wiki.
-
-## Default Checks
-
-```powershell
-python -m unittest discover -s tests
-python tools/llm_wiki.py task readiness --json
-python tools/llm_wiki.py stack status
-python tools/llm_wiki.py quality --skip-frontend
-```
-"""
-
-FRONTEND_README = """# Optional Frontend Template
-
-This is the optional bundled Next.js starter/template for the site workspace. It is not the selected stack until `STACK.md` says so.
-
-```powershell
-npm ci
-npm run dev
-npm run lint
-npm run build
-```
-
-Start implementation only after `PRODUCT.md`, `DESIGN.md`, and `STACK.md` are ready.
-"""
-
-FRONTEND_PAGE = """export default function Home() {
-  return (
-    <main className="min-h-screen bg-background px-6 py-16 text-foreground sm:px-10">
-      <section className="mx-auto flex max-w-3xl flex-col gap-8">
-        <div className="space-y-4">
-          <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
-            Autonomous Site Starter
-          </p>
-          <h1 className="text-4xl font-semibold tracking-normal text-balance sm:text-5xl">
-            Project ready
-          </h1>
-          <p className="max-w-2xl text-lg leading-8 text-zinc-600">
-            Fill in PRODUCT.md and DESIGN.md, create the first task, then start
-            building the site from approved scope.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {["Define product", "Choose direction", "Create task"].map((item) => (
-            <div key={item} className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-900">{item}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
-}
-"""
-
-FRONTEND_LAYOUT = """import type { Metadata } from "next";
-import "./globals.css";
-
-export const metadata: Metadata = {
-  title: "Autonomous Site Starter",
-  description: "A clean generated site workspace for autonomous development.",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full">{children}</body>
-    </html>
-  );
-}
-"""
-
-TASKS_README = """# Durable Task Queue
-
-This directory starts empty except for `_template.md`.
-
-Use one task file per atomic implementation, QA, docs, release, or knowledge-stewardship unit.
-
-```powershell
-python tools/llm_wiki.py task create --title "Write Product Brief" --objective "Capture approved product decisions."
-python tools/llm_wiki.py task list
-python tools/llm_wiki.py task next
-python tools/llm_wiki.py task validate --strict
-```
-"""
-
-TASK_TEMPLATE = """# Task: Short Action-Oriented Name
-
-Status: planned
-Role owner: Conductor
-Created: YYYY-MM-DD
-
-## Objective
-
-Describe one atomic outcome.
-
-## Context Files
-
-- AGENTS.md
-- agents/TEAM.md
-- agents/tooling-matrix.md
-
-## Ownership
-
-- Owned files: none assigned yet
-- Do not edit: raw/, data/wiki.sqlite
-
-## Allowed Tooling
-
-- Use only tooling granted by agents/tooling-matrix.md and this task file.
-
-## Acceptance Checklist
-
-- Scope is respected.
-- Verification command is run.
-- Completion evidence is recorded.
-
-## Verification
-
-Command:
-
-```powershell
-python tools/llm_wiki.py task validate --strict
-```
-
-Expected result:
-
-```text
-No task validation issues found.
-```
-
-## Progress
-
-- No work has started.
-"""
-
-WIKI_INDEX = """# Wiki Index
-
-This clean wiki starts empty. Add durable decisions, source summaries, concepts, and synthesis pages as the project develops.
-
-## Core Pages
-
-- [[Review]]
-"""
-
-WIKI_LOG = """# Operation Log
-
-Append durable project events using:
-
-```markdown
-## [YYYY-MM-DD] kind | Summary
-- Path: `path/to/file`
-```
-"""
-
-WIKI_REVIEW = """---
-title: Review
-type: overview
-status: draft
-confidence: medium
-sources: []
-tags: []
-summary: Human-in-the-loop decisions and unresolved review items.
----
-
-# Review
-
-No review items recorded yet.
-"""
-
-WIKI_PAGE_TEMPLATE = """---
-title: Page Title
-type: concept
-status: draft
-confidence: medium
-sources: []
-tags: []
-summary: One sentence summary.
----
-
-# Page Title
-
-## Summary
-
-Write the durable synthesis here.
-
-## Evidence
-
-- Source: raw/sources/example.md
-
-## Links
-
-- Add relevant wikilinks here.
-
-## Open Questions
-
-- What still needs source-backed clarification?
-"""

@@ -35,6 +35,17 @@ class StackCliTests(unittest.TestCase):
         for profile in ["next-static", "next-fullstack", "astro-content", "sveltekit", "custom"]:
             self.assertIn(profile, output)
 
+    def test_stack_list_json_includes_profile_metadata(self) -> None:
+        code, output = self.run_cli("--root", str(ROOT), "stack", "list", "--json")
+
+        self.assertEqual(code, 0)
+        profiles = {row["name"]: row for row in json.loads(output)}
+        next_static = profiles["next-static"]
+        for key in ["commands", "required_tools", "ci_policy", "frontend", "backend", "deploy_notes"]:
+            self.assertIn(key, next_static)
+        self.assertTrue(next_static["frontend"])
+        self.assertFalse(next_static["backend"])
+
     def test_stack_status_reads_stack_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -15,10 +15,24 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from llm_wiki.cli import main
-from llm_wiki.site_generator import create_site_project
+from llm_wiki.site_generator import SITE_STARTER_TEMPLATE_ROOT, create_site_project
+
+
+def is_source_project() -> bool:
+    return (ROOT / "README.md").read_text(encoding="utf-8").lstrip().startswith("# HARNESS_88")
 
 
 class SiteGeneratorTests(unittest.TestCase):
+    def run_cli(self, *args: str) -> tuple[int, str]:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            try:
+                code = main(list(args))
+            except SystemExit as exc:
+                code = int(exc.code)
+        return code, stdout.getvalue() + stderr.getvalue()
+
     def test_create_site_project_omits_local_only_state(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"
@@ -82,14 +96,49 @@ class SiteGeneratorTests(unittest.TestCase):
     def test_cli_site_init_creates_project(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"
-            stdout = io.StringIO()
 
-            with contextlib.redirect_stdout(stdout):
-                code = main(["--root", str(ROOT), "site", "init", str(target)])
+            code, output = self.run_cli("--root", str(ROOT), "site", "init", str(target))
 
             self.assertEqual(code, 0)
-            self.assertIn("Created clean site project", stdout.getvalue())
+            self.assertIn("Created clean site project", output)
             self.assertTrue((target / "README.md").exists())
+
+    def test_starter_templates_match_generated_overlay_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+
+            create_site_project(ROOT, target)
+
+            for template_path in sorted(SITE_STARTER_TEMPLATE_ROOT.rglob("*")):
+                if not template_path.is_file():
+                    continue
+                rel = template_path.relative_to(SITE_STARTER_TEMPLATE_ROOT)
+                self.assertEqual(
+                    template_path.read_text(encoding="utf-8"),
+                    (target / rel).read_text(encoding="utf-8"),
+                    f"Generated file drifted from template: {rel.as_posix()}",
+                )
+
+    @unittest.skipUnless(is_source_project(), "Only the source project should recursively self-test generated starters.")
+    def test_cli_site_init_self_test_passes_generated_core_quality(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+
+            code, output = self.run_cli("--root", str(ROOT), "site", "init", str(target), "--self-test", "--json")
+
+            self.assertEqual(code, 0, output)
+            payload = json.loads(output)
+            self.assertEqual(payload["self_test"]["status"], "passed")
+            self.assertTrue((target / "wiki" / "review.md").read_text(encoding="utf-8").endswith("No review items recorded yet.\n"))
+
+    @unittest.skipUnless(is_source_project(), "Only the source project should recursively self-test generated starters.")
+    def test_cli_site_self_test_creates_temporary_project_and_passes(self) -> None:
+        code, output = self.run_cli("--root", str(ROOT), "site", "self-test", "--json")
+
+        self.assertEqual(code, 0, output)
+        payload = json.loads(output)
+        self.assertEqual(payload["status"], "passed")
+        self.assertIn("python-tests", [step["name"] for step in payload["quality_results"]])
 
 
 if __name__ == "__main__":

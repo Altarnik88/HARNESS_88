@@ -1,6 +1,6 @@
 # Agent Site Tooling
 
-HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should begin with `START_HERE.md`.
+This clean project starts with the portable, stack-neutral site-development harness only.
 
 ## Current Project State
 
@@ -20,40 +20,16 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - For multi-agent website work, read `agents/TEAM.md` before delegation.
 - Real implementation requires a concrete task file in `agents/tasks/` or an equivalent approved plan.
 
-## Optional Frontend Template
+## Optional Resources
 
-The `frontend/` directory is provided as an optional bundled Next.js starter/template. It is useful when the selected profile is compatible with Next.js, but HARNESS_88 does not assume it is selected.
-
-Install frontend dependencies only when frontend checks or implementation are in scope:
-
-```powershell
-cd frontend
-npm ci
-```
+Project-local design and AI skill packs are intentionally not bundled in this generated starter. Install or copy them only when a task explicitly needs them, then record the decision in the wiki.
 
 ## Default Checks
-
-Core checks:
 
 ```powershell
 python -m unittest discover -s tests
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py stack status
-python tools/llm_wiki.py site doctor --skip-self-test
+python tools/llm_wiki.py site doctor
 python tools/llm_wiki.py quality --skip-frontend
-```
-
-Optional frontend checks:
-
-```powershell
-cd frontend
-npm ci
-npm run lint
-npm run build
-```
-
-Optional frontend security review:
-
-```powershell
-python tools/llm_wiki.py security audit --json --no-record
 ```

@@ -31,6 +31,7 @@ I am not sure which stack/fullstack profile fits. Ask me 3-5 short questions abo
    ```powershell
    python tools/llm_wiki.py task readiness --json
    python tools/llm_wiki.py stack status
+   python tools/llm_wiki.py site doctor --skip-self-test
    ```
 
 2. Review available profiles:
@@ -47,8 +48,8 @@ I am not sure which stack/fullstack profile fits. Ask me 3-5 short questions abo
 
 4. Fill or update the durable briefs:
 
-   - `PRODUCT.md`: product goal, audience, scope, user jobs, acceptance criteria.
-   - `DESIGN.md`: visual direction, UX constraints, accessibility, component rules.
+   - `PRODUCT.md`: product goal, audience, scope, user jobs, acceptance criteria, and explicit `Status: approved` when accepted.
+   - `DESIGN.md`: visual direction, UX constraints, accessibility, component rules, and explicit `Status: approved` when accepted.
    - `STACK.md`: selected stack/fullstack profile and any stack notes.
 
 5. Create the first task:
@@ -62,3 +63,5 @@ I am not sure which stack/fullstack profile fits. Ask me 3-5 short questions abo
 ## Important Rule
 
 HARNESS_88 does not choose Next.js or fullstack by default. The `frontend/` directory is an optional bundled Next.js starter/template. Production implementation starts only after a stack profile is selected or the user explicitly confirms a custom approach.
+
+Use `python tools/llm_wiki.py site doctor` for a unified readiness, wiki, task, frontend, security, and generated-starter self-test report.
