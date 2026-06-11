@@ -222,6 +222,9 @@ class TaskQueueTests(unittest.TestCase):
             report = readiness_report(root)
 
             self.assertFalse(report["product_design_ready"])
+            self.assertFalse(report["core_development_ready"])
+            self.assertFalse(report["site_implementation_ready"])
+            self.assertFalse(report["implementation_ready"])
             self.assertIn("PRODUCT.md", report["pending_decisions"])
             self.assertIn("DESIGN.md", report["pending_decisions"])
             self.assertIn("STACK.md", report["pending_decisions"])
@@ -242,8 +245,19 @@ class TaskQueueTests(unittest.TestCase):
 
             self.assertTrue(report["product_design_ready"])
             self.assertTrue(report["stack_ready"])
+            self.assertFalse(report["core_development_ready"])
+            self.assertTrue(report["site_implementation_ready"])
             self.assertTrue(report["implementation_ready"])
             self.assertEqual(report["pending_decisions"], [])
+
+    def test_current_core_can_be_ready_while_site_implementation_is_not_configured(self) -> None:
+        report = readiness_report(ROOT)
+
+        self.assertTrue(report["core_development_ready"])
+        self.assertFalse(report["site_implementation_ready"])
+        self.assertFalse(report["implementation_ready"])
+        self.assertIn("PRODUCT.md", report["pending_decisions"])
+        self.assertIn("STACK.md", report["pending_decisions"])
 
     def test_set_task_status_rejects_invalid_transition_without_force(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

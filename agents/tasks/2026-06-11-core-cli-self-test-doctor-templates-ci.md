@@ -61,6 +61,7 @@ Expected result:
 ## Progress
 
 - Implemented generated-project self-tests, `site doctor`, explicit brief statuses, data-driven starter templates and stack profiles, stronger task validation, split CI, and non-blocking frontend security audit.
+- Clarified readiness semantics: root draft briefs and unselected stack block concrete site implementation, not core engineering on HARNESS_88 itself.
 - Verification evidence: `python -m unittest discover -s tests` exited 0 with 74 tests OK.
 - Verification evidence: `python tools/llm_wiki.py quality --skip-frontend` exited 0.
 - Verification evidence: `python tools/llm_wiki.py task validate --strict` exited 0 with no task validation issues.

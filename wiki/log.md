@@ -17,3 +17,9 @@ Append durable project events using:
 - Path: `agents/harness/stack-profiles.json`
 - Path: `agents/tasks/2026-06-11-core-cli-self-test-doctor-templates-ci.md`
 - Path: `.github/workflows/quality.yml`
+
+## [2026-06-11] maintenance | Clarified core readiness versus site implementation readiness
+- Path: `src/llm_wiki/tasks.py`
+- Path: `src/llm_wiki/cli.py`
+- Path: `README.md`
+- Path: `AGENTS.md`

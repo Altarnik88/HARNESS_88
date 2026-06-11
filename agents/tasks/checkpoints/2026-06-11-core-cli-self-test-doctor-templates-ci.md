@@ -15,6 +15,7 @@ Linked task: `agents/tasks/2026-06-11-core-cli-self-test-doctor-templates-ci.md`
 - Starter overlay files live under `src/llm_wiki/templates/site_starter/`, with drift tests comparing templates to generated output.
 - Stack profile metadata lives in `agents/harness/stack-profiles.json` and is consumed by the stack CLI.
 - Readiness uses explicit `draft`, `approved`, and `needs-review` brief statuses and reports blockers, files, next command, and suggested tasks.
+- Readiness now distinguishes `core_development_ready` from `site_implementation_ready`; the backward-compatible `implementation_ready` field remains the site implementation gate.
 - `site doctor` reports readiness, stack, briefs, task graph, wiki health, frontend state, security state, and generated-project self-test.
 - Task validation checks linked progress/checkpoint files, open-task owned-file conflicts, and stronger verified/done evidence.
 - Core CI is split from optional frontend CI; optional security audit is non-blocking by default.

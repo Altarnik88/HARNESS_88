@@ -438,7 +438,9 @@ def cmd_task(args: argparse.Namespace, root: Path) -> int:
             env = "ready" if report["environment_ready"] else "has issues"
             product = "ready" if report["product_design_ready"] else "pending decisions"
             print(f"Environment: {env}")
+            print(f"Core development: {'ready' if report['core_development_ready'] else 'has issues'}")
             print(f"Product/design: {product}")
+            print(f"Site implementation: {'ready' if report['site_implementation_ready'] else 'not configured'}")
             pending = report["pending_decisions"]
             if pending:
                 print("Pending decisions:")
@@ -469,7 +471,8 @@ def print_doctor_report(report: dict[str, object]) -> None:
     print(f"Doctor status: {report['status']}")
     readiness = report["readiness"]
     assert isinstance(readiness, dict)
-    print(f"Implementation ready: {readiness['implementation_ready']}")
+    print(f"Core workflow: {'ready' if readiness['core_development_ready'] else 'has issues'}")
+    print(f"Site implementation: {'ready' if readiness['site_implementation_ready'] else 'not configured'}")
     print(f"Next command: {readiness['next_command']}")
     blockers = readiness.get("blockers", [])
     if blockers:

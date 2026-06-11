@@ -45,6 +45,15 @@ class SiteDoctorTests(unittest.TestCase):
             self.assertIn(key, payload)
         self.assertEqual(payload["generated_project_self_test"]["status"], "skipped")
         self.assertEqual(payload["security"]["status"], "not-run")
+        self.assertTrue(payload["readiness"]["core_development_ready"])
+        self.assertFalse(payload["readiness"]["site_implementation_ready"])
+
+    def test_site_doctor_human_output_distinguishes_core_from_site_readiness(self) -> None:
+        code, output = self.run_cli("--root", str(ROOT), "site", "doctor", "--skip-self-test")
+
+        self.assertEqual(code, 0, output)
+        self.assertIn("Core workflow: ready", output)
+        self.assertIn("Site implementation: not configured", output)
 
 
 if __name__ == "__main__":

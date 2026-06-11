@@ -10,6 +10,8 @@ New users start from `START_HERE.md`, choose a stack/fullstack profile, and reco
 
 Do not assume Next.js or fullstack has already been selected. The `frontend/` directory is an optional bundled Next.js starter/template, not the default stack.
 
+Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflow gate. Their draft/unselected state blocks concrete site implementation, not core engineering work on HARNESS_88 itself.
+
 ## Read First
 
 - `START_HERE.md` - first-run workflow for new users.

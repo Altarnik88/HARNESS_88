@@ -12,6 +12,7 @@ Current status: verified
 - Moved stack profile metadata to `agents/harness/stack-profiles.json`.
 - Strengthened task validation for linked support files, status transitions, ownership conflicts, and verification evidence.
 - Split core CI from optional frontend CI.
+- Clarified readiness semantics so core development readiness is distinct from concrete site implementation readiness.
 - Updated root docs, harness docs, generated starter templates, and wiki log.
 
 ## Current Blocker

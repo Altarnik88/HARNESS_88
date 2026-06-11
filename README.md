@@ -4,6 +4,12 @@ HARNESS_88 is a stack-neutral autonomous core for site-development work. It give
 
 Start fresh clones with [START_HERE.md](START_HERE.md).
 
+## Working On The Core
+
+This repository is the reusable core, not a concrete site project. It is expected for root `PRODUCT.md` and `DESIGN.md` to remain `Status: draft`, and for root `STACK.md` to remain unselected, while core CLI, generator, template, CI, task, and wiki workflow work continues through `agents/tasks/`.
+
+In readiness and doctor output, `core_development_ready` means the HARNESS_88 core workflow is healthy enough to work on. `site_implementation_ready` means a concrete site has approved briefs and a selected stack.
+
 ## What Is Included
 
 - `START_HERE.md`: first-chat instructions for a new user.

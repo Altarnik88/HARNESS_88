@@ -207,11 +207,15 @@ def readiness_report(root: Path) -> dict[str, object]:
         pending_decisions.append("STACK.md")
     blockers = readiness_blockers(root, issues, briefs, stack_ready)
     files_to_edit = sorted({blocker["path"] for blocker in blockers if blocker.get("path")})
+    core_development_ready = not issues
+    site_implementation_ready = not pending_decisions
     return {
-        "environment_ready": not issues,
+        "environment_ready": core_development_ready,
+        "core_development_ready": core_development_ready,
         "product_design_ready": not product_design_pending,
         "stack_ready": stack_ready,
-        "implementation_ready": not pending_decisions,
+        "site_implementation_ready": site_implementation_ready,
+        "implementation_ready": site_implementation_ready,
         "pending_decisions": pending_decisions,
         "harness_issue_count": len(issues),
         "task_metrics": task_metrics(root),
