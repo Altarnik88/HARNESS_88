@@ -217,12 +217,14 @@ class TaskQueueTests(unittest.TestCase):
             root = Path(tmp)
             (root / "PRODUCT.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
             (root / "DESIGN.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
+            (root / "STACK.md").write_text("status: unselected\nselected_profile: none\n", encoding="utf-8")
 
             report = readiness_report(root)
 
             self.assertFalse(report["product_design_ready"])
             self.assertIn("PRODUCT.md", report["pending_decisions"])
             self.assertIn("DESIGN.md", report["pending_decisions"])
+            self.assertIn("STACK.md", report["pending_decisions"])
 
 
 if __name__ == "__main__":

@@ -2,7 +2,9 @@
 
 Status: draft-required-before-implementation
 
-This file is the durable design contract for website or product UI work. Agents must not begin frontend implementation until this file, `PRODUCT.md`, or equivalent wiki decisions define the visual direction and UX constraints.
+This file is the durable design contract for website or product UI work. Agents must not begin frontend implementation until this file, `PRODUCT.md`, `STACK.md`, or equivalent wiki decisions define the visual direction, UX constraints, and selected stack/fullstack profile.
+
+Start new projects from `START_HERE.md`. The optional bundled Next.js starter/template in `frontend/` is not a selected design or stack decision.
 
 ## Design Goal
 
@@ -29,4 +31,4 @@ No approved visual direction has been selected yet.
 
 ## Open Decisions
 
-- Define visual direction, responsive behavior, component rules, imagery direction, and motion policy before implementation.
+- Define visual direction, responsive behavior, component rules, imagery direction, motion policy, and stack constraints before implementation.

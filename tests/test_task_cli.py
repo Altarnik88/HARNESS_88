@@ -126,13 +126,14 @@ class TaskCliTests(unittest.TestCase):
             root = Path(tmp)
             (root / "PRODUCT.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
             (root / "DESIGN.md").write_text("Status: draft-required-before-implementation\n", encoding="utf-8")
+            (root / "STACK.md").write_text("status: unselected\nselected_profile: none\n", encoding="utf-8")
 
             code, output = self.run_cli("--root", str(root), "task", "readiness", "--json")
 
             self.assertEqual(code, 0)
             payload = json.loads(output)
             self.assertFalse(payload["product_design_ready"])
-            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md"])
+            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md"])
 
 
 if __name__ == "__main__":

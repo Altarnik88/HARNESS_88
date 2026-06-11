@@ -1,0 +1,94 @@
+from __future__ import annotations
+
+import contextlib
+import io
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from llm_wiki.cli import main
+
+
+class StackCliTests(unittest.TestCase):
+    def run_cli(self, *args: str) -> tuple[int, str]:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            try:
+                code = main(list(args))
+            except SystemExit as exc:
+                code = int(exc.code)
+        return code, stdout.getvalue() + stderr.getvalue()
+
+    def test_stack_list_outputs_available_profiles(self) -> None:
+        code, output = self.run_cli("--root", str(ROOT), "stack", "list")
+
+        self.assertEqual(code, 0)
+        for profile in ["next-static", "next-fullstack", "astro-content", "sveltekit", "custom"]:
+            self.assertIn(profile, output)
+
+    def test_stack_status_reads_stack_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "STACK.md").write_text(
+                "status: unselected\nselected_profile: none\nnote: stack is selected in the first project chat\n",
+                encoding="utf-8",
+            )
+
+            code, output = self.run_cli("--root", str(root), "stack", "status")
+
+            self.assertEqual(code, 0)
+            self.assertIn("unselected", output)
+            self.assertIn("none", output)
+
+    def test_stack_select_updates_stack_md_only(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            frontend = root / "frontend"
+            frontend.mkdir()
+            (frontend / "package.json").write_text("{}", encoding="utf-8")
+
+            code, output = self.run_cli("--root", str(root), "stack", "select", "next-static")
+
+            self.assertEqual(code, 0)
+            self.assertIn("next-static", output)
+            text = (root / "STACK.md").read_text(encoding="utf-8")
+            self.assertIn("status: selected", text)
+            self.assertIn("selected_profile: next-static", text)
+            self.assertFalse((frontend / "node_modules").exists())
+
+    def test_unknown_stack_profile_prints_clear_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            code, output = self.run_cli("--root", tmp, "stack", "select", "rails")
+
+            self.assertNotEqual(code, 0)
+            self.assertIn("Unknown stack profile: rails", output)
+            self.assertIn("next-static", output)
+            self.assertIn("custom", output)
+
+    def test_stack_status_json_is_machine_readable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "STACK.md").write_text(
+                "status: selected\nselected_profile: sveltekit\nnote: selected during first chat\n",
+                encoding="utf-8",
+            )
+
+            code, output = self.run_cli("--root", str(root), "stack", "status", "--json")
+
+            self.assertEqual(code, 0)
+            payload = json.loads(output)
+            self.assertEqual(payload["status"], "selected")
+            self.assertEqual(payload["selected_profile"], "sveltekit")
+
+
+if __name__ == "__main__":
+    unittest.main()

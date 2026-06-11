@@ -2,7 +2,7 @@
 
 Status: planned
 Role owner: Conductor
-Created: 2026-06-11
+Created: YYYY-MM-DD
 
 ## Objective
 

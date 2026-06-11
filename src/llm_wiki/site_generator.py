@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import shutil
 from dataclasses import dataclass
-from datetime import date
 from pathlib import Path
 
 
@@ -16,6 +15,8 @@ ROOT_FILES = [
     "NOTICE/THIRD_PARTY.md",
     "PRODUCT.md",
     "README.md",
+    "STACK.md",
+    "START_HERE.md",
     "llms.txt",
     "purpose.md",
     "pyproject.toml",
@@ -145,8 +146,11 @@ def reset_clean_state(target: Path) -> None:
     write_text(target / "wiki" / "review.md", WIKI_REVIEW)
     write_text(target / "wiki" / "templates" / "page.md", WIKI_PAGE_TEMPLATE)
 
+    write_text(target / "START_HERE.md", START_HERE)
+    write_text(target / "STACK.md", STACK_MD)
     write_text(target / "README.md", STARTER_README)
     write_text(target / "AGENT_SITE_TOOLING.md", STARTER_TOOLING)
+    write_text(target / "agents" / "harness" / "stack-options.md", STACK_OPTIONS)
     write_text(target / "frontend" / "README.md", FRONTEND_README)
     write_text(target / "frontend" / "src" / "app" / "page.tsx", FRONTEND_PAGE)
     write_text(target / "frontend" / "src" / "app" / "layout.tsx", FRONTEND_LAYOUT)
@@ -190,50 +194,113 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+START_HERE = """# START HERE
+
+Use this file after a fresh clone of HARNESS_88. It is a practical first-chat script for turning the repository into a site project.
+
+## First Chat
+
+Open Codex or another coding-agent chat in the root of this repository and start with something like:
+
+```text
+Read START_HERE.md, AGENTS.md, PRODUCT.md, DESIGN.md, STACK.md, and agents/harness/stack-options.md.
+Check readiness with python tools/llm_wiki.py task readiness --json.
+The stack is not selected yet. Help me choose a stack/fullstack profile, then update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness.
+```
+
+If you are not sure, ask the agent to ask 3-5 short questions and recommend a profile.
+
+## First-Run Checklist
+
+```powershell
+python tools/llm_wiki.py task readiness --json
+python tools/llm_wiki.py stack list
+python tools/llm_wiki.py stack status
+```
+
+After selecting a profile, update `PRODUCT.md`, `DESIGN.md`, and `STACK.md`, create the first task, and begin development from that task.
+"""
+
+STACK_MD = """# Stack Selection
+
+status: unselected
+selected_profile: none
+note: stack is selected in the first project chat
+
+Production implementation must not begin until a stack profile is selected here or the user explicitly confirms a custom approach.
+
+## Available Profiles
+
+See `agents/harness/stack-options.md`.
+"""
+
+STACK_OPTIONS = """# Stack Options
+
+These are selection profiles, not pre-scaffolded projects. Choose one during the first project chat, then record the choice in `STACK.md`.
+
+## Profiles
+
+- `next-static`: Next.js App Router + TypeScript + Tailwind for landing pages, marketing sites, and frontend-first sites.
+- `next-fullstack`: Next.js App Router + TypeScript + Tailwind, with backend and data decisions made later, for SaaS or app-like sites.
+- `astro-content`: Astro for SEO/content-heavy sites, blogs, and documentation.
+- `sveltekit`: SvelteKit for interactive applications.
+- `custom`: A user-defined stack selected after clarification.
+
+## Rules
+
+- Do not scaffold every profile.
+- Do not treat the bundled `frontend/` directory as the selected stack.
+"""
+
 STARTER_README = """# Autonomous Site Starter
 
-This project is a clean generated site workspace. It includes:
+This project is a clean generated site workspace built from the HARNESS_88 autonomous core. It includes:
 
-- a Next.js frontend in `frontend/`;
+- stack-neutral first-run guidance in `START_HERE.md`;
+- stack selection state in `STACK.md`;
 - Codex agent roles and harness templates in `agents/`;
 - durable product and design briefs in `PRODUCT.md` and `DESIGN.md`;
 - a local Markdown + SQLite LLM Wiki toolchain under `src/llm_wiki/`.
+- an optional bundled Next.js starter/template in `frontend/`.
 
 ## First Run
 
 ```powershell
-python tools/llm_wiki.py task readiness
 python -m unittest discover -s tests
-cd frontend
-npm install
-npm run lint
+python tools/llm_wiki.py task readiness --json
+python tools/llm_wiki.py stack list
+python tools/llm_wiki.py stack status
+python tools/llm_wiki.py quality --skip-frontend
 ```
 
 ## Development Flow
 
-1. Fill in `PRODUCT.md` with the website goal, audience, scope, and acceptance criteria.
-2. Fill in `DESIGN.md` with the visual direction, UX constraints, and component rules.
-3. Create atomic task files with `python tools/llm_wiki.py task create ...`.
-4. Implement only from approved briefs and task ownership.
-5. Run `python tools/llm_wiki.py quality` before handoff.
+1. Start with `START_HERE.md`.
+2. Choose a stack/fullstack profile and record it in `STACK.md`.
+3. Fill in `PRODUCT.md` with the website goal, audience, scope, and acceptance criteria.
+4. Fill in `DESIGN.md` with the visual direction, UX constraints, and component rules.
+5. Create atomic task files with `python tools/llm_wiki.py task create ...`.
+6. Implement only from approved briefs, selected stack state, and task ownership.
+7. Run core checks with `python tools/llm_wiki.py quality --skip-frontend`.
 
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.
 """
 
 STARTER_TOOLING = """# Agent Site Tooling
 
-This clean project starts with the portable site-development harness only.
+This clean project starts with the portable, stack-neutral site-development harness only.
 
 ## Current Project State
 
 - Workspace: `<project-root>`
-- Frontend app: `frontend/`
-- Frontend stack: Next.js App Router, TypeScript, Tailwind CSS, GSAP-ready package slots.
+- Stack state: `STACK.md` starts unselected and must be updated before production implementation.
+- Optional frontend template: `frontend/` contains a bundled Next.js starter/template.
 - Canonical LLM Wiki: `wiki/`
 - Generated SQLite state: `data/wiki.sqlite`
 
 ## Hard Rules
 
+- Do not begin website implementation until `STACK.md` has a selected profile or the user explicitly confirms a custom approach.
 - Do not begin website implementation until `PRODUCT.md`, `DESIGN.md`, or equivalent approved wiki decisions define the product and design direction.
 - Keep secrets in environment variables only.
 - Treat `data/wiki.sqlite` as generated state.
@@ -249,23 +316,24 @@ Project-local design and AI skill packs are intentionally not bundled in this ge
 
 ```powershell
 python -m unittest discover -s tests
-python tools/llm_wiki.py task readiness
-python tools/llm_wiki.py quality
+python tools/llm_wiki.py task readiness --json
+python tools/llm_wiki.py stack status
+python tools/llm_wiki.py quality --skip-frontend
 ```
 """
 
-FRONTEND_README = """# Frontend
+FRONTEND_README = """# Optional Frontend Template
 
-This is the generated Next.js app for the site workspace.
+This is the optional bundled Next.js starter/template for the site workspace. It is not the selected stack until `STACK.md` says so.
 
 ```powershell
-npm install
+npm ci
 npm run dev
 npm run lint
 npm run build
 ```
 
-Start implementation only after `PRODUCT.md` and `DESIGN.md` are approved.
+Start implementation only after `PRODUCT.md`, `DESIGN.md`, and `STACK.md` are ready.
 """
 
 FRONTEND_PAGE = """export default function Home() {
@@ -336,7 +404,7 @@ TASK_TEMPLATE = """# Task: Short Action-Oriented Name
 
 Status: planned
 Role owner: Conductor
-Created: {today}
+Created: YYYY-MM-DD
 
 ## Objective
 
@@ -380,7 +448,7 @@ No task validation issues found.
 ## Progress
 
 - No work has started.
-""".format(today=date.today().isoformat())
+"""
 
 WIKI_INDEX = """# Wiki Index
 

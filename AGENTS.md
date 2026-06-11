@@ -13,6 +13,12 @@
 
 This project is an LLM-maintained wiki. The human curates sources and asks questions. The agent maintains the wiki, database index, links, summaries, review queue, and operation log.
 
+## HARNESS_88 Role
+
+HARNESS_88 is a stack-neutral autonomous core for site-development work. New users start from `START_HERE.md`, then choose a stack/fullstack profile and record it in `STACK.md`.
+
+Do not assume Next.js or fullstack has already been selected. The `frontend/` directory is an optional bundled Next.js starter/template, not the default stack.
+
 Primary invariants:
 
 - `raw/` is source-of-truth input. Do not edit raw source files during ingest.
@@ -23,6 +29,7 @@ Primary invariants:
 - `wiki/index.md` is the content catalog. Update it whenever pages are added, moved, renamed, archived, or substantially changed.
 - `wiki/log.md` is append-only. Every ingest, query saved to wiki, lint pass, migration, and major maintenance action gets a parseable entry.
 - `ingest_jobs` is an agent-assisted queue. The CLI prepares source packages; the agent still performs the semantic wiki edits.
+- `STACK.md` records the selected stack state. Production implementation waits until it is selected or the user explicitly confirms a custom approach.
 
 ## Required Agent Workflow
 
@@ -56,6 +63,7 @@ Core rules:
 ## Harness Engineering Protocol
 
 - Decompose implementation work into durable atomic task files before production implementation.
+- Confirm `STACK.md` is selected, or that the user explicitly confirmed a custom approach, before production implementation.
 - New worker chats should rely on files, not chat history, for product, design, spec, task, progress, checkpoint, and acceptance context.
 - Task, progress, and checkpoint files are the canonical execution state for delegated implementation work.
 - Knowledge Steward records durable outcomes, decisions, and unresolved follow-ups in the wiki.

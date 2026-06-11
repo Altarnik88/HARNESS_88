@@ -6,6 +6,12 @@ from pathlib import Path
 
 from .quality import quality_exit_code, run_quality
 from .site_generator import create_site_project
+from .stack import (
+    STACK_PROFILES,
+    allowed_profile_text,
+    read_stack_status,
+    select_stack_profile,
+)
 from .tasks import (
     create_task,
     list_tasks,
@@ -77,7 +83,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     quality_parser = subparsers.add_parser("quality", help="Run the project quality gate.")
     quality_parser.add_argument("--full", action="store_true", help="Also run slower full checks such as frontend build.")
+    quality_parser.add_argument("--skip-frontend", action="store_true", help="Run core checks without optional frontend checks.")
     quality_parser.add_argument("--json", action="store_true", help="Emit JSON quality results.")
+
+    stack_parser = subparsers.add_parser("stack", help="Inspect and select the project stack profile.")
+    stack_subparsers = stack_parser.add_subparsers(dest="stack_command", required=True)
+    stack_list_parser = stack_subparsers.add_parser("list", help="List available stack profiles.")
+    stack_list_parser.add_argument("--json", action="store_true", help="Emit JSON stack profiles.")
+    stack_status_parser = stack_subparsers.add_parser("status", help="Show current stack status from STACK.md.")
+    stack_status_parser.add_argument("--json", action="store_true", help="Emit JSON stack status.")
+    stack_select_parser = stack_subparsers.add_parser("select", help="Record the selected stack profile in STACK.md.")
+    stack_select_parser.add_argument("profile", help="Stack profile name.")
+    stack_select_parser.add_argument("--json", action="store_true", help="Emit JSON stack status.")
 
     site_parser = subparsers.add_parser("site", help="Create clean site-development projects.")
     site_subparsers = site_parser.add_subparsers(dest="site_command", required=True)
@@ -205,8 +222,8 @@ def cmd_events(root: Path, limit: int, as_json: bool) -> int:
     return 0
 
 
-def cmd_quality(root: Path, full: bool, as_json: bool) -> int:
-    results = run_quality(root, full=full)
+def cmd_quality(root: Path, full: bool, skip_frontend: bool, as_json: bool) -> int:
+    results = run_quality(root, full=full, skip_frontend=skip_frontend)
     if as_json:
         print(json.dumps([result.to_json() for result in results], ensure_ascii=False, indent=2))
     else:
@@ -219,6 +236,44 @@ def cmd_quality(root: Path, full: bool, as_json: bool) -> int:
             if result.stderr.strip():
                 print(result.stderr.rstrip())
     return quality_exit_code(results)
+
+
+def cmd_stack(args: argparse.Namespace, root: Path) -> int:
+    if args.stack_command == "list":
+        if args.json:
+            print(json.dumps([profile.to_json() for profile in STACK_PROFILES], ensure_ascii=False, indent=2))
+        else:
+            print("Available stack profiles:")
+            for profile in STACK_PROFILES:
+                print(f"- {profile.name}: {profile.description}")
+        return 0
+
+    if args.stack_command == "status":
+        status = read_stack_status(root)
+        if args.json:
+            print(json.dumps(status, ensure_ascii=False, indent=2))
+        else:
+            print(f"Stack status: {status['status']}")
+            print(f"Selected profile: {status['selected_profile']}")
+            if status["note"]:
+                print(f"Note: {status['note']}")
+        return 0 if status["status"] != "missing" else 1
+
+    if args.stack_command == "select":
+        try:
+            status = select_stack_profile(root, args.profile)
+        except ValueError as exc:
+            print(str(exc))
+            print(f"Allowed profiles: {allowed_profile_text()}")
+            return 2
+        if args.json:
+            print(json.dumps(status, ensure_ascii=False, indent=2))
+        else:
+            print(f"Selected stack profile: {status['selected_profile']}")
+            print("STACK.md updated. No dependencies were installed and frontend/ was not changed.")
+        return 0
+
+    raise ValueError(f"Unknown stack command: {args.stack_command}")
 
 
 def cmd_site(args: argparse.Namespace, root: Path) -> int:
@@ -415,7 +470,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "events":
         return cmd_events(root, args.limit, args.json)
     if args.command == "quality":
-        return cmd_quality(root, args.full, args.json)
+        return cmd_quality(root, args.full, args.skip_frontend, args.json)
+    if args.command == "stack":
+        return cmd_stack(args, root)
     if args.command == "site":
         return cmd_site(args, root)
     if args.command == "task":

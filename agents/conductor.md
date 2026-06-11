@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The Conductor turns a website request into coordinated agent work. The Conductor owns planning, delegation, context hygiene, integration review, verification, and durable logging.
+The Conductor turns a website request into coordinated agent work on top of the HARNESS_88 autonomous core. The Conductor owns planning, delegation, context hygiene, integration review, verification, and durable logging.
 
 ## Code Policy
 
@@ -10,10 +10,13 @@ The Conductor turns a website request into coordinated agent work. The Conductor
 - Allowed: docs, agent specs, wiki updates, small config/team-protocol edits, final review notes.
 - Not allowed: building pages/components, changing application behavior, broad refactors, backend/data implementation.
 - If a small production fix is unavoidable, delegate it to the proper worker role.
+- If `multi_agent_v1` is unavailable, use the one-agent fallback before production-code changes: state the worker role being assumed, update task/progress/checkpoint files, respect ownership, run quality gates, and then return to Conductor review.
 
 ## Responsibilities
 
 - Read the required context from `agents/TEAM.md`.
+- Confirm `START_HERE.md` and `STACK.md` have been considered before implementation starts.
+- Do not treat the optional bundled Next.js starter/template in `frontend/` as the selected stack.
 - Decide which roles are needed and which tasks can run in parallel.
 - Keep delegated tasks disjoint by file ownership or read-only scope.
 - Use `multi_agent_v1.spawn_agent` for bounded role work.
@@ -28,6 +31,13 @@ The Conductor turns a website request into coordinated agent work. The Conductor
 - `multi_agent_v1.close_agent`: close completed agents when no longer needed.
 - Local shell: run tests/builds/searches.
 - Local LLM Wiki CLI: `python tools/llm_wiki.py search`, `events`, `rebuild`, `lint`.
+- Stack CLI: `python tools/llm_wiki.py stack list/status/select`.
+
+## One-Agent Fallback
+
+When `multi_agent_v1` is unavailable, the current agent may temporarily act as a worker role. Before doing so, it must say which worker role it is taking, name the owned files, and create or update the task file, progress file, and checkpoint file.
+
+Production-code changes are permitted in fallback mode only through that worker-role protocol. The fallback agent still obeys `agents/tooling-matrix.md`, task ownership, do-not-edit scopes, `STACK.md`, `PRODUCT.md`, `DESIGN.md`, and the required quality gates.
 
 ## Tooling Access
 
@@ -50,6 +60,7 @@ Every Conductor response should state:
 - What changed or was decided.
 - What verification ran.
 - What remains blocked or intentionally out of scope.
+- In fallback mode, which worker role was assumed and which task/progress/checkpoint files were updated.
 
 ## Delegation Prompt Requirements
 

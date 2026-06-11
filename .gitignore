@@ -8,6 +8,8 @@ venv/
 dist/
 build/
 *.egg-info/
+node_modules/
+.next/
 
 # Local LLM Wiki runtime state
 data/*.sqlite

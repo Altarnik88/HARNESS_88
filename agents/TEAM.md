@@ -1,24 +1,28 @@
 # Codex-Native Agents Team
 
-This team is for building multi-page websites with Codex. It is inspired by `peterfei/ai-agent-team`, but adapted to this project, Codex sub-agents, the local LLM Wiki, and the available plugins/MCP servers.
+This team is for building websites with Codex on top of the HARNESS_88 autonomous core. It is inspired by `peterfei/ai-agent-team`, but adapted to this project, Codex sub-agents, the local LLM Wiki, and the available plugins/MCP servers.
 
 ## Operating Rule
 
-The Conductor does not make serious production-code changes. The Conductor plans, delegates, coordinates, reviews, runs verification, and updates durable project knowledge. Production implementation belongs to worker agents with explicit ownership.
+The Conductor does not make serious production-code changes in multi-agent mode. The Conductor plans, delegates, coordinates, reviews, runs verification, and updates durable project knowledge. Production implementation belongs to worker agents with explicit ownership.
+
+The project is stack-neutral until `STACK.md` is selected. The optional bundled Next.js starter/template in `frontend/` is not the default stack.
 
 ## Read Order
 
 For every multi-agent website task, the Conductor reads:
 
 1. `AGENTS.md`
-2. `agents/TEAM.md`
-3. `agents/tooling-matrix.md`
-4. `agents/harness/README.md` when implementation tasks are delegated
-5. `agents/conductor.md`
-6. `purpose.md`
-7. `schema.md`
-8. `wiki/index.md`
-9. Recent `wiki/log.md` entries
+2. `START_HERE.md`
+3. `STACK.md`
+4. `agents/TEAM.md`
+5. `agents/tooling-matrix.md`
+6. `agents/harness/README.md` when implementation tasks are delegated
+7. `agents/conductor.md`
+8. `purpose.md`
+9. `schema.md`
+10. `wiki/index.md`
+11. Recent `wiki/log.md` entries
 
 Role agents read `agents/tooling-matrix.md`, their own role file, and the delegation brief they receive.
 
@@ -55,6 +59,19 @@ Use `multi_agent_v1.spawn_agent` only when the user asks for sub-agents, delegat
 
 Use `agents/templates/delegation-brief.md` as the default prompt shape.
 
+## One-Agent Fallback
+
+If `multi_agent_v1` is unavailable, the current agent may temporarily take the needed worker role. The agent must state the worker role it is assuming before making changes.
+
+Fallback production-code changes are allowed only when the agent follows the harness protocol:
+
+- Confirm `STACK.md`, `PRODUCT.md`, and `DESIGN.md` are ready or record the remaining blocker.
+- Create or update the task file for the work.
+- Create or update the linked progress and checkpoint files.
+- Respect ownership and do-not-edit scopes from the task.
+- Run the required quality gates and record verification evidence.
+- Return to Conductor-style review after the worker-role work is complete.
+
 ## Plugin, MCP, and Skill Policy
 
 - Default deny: agents may use only the skills, plugins, MCP servers, and write scopes listed in `agents/tooling-matrix.md` or explicitly granted in a delegation brief.
@@ -89,6 +106,7 @@ Use `agents/templates/delegation-brief.md` as the default prompt shape.
 For website work, final verification should include the relevant subset of:
 
 - Repo-specific tests/builds.
+- `python tools/llm_wiki.py stack status`
 - `python tools/llm_wiki.py rebuild`
 - `python tools/llm_wiki.py lint`
 - Browser/Playwright local UI check after frontend changes.

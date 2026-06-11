@@ -14,6 +14,7 @@ class QualityStep:
     name: str
     command: list[str]
     cwd: Path
+    preflight_message: str = ""
 
     def command_text(self) -> str:
         return " ".join(self.command)
@@ -44,26 +45,41 @@ class QualityResult:
 StepRunner = Callable[[QualityStep], tuple[int, str, str]]
 
 
-def build_quality_steps(root: Path, full: bool = False) -> list[QualityStep]:
+def build_quality_steps(root: Path, full: bool = False, skip_frontend: bool = False) -> list[QualityStep]:
     steps = [
         QualityStep("python-tests", [sys.executable, "-m", "unittest", "discover", "-s", "tests"], root),
         QualityStep("wiki-rebuild", [sys.executable, "tools/llm_wiki.py", "rebuild"], root),
         QualityStep("wiki-lint-strict", [sys.executable, "tools/llm_wiki.py", "lint", "--strict"], root),
     ]
+    if skip_frontend:
+        return steps
     frontend = root / "frontend"
     if (frontend / "package.json").exists():
+        if not (frontend / "node_modules").exists():
+            steps.append(
+                QualityStep(
+                    "frontend-dependencies",
+                    ["npm", "ci"],
+                    frontend,
+                    "Frontend dependencies are not installed. Run: cd frontend && npm ci",
+                )
+            )
+            return steps
         steps.append(QualityStep("frontend-lint", ["npm", "run", "lint"], frontend))
         if full:
             steps.append(QualityStep("frontend-build", ["npm", "run", "build"], frontend))
     return steps
 
 
-def run_quality(root: Path, full: bool = False, runner: StepRunner | None = None) -> list[QualityResult]:
+def run_quality(root: Path, full: bool = False, skip_frontend: bool = False, runner: StepRunner | None = None) -> list[QualityResult]:
     execute = runner or run_subprocess
     results: list[QualityResult] = []
-    for step in build_quality_steps(root, full):
+    for step in build_quality_steps(root, full, skip_frontend):
         started = time.perf_counter()
-        exit_code, stdout, stderr = execute(step)
+        if step.preflight_message:
+            exit_code, stdout, stderr = 1, step.preflight_message, ""
+        else:
+            exit_code, stdout, stderr = execute(step)
         duration = time.perf_counter() - started
         results.append(
             QualityResult(

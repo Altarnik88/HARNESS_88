@@ -22,6 +22,7 @@ class QualityGateTests(unittest.TestCase):
             root = Path(tmp)
             (root / "frontend").mkdir()
             (root / "frontend" / "package.json").write_text("{}", encoding="utf-8")
+            (root / "frontend" / "node_modules").mkdir()
 
             steps = build_quality_steps(root, full=False)
 
@@ -35,11 +36,45 @@ class QualityGateTests(unittest.TestCase):
             root = Path(tmp)
             (root / "frontend").mkdir()
             (root / "frontend" / "package.json").write_text("{}", encoding="utf-8")
+            (root / "frontend" / "node_modules").mkdir()
 
             steps = build_quality_steps(root, full=True)
 
             self.assertEqual(steps[-2].name, "frontend-lint")
             self.assertEqual(steps[-1].name, "frontend-build")
+
+    def test_skip_frontend_omits_frontend_steps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "frontend").mkdir()
+            (root / "frontend" / "package.json").write_text("{}", encoding="utf-8")
+
+            steps = build_quality_steps(root, full=True, skip_frontend=True)
+
+            self.assertEqual(
+                [step.name for step in steps],
+                ["python-tests", "wiki-rebuild", "wiki-lint-strict"],
+            )
+
+    def test_missing_frontend_dependencies_get_clear_preflight_result(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "frontend").mkdir()
+            (root / "frontend" / "package.json").write_text("{}", encoding="utf-8")
+            calls: list[str] = []
+
+            def fake_runner(step):
+                calls.append(step.name)
+                return 0, "ok", ""
+
+            results = run_quality(root, runner=fake_runner)
+
+            names = [result.name for result in results]
+            self.assertIn("frontend-dependencies", names)
+            self.assertNotIn("frontend-lint", names)
+            dependency_result = next(result for result in results if result.name == "frontend-dependencies")
+            self.assertNotEqual(dependency_result.exit_code, 0)
+            self.assertIn("cd frontend && npm ci", dependency_result.stdout)
 
     def test_run_quality_continues_after_failed_step(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

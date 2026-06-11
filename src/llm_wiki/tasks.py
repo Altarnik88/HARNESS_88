@@ -8,6 +8,7 @@ from pathlib import Path
 from .harness import ALLOWED_TASK_STATUSES, ROLE_OWNER_RE, STATUS_RE, validate_harness
 from .markdown import slugify
 from .paths import relative_posix
+from .stack import stack_is_selected
 
 
 TASK_TITLE_RE = re.compile(r"^#\s+Task:\s*(?P<title>.+?)\s*$", re.MULTILINE)
@@ -169,13 +170,20 @@ def task_metrics(root: Path) -> dict[str, object]:
 def readiness_report(root: Path) -> dict[str, object]:
     issues = validate_harness(root)
     pending_decisions: list[str] = []
+    product_design_pending: list[str] = []
     if not brief_is_approved(root / "PRODUCT.md"):
-        pending_decisions.append("PRODUCT.md")
+        product_design_pending.append("PRODUCT.md")
     if not brief_is_approved(root / "DESIGN.md"):
-        pending_decisions.append("DESIGN.md")
+        product_design_pending.append("DESIGN.md")
+    pending_decisions.extend(product_design_pending)
+    stack_ready = stack_is_selected(root)
+    if not stack_ready:
+        pending_decisions.append("STACK.md")
     return {
         "environment_ready": not issues,
-        "product_design_ready": not pending_decisions,
+        "product_design_ready": not product_design_pending,
+        "stack_ready": stack_ready,
+        "implementation_ready": not pending_decisions,
         "pending_decisions": pending_decisions,
         "harness_issue_count": len(issues),
         "task_metrics": task_metrics(root),

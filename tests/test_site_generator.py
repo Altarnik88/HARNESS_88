@@ -27,8 +27,11 @@ class SiteGeneratorTests(unittest.TestCase):
 
             self.assertEqual(result.target, target)
             self.assertTrue((target / "AGENTS.md").exists())
+            self.assertTrue((target / "START_HERE.md").exists())
+            self.assertTrue((target / "STACK.md").exists())
             self.assertTrue((target / "LICENSE").exists())
             self.assertTrue((target / "NOTICE" / "THIRD_PARTY.md").exists())
+            self.assertTrue((target / "agents" / "harness" / "stack-options.md").exists())
             self.assertTrue((target / "frontend" / "src" / "app" / "page.tsx").exists())
             self.assertTrue((target / "raw" / "sources" / ".gitkeep").exists())
             self.assertTrue((target / "raw" / "assets" / ".gitkeep").exists())
@@ -56,6 +59,8 @@ class SiteGeneratorTests(unittest.TestCase):
             )
             self.assertNotIn("C:\\Users\\Io", text)
             self.assertNotIn("To get started, edit the " + "page.tsx file.", text)
+            self.assertIn("optional bundled Next.js starter", (target / "README.md").read_text(encoding="utf-8"))
+            self.assertIn("status: unselected", (target / "STACK.md").read_text(encoding="utf-8"))
             self.assertIn("Project ready", (target / "frontend" / "src" / "app" / "page.tsx").read_text(encoding="utf-8"))
 
     def test_generated_project_readiness_reports_pending_briefs(self) -> None:
@@ -71,7 +76,7 @@ class SiteGeneratorTests(unittest.TestCase):
             payload = json.loads(stdout.getvalue())
             self.assertTrue(payload["environment_ready"])
             self.assertFalse(payload["product_design_ready"])
-            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md"])
+            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md"])
 
     def test_cli_site_init_creates_project(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
