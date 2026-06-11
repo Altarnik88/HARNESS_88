@@ -1,6 +1,6 @@
 # HARNESS_88
 
-HARNESS_88 is a stack-neutral autonomous core for site-development work. It gives a coding agent durable briefs, task files, progress/checkpoint files, wiki memory, and quality gates before any production implementation starts.
+HARNESS_88 is a stack-neutral autonomous core for site-development work. It gives a coding agent durable briefs, task files, progress/checkpoint files, wiki memory, approval gates, audit/remediation loops, and release handoff before any production implementation ships.
 
 Start fresh clones with [START_HERE.md](START_HERE.md).
 
@@ -13,9 +13,12 @@ In readiness and doctor output, `core_development_ready` means the HARNESS_88 co
 ## What Is Included
 
 - `START_HERE.md`: first-chat instructions for a new user.
+- `SITE_INTAKE.md`: machine-checkable first-run intake and reference approval gate.
 - `STACK.md`: the controlled stack selection state. It starts as `status: unselected`.
 - `PRODUCT.md` and `DESIGN.md`: durable product and design contracts with explicit `draft`, `approved`, or `needs-review` statuses.
 - `agents/`: role docs, delegation protocol, and harness templates.
+- `agents/workflows/agentic-site-delivery.md`: canonical agentic site delivery workflow from intake to final audit, user approval, and VPS handoff.
+- `agents/workflows/secret-broker.md`: contract for secret-safe backend/deployment configuration without exposing secret values to agents.
 - `wiki/`: LLM-maintained Markdown knowledge base.
 - `src/llm_wiki/` and `tools/llm_wiki.py`: local CLI for wiki, task, stack, and quality workflows.
 - `frontend/`: optional bundled Next.js starter/template, not the default selected stack.
@@ -29,6 +32,7 @@ In readiness and doctor output, `core_development_ready` means the HARNESS_88 co
 
 ```powershell
 python tools/llm_wiki.py task readiness --json
+python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor --skip-self-test
@@ -47,12 +51,17 @@ npm run build
 ## Development Flow
 
 1. Open a chat in the repository root and follow `START_HERE.md`.
-2. Choose a stack/fullstack profile and record it in `STACK.md`.
-3. Fill in `PRODUCT.md` with the website goal, audience, scope, and acceptance criteria, then set `Status: approved` when accepted.
-4. Fill in `DESIGN.md` with visual direction, UX constraints, and component rules, then set `Status: approved` when accepted.
-5. Create atomic task files with `python tools/llm_wiki.py task create ...`.
-6. Implement only from approved briefs, selected stack state, and task ownership.
-7. Run `python tools/llm_wiki.py quality --skip-frontend` for core checks, and frontend checks only when the optional frontend is in scope.
+2. Run the first-run intake and record accepted answers in `SITE_INTAKE.md`.
+3. Choose a stack/fullstack profile and record it in `STACK.md`.
+4. Fill in `PRODUCT.md` with the website goal, audience, scope, and acceptance criteria, then set `Status: approved` when accepted.
+5. Include commerce mode in the brief: no commerce, catalog only, online payment, offline payment, request to manager, or mixed.
+6. Fill in `DESIGN.md` with visual direction, UX constraints, reference expectations, and component rules, then set `Status: approved` when accepted.
+7. Approve user-provided or agent-proposed reference sites and set `references_status: approved` in `SITE_INTAKE.md` before serious frontend implementation.
+8. Create atomic task files with `python tools/llm_wiki.py task create ...`.
+9. Implement only from approved intake, approved briefs, selected stack state, approved references, and task ownership.
+10. Show frontend previews for approval, then implement backend/data/payment/request flows as approved.
+11. Run total agent audit, fix findings through tracked tasks, and show the final site for user approval before publish instructions.
+12. Run `python tools/llm_wiki.py quality --skip-frontend` for core checks, and frontend checks only when the optional frontend is in scope.
 
 ## Core Diagnostics
 

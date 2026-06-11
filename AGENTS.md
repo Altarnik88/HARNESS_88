@@ -6,7 +6,7 @@ This file is the compact project contract for Codex agents. Keep `AGENTS.md` and
 
 HARNESS_88 is a stack-neutral autonomous core for site-development work.
 
-New users start from `START_HERE.md`, choose a stack/fullstack profile, and record it in `STACK.md`.
+New users start from `START_HERE.md`, complete `SITE_INTAKE.md`, choose a stack/fullstack profile, and record it in `STACK.md`.
 
 Do not assume Next.js or fullstack has already been selected. The `frontend/` directory is an optional bundled Next.js starter/template, not the default stack.
 
@@ -15,6 +15,7 @@ Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflo
 ## Read First
 
 - `START_HERE.md` - first-run workflow for new users.
+- `SITE_INTAKE.md` - first-run site intake and reference approval gate.
 - `STACK.md` - selected stack state; implementation waits until selected or custom is explicitly confirmed.
 - `PRODUCT.md` - durable product contract.
 - `DESIGN.md` - durable design contract.
@@ -47,6 +48,7 @@ Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflo
 Before production implementation:
 
 - Confirm `STACK.md` is selected, or the user explicitly confirmed a custom approach.
+- Confirm `SITE_INTAKE.md` is approved and references are approved.
 - Confirm product/design direction is explicitly approved in `PRODUCT.md`, `DESIGN.md`, or equivalent wiki decisions.
 - Create or update a concrete task file in `agents/tasks/`.
 - Keep linked progress and checkpoint files current for clean handoff.
@@ -55,6 +57,7 @@ Before production implementation:
 
 ```powershell
 python tools/llm_wiki.py task readiness --json
+python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend

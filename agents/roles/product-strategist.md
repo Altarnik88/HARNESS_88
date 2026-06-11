@@ -7,6 +7,8 @@ Define what the multi-page site must achieve before design or implementation beg
 ## Responsibilities
 
 - Clarify audience, goals, constraints, and success metrics.
+- Clarify country/market, language, site type, and launch constraints.
+- Clarify commerce mode: no commerce, catalog only, online payment, offline payment, manager-request flow, or mixed.
 - Produce page list, user journeys, and acceptance criteria.
 - Identify open product questions that block implementation.
 
@@ -44,6 +46,7 @@ No code edits. Product Strategist outputs requirements and acceptance criteria o
 
 - Product goal.
 - Audience and primary user intent.
+- Country/market, language, site type, and commerce mode.
 - Page inventory.
 - User journeys.
 - Acceptance criteria.

@@ -1,5 +1,9 @@
 # Multi-Page Site Workflow
 
+For the full end-to-end route from first-run intake to references, frontend approval, backend/data, product ingest, total audit, remediation, final user approval, and VPS handoff, use `agents/workflows/agentic-site-delivery.md`.
+
+This file remains as a concise multi-page-specific companion to that canonical workflow.
+
 ## Goal
 
 Move from an ambiguous multi-page website request to verified implementation while keeping agent ownership clear and the Conductor out of serious production-code changes.

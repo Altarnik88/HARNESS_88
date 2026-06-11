@@ -16,10 +16,12 @@ from llm_wiki.harness import validate_harness
 
 REQUIRED_HARNESS_FILES = [
     "START_HERE.md",
+    "SITE_INTAKE.md",
     "STACK.md",
     "PRODUCT.md",
     "DESIGN.md",
     "agents/harness/README.md",
+    "agents/harness/site-intake-template.md",
     "agents/harness/stack-options.md",
     "agents/harness/prd-template.md",
     "agents/harness/spec-template.md",

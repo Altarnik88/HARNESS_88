@@ -23,3 +23,15 @@ Append durable project events using:
 - Path: `src/llm_wiki/cli.py`
 - Path: `README.md`
 - Path: `AGENTS.md`
+
+## [2026-06-11] maintenance | Recorded agentic site delivery workflow gates
+- Path: `agents/workflows/agentic-site-delivery.md`
+- Path: `agents/workflows/secret-broker.md`
+- Path: `START_HERE.md`
+- Path: `README.md`
+
+## [2026-06-11] maintenance | Added machine-checkable site intake and reference gates
+- Path: `SITE_INTAKE.md`
+- Path: `src/llm_wiki/intake.py`
+- Path: `agents/harness/site-intake-template.md`
+- Path: `src/llm_wiki/templates/site_starter/SITE_INTAKE.md`

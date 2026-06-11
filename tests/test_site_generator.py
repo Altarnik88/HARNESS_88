@@ -42,6 +42,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertEqual(result.target, target)
             self.assertTrue((target / "AGENTS.md").exists())
             self.assertTrue((target / "START_HERE.md").exists())
+            self.assertTrue((target / "SITE_INTAKE.md").exists())
             self.assertTrue((target / "STACK.md").exists())
             self.assertTrue((target / "LICENSE").exists())
             self.assertTrue((target / "NOTICE" / "THIRD_PARTY.md").exists())
@@ -91,7 +92,44 @@ class SiteGeneratorTests(unittest.TestCase):
             payload = json.loads(stdout.getvalue())
             self.assertTrue(payload["environment_ready"])
             self.assertFalse(payload["product_design_ready"])
-            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md"])
+            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md", "SITE_INTAKE.md", "references"])
+            self.assertFalse(payload["intake_ready"])
+            self.assertFalse(payload["references_ready"])
+
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                code = main(["--root", str(target), "site", "intake", "--json"])
+
+            self.assertEqual(code, 0)
+            intake = json.loads(stdout.getvalue())
+            self.assertEqual(intake["path"], "SITE_INTAKE.md")
+            self.assertFalse(intake["intake_ready"])
+
+    def test_generated_project_includes_agentic_delivery_gates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+            create_site_project(ROOT, target)
+
+            workflow = (target / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
+            tooling = (target / "AGENT_SITE_TOOLING.md").read_text(encoding="utf-8")
+            start_here = (target / "START_HERE.md").read_text(encoding="utf-8")
+
+            for needle in [
+                "ecommerce with online payment",
+                "purchase request/lead form for a manager",
+                "Reference Gate",
+                "Total Agent Audit",
+                "Remediation Plan and Fix Loop",
+                "Final User Approval",
+                "VPS publication instructions",
+            ]:
+                self.assertIn(needle, workflow)
+            self.assertIn("Do not begin serious frontend implementation", tooling)
+            self.assertIn("Never ask the user to paste secrets into chat", tooling)
+            self.assertIn("ecommerce/catalog/payment/request mode", start_here)
+            self.assertIn("site intake --json", start_here)
+            self.assertIn("SITE_INTAKE.md", tooling)
+            self.assertTrue((target / "agents" / "workflows" / "secret-broker.md").exists())
 
     def test_cli_site_init_creates_project(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

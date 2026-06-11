@@ -66,6 +66,31 @@ Expected result:
 - Verification evidence: pending until verified.
 """
 
+APPROVED_INTAKE = """# Site Intake
+
+Status: approved
+
+goal: Launch a services site.
+audience: Local buyers.
+country: Poland
+language: Polish
+site_type: landing
+catalog_mode: none
+payment_request_mode: request-to-manager
+design_style: clean professional
+reference_mode: agent-suggested
+references_status: approved
+content_sources: user-provided copy
+stack_expectations: static frontend
+deploy_expectations: VPS after approval
+backend: none
+data: none
+auth: none
+admin: none
+integrations: contact form
+product_catalog_document: not-required
+"""
+
 
 class TaskQueueTests(unittest.TestCase):
     def write_task(
@@ -228,6 +253,8 @@ class TaskQueueTests(unittest.TestCase):
             self.assertIn("PRODUCT.md", report["pending_decisions"])
             self.assertIn("DESIGN.md", report["pending_decisions"])
             self.assertIn("STACK.md", report["pending_decisions"])
+            self.assertIn("SITE_INTAKE.md", report["pending_decisions"])
+            self.assertIn("references", report["pending_decisions"])
             self.assertIn("blockers", report)
             self.assertIn("next_command", report)
             self.assertIn("files_to_edit", report)
@@ -240,11 +267,14 @@ class TaskQueueTests(unittest.TestCase):
             (root / "PRODUCT.md").write_text("Status: approved\n", encoding="utf-8")
             (root / "DESIGN.md").write_text("Status: approved\n", encoding="utf-8")
             (root / "STACK.md").write_text("status: selected\nselected_profile: next-static\n", encoding="utf-8")
+            (root / "SITE_INTAKE.md").write_text(APPROVED_INTAKE, encoding="utf-8")
 
             report = readiness_report(root)
 
             self.assertTrue(report["product_design_ready"])
             self.assertTrue(report["stack_ready"])
+            self.assertTrue(report["intake_ready"])
+            self.assertTrue(report["references_ready"])
             self.assertFalse(report["core_development_ready"])
             self.assertTrue(report["site_implementation_ready"])
             self.assertTrue(report["implementation_ready"])
@@ -258,6 +288,7 @@ class TaskQueueTests(unittest.TestCase):
         self.assertFalse(report["implementation_ready"])
         self.assertIn("PRODUCT.md", report["pending_decisions"])
         self.assertIn("STACK.md", report["pending_decisions"])
+        self.assertIn("SITE_INTAKE.md", report["pending_decisions"])
 
     def test_set_task_status_rejects_invalid_transition_without_force(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

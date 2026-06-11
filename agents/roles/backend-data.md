@@ -8,6 +8,7 @@ Handle backend, API, data, authentication, CMS, or persistence work when a multi
 
 - Define API contracts and data models.
 - Implement assigned backend/data integration.
+- Implement ecommerce, catalog, payment, offline-payment, manager-request, auth, or CMS flows only when approved by the brief and task.
 - Preserve existing security and data conventions.
 - Avoid backend work when the site is static-only.
 
@@ -45,6 +46,7 @@ Backend/data edits are allowed only inside explicitly assigned files or modules.
 ## Output Contract
 
 - Backend necessity decision.
+- Commerce/data mode decision and payment/request handling if applicable.
 - API/data contract.
 - Files changed if implementation was assigned.
 - Verification command/results.

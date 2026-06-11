@@ -100,6 +100,8 @@ Fallback production-code changes are allowed only when the agent follows the har
 - Conductor escalates to Performance/SEO before release or when pages include marketing/discovery goals.
 - Conductor escalates to DevOps/Release when build/deploy/CI/environment behavior matters.
 - Conductor escalates to Knowledge Steward after durable decisions or completed website milestones.
+- Conductor escalates to Backend/Data when intake selects ecommerce, catalog, online/offline payment, manager-request flow, auth, database, CMS, or integrations.
+- Conductor must run the total audit and remediation loop in `agents/workflows/agentic-site-delivery.md` before final publish handoff.
 
 ## Required Verification
 
@@ -112,9 +114,13 @@ For website work, final verification should include the relevant subset of:
 - Browser/Playwright local UI check after frontend changes.
 - QA/accessibility review for new or changed user flows.
 - Performance/SEO audit before release.
+- Security/dependency audit when frontend/backend dependencies are present.
+- Final user approval after remediation and before VPS publication instructions.
 
 ## References
 
+- `agents/workflows/agentic-site-delivery.md`
 - `agents/workflows/multipage-site.md`
+- `agents/workflows/secret-broker.md`
 - `agents/templates/delegation-brief.md`
 - `https://github.com/peterfei/ai-agent-team`

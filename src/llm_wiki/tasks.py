@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .harness import ALLOWED_TASK_STATUSES, ROLE_OWNER_RE, STATUS_RE, validate_harness
+from .intake import intake_status
 from .markdown import slugify
 from .paths import relative_posix
 from .stack import stack_is_selected
@@ -205,7 +206,14 @@ def readiness_report(root: Path) -> dict[str, object]:
     stack_ready = stack_is_selected(root)
     if not stack_ready:
         pending_decisions.append("STACK.md")
-    blockers = readiness_blockers(root, issues, briefs, stack_ready)
+    intake = intake_status(root)
+    intake_ready = bool(intake["intake_ready"])
+    references_ready = bool(intake["references_ready"])
+    if not intake_ready:
+        pending_decisions.append("SITE_INTAKE.md")
+    if not references_ready:
+        pending_decisions.append("references")
+    blockers = readiness_blockers(root, issues, briefs, stack_ready, intake)
     files_to_edit = sorted({blocker["path"] for blocker in blockers if blocker.get("path")})
     core_development_ready = not issues
     site_implementation_ready = not pending_decisions
@@ -214,12 +222,15 @@ def readiness_report(root: Path) -> dict[str, object]:
         "core_development_ready": core_development_ready,
         "product_design_ready": not product_design_pending,
         "stack_ready": stack_ready,
+        "intake_ready": intake_ready,
+        "references_ready": references_ready,
         "site_implementation_ready": site_implementation_ready,
         "implementation_ready": site_implementation_ready,
         "pending_decisions": pending_decisions,
         "harness_issue_count": len(issues),
         "task_metrics": task_metrics(root),
         "briefs": briefs,
+        "intake": intake,
         "blockers": blockers,
         "files_to_edit": files_to_edit,
         "next_command": next_readiness_command(blockers),
@@ -273,7 +284,13 @@ def brief_status(path: Path) -> dict[str, object]:
     }
 
 
-def readiness_blockers(root: Path, issues, briefs: dict[str, dict[str, object]], stack_ready: bool) -> list[dict[str, str]]:
+def readiness_blockers(
+    root: Path,
+    issues,
+    briefs: dict[str, dict[str, object]],
+    stack_ready: bool,
+    intake: dict[str, object],
+) -> list[dict[str, str]]:
     blockers: list[dict[str, str]] = []
     for issue in issues:
         blockers.append(
@@ -303,6 +320,9 @@ def readiness_blockers(root: Path, issues, briefs: dict[str, dict[str, object]],
                 "next_command": "python tools/llm_wiki.py stack list",
             }
         )
+    for blocker in intake.get("blockers", []):
+        assert isinstance(blocker, dict)
+        blockers.append({key: str(value) for key, value in blocker.items()})
     if not list_tasks(root):
         blockers.append(
             {
@@ -340,6 +360,20 @@ def suggested_readiness_tasks(pending_decisions: list[str]) -> list[dict[str, st
             {
                 "title": "Select Stack Profile",
                 "objective": "Choose a stack/fullstack profile and record it with python tools/llm_wiki.py stack select <profile>.",
+            }
+        )
+    if "SITE_INTAKE.md" in pending_decisions:
+        suggestions.append(
+            {
+                "title": "Approve Site Intake",
+                "objective": "Capture the first-run site intake in SITE_INTAKE.md and set Status: approved after decisions are accepted.",
+            }
+        )
+    if "references" in pending_decisions:
+        suggestions.append(
+            {
+                "title": "Approve Site References",
+                "objective": "Record user-provided or agent-suggested references and set references_status: approved in SITE_INTAKE.md.",
             }
         )
     return suggestions

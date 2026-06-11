@@ -18,6 +18,7 @@ def build_doctor_report(root: Path, skip_self_test: bool = False, run_security: 
         "readiness": readiness,
         "stack": read_stack_status(root),
         "briefs": readiness["briefs"],
+        "intake": readiness["intake"],
         "tasks": {
             "metrics": task_metrics(root),
             "issue_count": len(task_issues),

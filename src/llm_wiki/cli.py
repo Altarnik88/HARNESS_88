@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .doctor import build_doctor_report
+from .intake import intake_status
 from .quality import quality_exit_code, run_quality
 from .security import run_security_audit
 from .site_generator import create_site_project
@@ -107,6 +108,8 @@ def build_parser() -> argparse.ArgumentParser:
     site_init_parser.add_argument("--json", action="store_true", help="Emit JSON init result.")
     site_self_test_parser = site_subparsers.add_parser("self-test", help="Create a temporary starter and run core self-test.")
     site_self_test_parser.add_argument("--json", action="store_true", help="Emit JSON self-test results.")
+    site_intake_parser = site_subparsers.add_parser("intake", help="Report first-run site intake and reference gates.")
+    site_intake_parser.add_argument("--json", action="store_true", help="Emit JSON site intake status.")
     site_doctor_parser = site_subparsers.add_parser("doctor", help="Report unified project health and next actions.")
     site_doctor_parser.add_argument("--json", action="store_true", help="Emit JSON doctor report.")
     site_doctor_parser.add_argument("--skip-self-test", action="store_true", help="Skip generated-project self-test.")
@@ -323,6 +326,13 @@ def cmd_site(args: argparse.Namespace, root: Path) -> int:
         else:
             print_self_test_result(result.to_json())
         return 0 if result.status == "passed" else 1
+    if args.site_command == "intake":
+        status = intake_status(root)
+        if args.json:
+            print(json.dumps(status, ensure_ascii=False, indent=2))
+        else:
+            print_intake_status(status)
+        return 0
     if args.site_command == "doctor":
         report = build_doctor_report(root, skip_self_test=args.skip_self_test, run_security=args.run_security)
         if args.json:
@@ -440,6 +450,8 @@ def cmd_task(args: argparse.Namespace, root: Path) -> int:
             print(f"Environment: {env}")
             print(f"Core development: {'ready' if report['core_development_ready'] else 'has issues'}")
             print(f"Product/design: {product}")
+            print(f"Site intake: {'ready' if report['intake_ready'] else 'pending'}")
+            print(f"References: {'ready' if report['references_ready'] else 'pending'}")
             print(f"Site implementation: {'ready' if report['site_implementation_ready'] else 'not configured'}")
             pending = report["pending_decisions"]
             if pending:
@@ -472,6 +484,8 @@ def print_doctor_report(report: dict[str, object]) -> None:
     readiness = report["readiness"]
     assert isinstance(readiness, dict)
     print(f"Core workflow: {'ready' if readiness['core_development_ready'] else 'has issues'}")
+    print(f"Site intake: {'ready' if readiness['intake_ready'] else 'pending'}")
+    print(f"References: {'ready' if readiness['references_ready'] else 'pending'}")
     print(f"Site implementation: {'ready' if readiness['site_implementation_ready'] else 'not configured'}")
     print(f"Next command: {readiness['next_command']}")
     blockers = readiness.get("blockers", [])
@@ -480,6 +494,24 @@ def print_doctor_report(report: dict[str, object]) -> None:
         for blocker in blockers:
             assert isinstance(blocker, dict)
             print(f"- {blocker['path']}: {blocker['message']}")
+
+
+def print_intake_status(status: dict[str, object]) -> None:
+    print(f"Site intake: {'ready' if status['intake_ready'] else 'pending'}")
+    print(f"References: {'ready' if status['references_ready'] else 'pending'}")
+    print(f"Path: {status['path']}")
+    print(f"Status: {status['status']}")
+    missing = status.get("missing_fields", [])
+    if missing:
+        print("Missing fields:")
+        for field in missing:
+            print(f"- {field}")
+    blockers = status.get("blockers", [])
+    if blockers:
+        print("Blockers:")
+        for blocker in blockers:
+            assert isinstance(blocker, dict)
+            print(f"- {blocker['message']}")
 
 
 def print_security_result(payload: dict[str, object]) -> None:

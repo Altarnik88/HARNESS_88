@@ -9,6 +9,7 @@ HARNESS_88 is a stack-neutral autonomous core. The stack state lives in root `ST
 - Clean-context execution uses project files as the source of truth.
 - Each real implementation starts from product, design, stack, spec, task, progress, checkpoint, and acceptance artifacts.
 - Production implementation waits until `STACK.md` is selected or the user explicitly confirms a custom approach.
+- Production implementation waits until `SITE_INTAKE.md` is `Status: approved` and its `references_status` is `approved`.
 - `PRODUCT.md` and `DESIGN.md` must use explicit statuses: `draft`, `approved`, or `needs-review`. Only `approved` unlocks implementation.
 - The Conductor creates or assigns atomic task files before production implementation.
 - Workers update progress and checkpoint files as work moves through preflight, implementation, verification, and review.
@@ -33,6 +34,7 @@ assigned checkpoint file
 ## Artifact Roles
 
 - `prd-template.md` captures the product problem, audience, requirements, and acceptance criteria.
+- `site-intake-template.md` captures first-run site intake decisions before product/design/stack approval.
 - `spec-template.md` turns an approved product/design brief into implementation decisions.
 - `task-template.md` defines one atomic unit of work with owner, scope, tooling, and evidence.
 - `stack-options.md` summarizes selectable stack/fullstack profiles. `stack-profiles.json` defines the CLI-readable profile metadata. Neither file scaffolds those stacks.
@@ -46,6 +48,8 @@ assigned checkpoint file
 `python tools/llm_wiki.py lint --strict` checks both wiki health and harness structure. Harness lint verifies required root files, task statuses, required task sections, and verification evidence for `verified` or `done` task files.
 
 Use `python tools/llm_wiki.py site doctor` for a unified readiness, stack, brief, task, wiki, frontend, security, and generated-starter self-test report.
+
+Use `python tools/llm_wiki.py site intake --json` for machine-readable first-run intake and reference approval state.
 
 Use `python tools/llm_wiki.py quality --skip-frontend` as the default core completion gate. It runs Python tests, wiki rebuild, and strict lint.
 

@@ -15,6 +15,7 @@ ROOT_FILES = [
     "NOTICE/THIRD_PARTY.md",
     "PRODUCT.md",
     "README.md",
+    "SITE_INTAKE.md",
     "STACK.md",
     "START_HERE.md",
     "llms.txt",

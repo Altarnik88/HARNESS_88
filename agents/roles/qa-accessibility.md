@@ -10,6 +10,7 @@ Validate that the multi-page site works, is accessible, and meets acceptance cri
 - Check responsive behavior and major user flows.
 - Identify accessibility issues.
 - Report bugs with reproducible steps.
+- Support the total audit before release by reporting functional, responsive, accessibility, and residual-risk findings.
 
 ## Sub-Agents
 
@@ -55,4 +56,5 @@ No feature implementation. Test files or tiny test fixtures only when explicitly
 - Commands/checks run.
 - Bugs with steps and expected/actual behavior.
 - Accessibility issues.
+- Total-audit findings when this role participates in release review.
 - Residual risk.

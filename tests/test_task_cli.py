@@ -133,9 +133,11 @@ class TaskCliTests(unittest.TestCase):
             self.assertEqual(code, 0)
             payload = json.loads(output)
             self.assertFalse(payload["product_design_ready"])
-            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md"])
+            self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md", "SITE_INTAKE.md", "references"])
             self.assertIn("blockers", payload)
             self.assertEqual(payload["briefs"]["PRODUCT.md"]["status"], "draft")
+            self.assertFalse(payload["intake_ready"])
+            self.assertFalse(payload["references_ready"])
 
     def test_task_set_status_requires_force_for_invalid_transition(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
