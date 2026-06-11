@@ -32,6 +32,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertTrue((target / "LICENSE").exists())
             self.assertTrue((target / "NOTICE" / "THIRD_PARTY.md").exists())
             self.assertTrue((target / "agents" / "harness" / "stack-options.md").exists())
+            self.assertTrue((target / "agents" / "protocols" / "wiki-operations.md").exists())
             self.assertTrue((target / "frontend" / "src" / "app" / "page.tsx").exists())
             self.assertTrue((target / "raw" / "sources" / ".gitkeep").exists())
             self.assertTrue((target / "raw" / "assets" / ".gitkeep").exists())

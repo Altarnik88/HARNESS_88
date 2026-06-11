@@ -28,6 +28,7 @@ COPY_PATHS = [
     "agents/TEAM.md",
     "agents/conductor.md",
     "agents/harness",
+    "agents/protocols",
     "agents/roles",
     "agents/templates",
     "agents/tooling-matrix.md",
