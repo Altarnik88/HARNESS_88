@@ -41,3 +41,9 @@ Append durable project events using:
 - Path: `src/llm_wiki/gates.py`
 - Path: `agents/harness/site-gates-template.md`
 - Path: `src/llm_wiki/templates/site_starter/SITE_GATES.md`
+
+## [2026-06-11] maintenance | Added task evidence summaries for audit and remediation gates
+- Path: `src/llm_wiki/evidence.py`
+- Path: `src/llm_wiki/cli.py`
+- Path: `agents/tasks/README.md`
+- Path: `agents/tasks/2026-06-11-task-evidence-summaries.md`

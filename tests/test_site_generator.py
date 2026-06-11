@@ -144,6 +144,10 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertIn("SITE_INTAKE.md", tooling)
             self.assertIn("SITE_GATES.md", tooling)
             self.assertTrue((target / "agents" / "workflows" / "secret-broker.md").exists())
+            self.assertIn(
+                "task evidence --json",
+                (target / "agents" / "tasks" / "README.md").read_text(encoding="utf-8"),
+            )
 
     def test_cli_site_init_creates_project(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .doctor import build_doctor_report
+from .evidence import evidence_report
 from .gates import gates_status
 from .intake import intake_status
 from .quality import quality_exit_code, run_quality
@@ -159,6 +160,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     task_report_parser = task_subparsers.add_parser("report", help="Summarize task queue metrics.")
     task_report_parser.add_argument("--json", action="store_true", help="Emit JSON metrics.")
+
+    task_evidence_parser = task_subparsers.add_parser("evidence", help="Summarize task, progress, and checkpoint evidence.")
+    task_evidence_parser.add_argument("--json", action="store_true", help="Emit JSON evidence summary.")
 
     task_readiness_parser = task_subparsers.add_parser("readiness", help="Report harness readiness and pending decisions.")
     task_readiness_parser.add_argument("--json", action="store_true", help="Emit JSON readiness report.")
@@ -450,6 +454,14 @@ def cmd_task(args: argparse.Namespace, root: Path) -> int:
                     print(f"- {status}: {count}")
         return 0
 
+    if args.task_command == "evidence":
+        report = evidence_report(root)
+        if args.json:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+        else:
+            print_evidence_report(report)
+        return 0
+
     if args.task_command == "readiness":
         report = readiness_report(root)
         if args.json:
@@ -551,6 +563,33 @@ def print_security_result(payload: dict[str, object]) -> None:
     print(f"Unresolved items: {payload['unresolved_count']}")
     if payload.get("message"):
         print(str(payload["message"]))
+
+
+def print_evidence_report(report: dict[str, object]) -> None:
+    metrics = report["task_metrics"]
+    assert isinstance(metrics, dict)
+    summary = report["summary"]
+    assert isinstance(summary, dict)
+    print(f"Tasks: {metrics['total']} total, {metrics['open']} open, {metrics['closed']} closed")
+    print(f"Missing support files: {summary_count(summary, 'missing_support_files')}")
+    print(f"Verified without verification evidence: {summary_count(summary, 'verified_without_verification')}")
+    print(f"Implementation evidence: {summary_count(summary, 'implementation_evidence')}")
+    print(f"Verification evidence: {summary_count(summary, 'verification_evidence')}")
+    print(f"Review evidence: {summary_count(summary, 'review_evidence')}")
+    print(f"Wiki/log evidence: {summary_count(summary, 'wiki_log_evidence')}")
+    print(f"Residual risk: {summary_count(summary, 'residual_risk')}")
+    issues = report.get("issues", [])
+    if issues:
+        print("Issues:")
+        for issue in issues:
+            assert isinstance(issue, dict)
+            print(f"- {issue['path']}: {issue['message']}")
+
+
+def summary_count(summary: dict[str, object], key: str) -> object:
+    bucket = summary[key]
+    assert isinstance(bucket, dict)
+    return bucket["count"]
 
 
 def cmd_ingest(args: argparse.Namespace, root: Path) -> int:
