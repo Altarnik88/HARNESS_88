@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from .gates import gates_status
 from .harness import ALLOWED_TASK_STATUSES, ROLE_OWNER_RE, STATUS_RE, validate_harness
 from .intake import intake_status
 from .markdown import slugify
@@ -213,6 +214,9 @@ def readiness_report(root: Path) -> dict[str, object]:
         pending_decisions.append("SITE_INTAKE.md")
     if not references_ready:
         pending_decisions.append("references")
+    gates = gates_status(root)
+    delivery_gates_ready = bool(gates["delivery_gates_ready"])
+    publish_ready = bool(gates["publish_ready"])
     blockers = readiness_blockers(root, issues, briefs, stack_ready, intake)
     files_to_edit = sorted({blocker["path"] for blocker in blockers if blocker.get("path")})
     core_development_ready = not issues
@@ -226,12 +230,17 @@ def readiness_report(root: Path) -> dict[str, object]:
         "references_ready": references_ready,
         "site_implementation_ready": site_implementation_ready,
         "implementation_ready": site_implementation_ready,
+        "delivery_gates_ready": delivery_gates_ready,
+        "publish_ready": publish_ready,
         "pending_decisions": pending_decisions,
+        "pending_delivery_gates": gates["pending_delivery_gates"],
         "harness_issue_count": len(issues),
         "task_metrics": task_metrics(root),
         "briefs": briefs,
         "intake": intake,
+        "delivery_gates": gates,
         "blockers": blockers,
+        "publish_blockers": gates["publish_blockers"],
         "files_to_edit": files_to_edit,
         "next_command": next_readiness_command(blockers),
         "suggested_tasks": suggested_readiness_tasks(pending_decisions),

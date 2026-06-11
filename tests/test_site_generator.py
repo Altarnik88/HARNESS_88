@@ -42,6 +42,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertEqual(result.target, target)
             self.assertTrue((target / "AGENTS.md").exists())
             self.assertTrue((target / "START_HERE.md").exists())
+            self.assertTrue((target / "SITE_GATES.md").exists())
             self.assertTrue((target / "SITE_INTAKE.md").exists())
             self.assertTrue((target / "STACK.md").exists())
             self.assertTrue((target / "LICENSE").exists())
@@ -95,6 +96,8 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md", "SITE_INTAKE.md", "references"])
             self.assertFalse(payload["intake_ready"])
             self.assertFalse(payload["references_ready"])
+            self.assertFalse(payload["delivery_gates_ready"])
+            self.assertFalse(payload["publish_ready"])
 
             stdout = io.StringIO()
             with contextlib.redirect_stdout(stdout):
@@ -104,6 +107,15 @@ class SiteGeneratorTests(unittest.TestCase):
             intake = json.loads(stdout.getvalue())
             self.assertEqual(intake["path"], "SITE_INTAKE.md")
             self.assertFalse(intake["intake_ready"])
+
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                code = main(["--root", str(target), "site", "gates", "--json"])
+
+            self.assertEqual(code, 0)
+            gates = json.loads(stdout.getvalue())
+            self.assertEqual(gates["path"], "SITE_GATES.md")
+            self.assertFalse(gates["publish_ready"])
 
     def test_generated_project_includes_agentic_delivery_gates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -128,7 +140,9 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertIn("Never ask the user to paste secrets into chat", tooling)
             self.assertIn("ecommerce/catalog/payment/request mode", start_here)
             self.assertIn("site intake --json", start_here)
+            self.assertIn("site gates --json", start_here)
             self.assertIn("SITE_INTAKE.md", tooling)
+            self.assertIn("SITE_GATES.md", tooling)
             self.assertTrue((target / "agents" / "workflows" / "secret-broker.md").exists())
 
     def test_cli_site_init_creates_project(self) -> None:

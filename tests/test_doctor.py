@@ -37,6 +37,7 @@ class SiteDoctorTests(unittest.TestCase):
             "stack",
             "briefs",
             "intake",
+            "gates",
             "tasks",
             "wiki",
             "frontend",
@@ -50,8 +51,11 @@ class SiteDoctorTests(unittest.TestCase):
         self.assertFalse(payload["readiness"]["site_implementation_ready"])
         self.assertFalse(payload["readiness"]["intake_ready"])
         self.assertFalse(payload["readiness"]["references_ready"])
+        self.assertFalse(payload["readiness"]["delivery_gates_ready"])
+        self.assertFalse(payload["readiness"]["publish_ready"])
         self.assertIn("SITE_INTAKE.md", payload["readiness"]["pending_decisions"])
         self.assertEqual(payload["intake"]["path"], "SITE_INTAKE.md")
+        self.assertEqual(payload["gates"]["path"], "SITE_GATES.md")
 
     def test_site_doctor_human_output_distinguishes_core_from_site_readiness(self) -> None:
         code, output = self.run_cli("--root", str(ROOT), "site", "doctor", "--skip-self-test")
@@ -60,6 +64,8 @@ class SiteDoctorTests(unittest.TestCase):
         self.assertIn("Core workflow: ready", output)
         self.assertIn("Site implementation: not configured", output)
         self.assertIn("Site intake: pending", output)
+        self.assertIn("Delivery gates: pending", output)
+        self.assertIn("Publish handoff: blocked", output)
 
 
 if __name__ == "__main__":

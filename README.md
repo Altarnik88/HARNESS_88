@@ -14,6 +14,7 @@ In readiness and doctor output, `core_development_ready` means the HARNESS_88 co
 
 - `START_HERE.md`: first-chat instructions for a new user.
 - `SITE_INTAKE.md`: machine-checkable first-run intake and reference approval gate.
+- `SITE_GATES.md`: machine-checkable frontend approval, backend/data readiness, audit, remediation, final approval, and publish handoff gate state.
 - `STACK.md`: the controlled stack selection state. It starts as `status: unselected`.
 - `PRODUCT.md` and `DESIGN.md`: durable product and design contracts with explicit `draft`, `approved`, or `needs-review` statuses.
 - `agents/`: role docs, delegation protocol, and harness templates.
@@ -33,6 +34,7 @@ In readiness and doctor output, `core_development_ready` means the HARNESS_88 co
 ```powershell
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
+python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor --skip-self-test
@@ -60,12 +62,14 @@ npm run build
 8. Create atomic task files with `python tools/llm_wiki.py task create ...`.
 9. Implement only from approved intake, approved briefs, selected stack state, approved references, and task ownership.
 10. Show frontend previews for approval, then implement backend/data/payment/request flows as approved.
-11. Run total agent audit, fix findings through tracked tasks, and show the final site for user approval before publish instructions.
-12. Run `python tools/llm_wiki.py quality --skip-frontend` for core checks, and frontend checks only when the optional frontend is in scope.
+11. Record frontend preview approval, backend/data readiness, total audit, remediation, final user approval, and publish/operate handoff in `SITE_GATES.md`.
+12. Run total agent audit, fix findings through tracked tasks, and show the final site for user approval before publish instructions.
+13. Run `python tools/llm_wiki.py quality --skip-frontend` for core checks, and frontend checks only when the optional frontend is in scope.
 
 ## Core Diagnostics
 
 - `python tools/llm_wiki.py site doctor` reports readiness, stack, briefs, task graph, wiki health, frontend state, security state, and generated-project self-test.
+- `python tools/llm_wiki.py site gates --json` reports delivery approval gates and publish readiness from `SITE_GATES.md`.
 - `python tools/llm_wiki.py site self-test` creates a temporary clean starter and runs its core quality gate.
 - `python tools/llm_wiki.py security audit --json --no-record` runs optional frontend `npm audit` when available. Security audit is non-blocking by default; add `--blocking` to make unresolved findings fail.
 - Core CI is stack-neutral. Optional frontend CI runs separately when `frontend/package.json` is present.

@@ -138,6 +138,9 @@ class TaskCliTests(unittest.TestCase):
             self.assertEqual(payload["briefs"]["PRODUCT.md"]["status"], "draft")
             self.assertFalse(payload["intake_ready"])
             self.assertFalse(payload["references_ready"])
+            self.assertFalse(payload["delivery_gates_ready"])
+            self.assertFalse(payload["publish_ready"])
+            self.assertIn("SITE_GATES.md", payload["pending_delivery_gates"])
 
     def test_task_set_status_requires_force_for_invalid_transition(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

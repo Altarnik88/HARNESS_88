@@ -7,8 +7,8 @@ Use this file after a fresh clone of HARNESS_88. It is a practical first-chat sc
 Open Codex or another coding-agent chat in the root of this repository and start with something like:
 
 ```text
-Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, PRODUCT.md, DESIGN.md, STACK.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
-Check intake and readiness with python tools/llm_wiki.py site intake --json and python tools/llm_wiki.py task readiness --json.
+Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
+Check intake, gates, and readiness with python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
 The stack is not selected yet. Run a first-run intake for my site, including country, language, site type, style, ecommerce/catalog/payment/request mode, references, and content sources. Record accepted answers in SITE_INTAKE.md. Then recommend a stack/fullstack profile, update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness only after approvals are recorded.
 ```
 
@@ -32,6 +32,7 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
 
 ```powershell
 python tools/llm_wiki.py site intake --json
+python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
@@ -40,6 +41,6 @@ python tools/llm_wiki.py site doctor
 
 After selecting a profile, update `PRODUCT.md`, `DESIGN.md`, and `STACK.md`, create the first task, and begin development from that task.
 
-Follow `agents/workflows/agentic-site-delivery.md` for reference approval, frontend preview approval, backend/data work, optional product ingest, total audit, remediation, final user approval, and VPS publish/maintenance handoff.
+Follow `agents/workflows/agentic-site-delivery.md` for reference approval, frontend preview approval, backend/data work, optional product ingest, total audit, remediation, final user approval, and VPS publish/maintenance handoff. Record the machine-checkable delivery state in `SITE_GATES.md`.
 
 Secrets must never be pasted into chat or project files. Use `agents/workflows/secret-broker.md` as the contract for future backend/deployment secret handling.

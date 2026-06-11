@@ -35,3 +35,9 @@ Append durable project events using:
 - Path: `src/llm_wiki/intake.py`
 - Path: `agents/harness/site-intake-template.md`
 - Path: `src/llm_wiki/templates/site_starter/SITE_INTAKE.md`
+
+## [2026-06-11] maintenance | Added machine-checkable site delivery gates
+- Path: `SITE_GATES.md`
+- Path: `src/llm_wiki/gates.py`
+- Path: `agents/harness/site-gates-template.md`
+- Path: `src/llm_wiki/templates/site_starter/SITE_GATES.md`

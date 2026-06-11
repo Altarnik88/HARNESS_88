@@ -35,6 +35,7 @@ assigned checkpoint file
 
 - `prd-template.md` captures the product problem, audience, requirements, and acceptance criteria.
 - `site-intake-template.md` captures first-run site intake decisions before product/design/stack approval.
+- `site-gates-template.md` captures machine-checkable delivery gates from frontend preview approval through publish/operate handoff.
 - `spec-template.md` turns an approved product/design brief into implementation decisions.
 - `task-template.md` defines one atomic unit of work with owner, scope, tooling, and evidence.
 - `stack-options.md` summarizes selectable stack/fullstack profiles. `stack-profiles.json` defines the CLI-readable profile metadata. Neither file scaffolds those stacks.
@@ -50,6 +51,8 @@ assigned checkpoint file
 Use `python tools/llm_wiki.py site doctor` for a unified readiness, stack, brief, task, wiki, frontend, security, and generated-starter self-test report.
 
 Use `python tools/llm_wiki.py site intake --json` for machine-readable first-run intake and reference approval state.
+
+Use `python tools/llm_wiki.py site gates --json` for machine-readable delivery approval, audit, remediation, final approval, and publish handoff state.
 
 Use `python tools/llm_wiki.py quality --skip-frontend` as the default core completion gate. It runs Python tests, wiki rebuild, and strict lint.
 

@@ -25,6 +25,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 - Keyboard and screen-reader basics are preserved.
 - Repo-specific lint, test, or build command is run.
 - Browser or Playwright check is run for visible UI changes.
+- `SITE_GATES.md` records frontend preview approval only after explicit user approval.
 - No secrets are stored.
 - Durable decisions are logged when needed.
 
@@ -46,6 +47,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 - Data contracts, migrations, and derived state are documented.
 - Database and external-service mutations have explicit authorization.
 - Relevant unit, integration, CLI, or inspection checks are run.
+- `SITE_GATES.md` records backend/data readiness as complete or not-required.
 - Sensitive values remain in environment variables.
 - No secrets are stored.
 - Durable decisions are logged when needed.
@@ -58,6 +60,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 - Accessibility findings include reproduction steps and impact.
 - Browser, Playwright, lint, build, or task-specific checks are run.
 - Findings are tracked in the task, checkpoint, wiki, or review queue.
+- `SITE_GATES.md` records total audit and remediation status before final approval.
 - No secrets are stored.
 - Durable decisions are logged when needed.
 
@@ -78,5 +81,6 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 - CI, deploy, environment, and rollback implications are documented.
 - GitHub or release writes have explicit user authorization.
 - Relevant build, CI, or release checks are run.
+- `SITE_GATES.md` records final user approval and publish/operate handoff before final deployment instructions.
 - No secrets are stored.
 - Durable decisions are logged when needed.

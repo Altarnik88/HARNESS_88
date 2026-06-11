@@ -122,6 +122,7 @@ Outputs:
 - Browser-visible previews for user review.
 - Progress/checkpoint updates for each assigned task.
 - Recorded user approval, or recorded feedback items that become follow-up tasks.
+- Updated `SITE_GATES.md` with `frontend_preview_approval: approved` only after explicit user approval.
 
 Rules:
 
@@ -153,6 +154,7 @@ Outputs:
   - mixed mode.
 - Environment variable names without secret values.
 - Updated verification evidence.
+- Updated `SITE_GATES.md` with `backend_data_readiness: complete` or `not-required`.
 
 Required skills/plugins/MCP:
 
@@ -198,6 +200,7 @@ Output:
   - weak architecture or unnecessary complexity.
 - Severity, evidence, reproduction steps, affected files, and recommended fix for each issue.
 - Explicit unresolved-risk list.
+- Updated `SITE_GATES.md` with `total_audit: complete` after audit evidence is recorded.
 
 Required skills/plugins/MCP:
 
@@ -216,6 +219,7 @@ Outputs:
 - Atomic tasks with ownership, status, verification command, and acceptance criteria.
 - Fixed issues and updated verification evidence.
 - Re-run audit subset proving the fix.
+- Updated `SITE_GATES.md` with `remediation: complete`, `not-required`, or `residual-risk-accepted`.
 
 Rules:
 
@@ -235,6 +239,7 @@ Outputs:
 - User feedback captured as concrete tasks or explicit approval.
 - Fixed final corrections and re-shown preview until approved.
 - Final approval note in the task/checkpoint or wiki.
+- Updated `SITE_GATES.md` with `final_user_approval: approved`.
 
 Required skills/plugins/MCP:
 
@@ -253,6 +258,7 @@ Outputs:
 - Build, deploy, rollback, backup, monitoring, and update instructions.
 - Maintenance notes for dependency updates and versioned releases.
 - Handoff checklist and residual risks.
+- Updated `SITE_GATES.md` with `publish_operate_handoff: complete`.
 
 Required skills/plugins/MCP:
 

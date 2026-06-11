@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .doctor import build_doctor_report
+from .gates import gates_status
 from .intake import intake_status
 from .quality import quality_exit_code, run_quality
 from .security import run_security_audit
@@ -110,6 +111,8 @@ def build_parser() -> argparse.ArgumentParser:
     site_self_test_parser.add_argument("--json", action="store_true", help="Emit JSON self-test results.")
     site_intake_parser = site_subparsers.add_parser("intake", help="Report first-run site intake and reference gates.")
     site_intake_parser.add_argument("--json", action="store_true", help="Emit JSON site intake status.")
+    site_gates_parser = site_subparsers.add_parser("gates", help="Report delivery approval and publish gates.")
+    site_gates_parser.add_argument("--json", action="store_true", help="Emit JSON site delivery gate status.")
     site_doctor_parser = site_subparsers.add_parser("doctor", help="Report unified project health and next actions.")
     site_doctor_parser.add_argument("--json", action="store_true", help="Emit JSON doctor report.")
     site_doctor_parser.add_argument("--skip-self-test", action="store_true", help="Skip generated-project self-test.")
@@ -333,6 +336,13 @@ def cmd_site(args: argparse.Namespace, root: Path) -> int:
         else:
             print_intake_status(status)
         return 0
+    if args.site_command == "gates":
+        status = gates_status(root)
+        if args.json:
+            print(json.dumps(status, ensure_ascii=False, indent=2))
+        else:
+            print_gates_status(status)
+        return 0
     if args.site_command == "doctor":
         report = build_doctor_report(root, skip_self_test=args.skip_self_test, run_security=args.run_security)
         if args.json:
@@ -453,6 +463,8 @@ def cmd_task(args: argparse.Namespace, root: Path) -> int:
             print(f"Site intake: {'ready' if report['intake_ready'] else 'pending'}")
             print(f"References: {'ready' if report['references_ready'] else 'pending'}")
             print(f"Site implementation: {'ready' if report['site_implementation_ready'] else 'not configured'}")
+            print(f"Delivery gates: {'ready' if report['delivery_gates_ready'] else 'pending'}")
+            print(f"Publish handoff: {'ready' if report['publish_ready'] else 'blocked'}")
             pending = report["pending_decisions"]
             if pending:
                 print("Pending decisions:")
@@ -487,6 +499,8 @@ def print_doctor_report(report: dict[str, object]) -> None:
     print(f"Site intake: {'ready' if readiness['intake_ready'] else 'pending'}")
     print(f"References: {'ready' if readiness['references_ready'] else 'pending'}")
     print(f"Site implementation: {'ready' if readiness['site_implementation_ready'] else 'not configured'}")
+    print(f"Delivery gates: {'ready' if readiness['delivery_gates_ready'] else 'pending'}")
+    print(f"Publish handoff: {'ready' if readiness['publish_ready'] else 'blocked'}")
     print(f"Next command: {readiness['next_command']}")
     blockers = readiness.get("blockers", [])
     if blockers:
@@ -506,6 +520,24 @@ def print_intake_status(status: dict[str, object]) -> None:
         print("Missing fields:")
         for field in missing:
             print(f"- {field}")
+    blockers = status.get("blockers", [])
+    if blockers:
+        print("Blockers:")
+        for blocker in blockers:
+            assert isinstance(blocker, dict)
+            print(f"- {blocker['message']}")
+
+
+def print_gates_status(status: dict[str, object]) -> None:
+    print(f"Delivery gates: {'ready' if status['delivery_gates_ready'] else 'pending'}")
+    print(f"Publish handoff: {'ready' if status['publish_ready'] else 'blocked'}")
+    print(f"Path: {status['path']}")
+    print(f"Status: {status['status']}")
+    pending = status.get("pending_delivery_gates", [])
+    if pending:
+        print("Pending delivery gates:")
+        for gate in pending:
+            print(f"- {gate}")
     blockers = status.get("blockers", [])
     if blockers:
         print("Blockers:")

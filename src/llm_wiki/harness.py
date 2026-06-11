@@ -19,11 +19,13 @@ ALLOWED_TASK_STATUSES = {
 
 REQUIRED_HARNESS_FILES = [
     Path("START_HERE.md"),
+    Path("SITE_GATES.md"),
     Path("SITE_INTAKE.md"),
     Path("STACK.md"),
     Path("PRODUCT.md"),
     Path("DESIGN.md"),
     Path("agents") / "harness" / "README.md",
+    Path("agents") / "harness" / "site-gates-template.md",
     Path("agents") / "harness" / "site-intake-template.md",
     Path("agents") / "harness" / "stack-options.md",
     Path("agents") / "harness" / "prd-template.md",

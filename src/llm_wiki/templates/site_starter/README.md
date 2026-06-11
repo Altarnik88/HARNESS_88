@@ -4,6 +4,7 @@ This project is a clean generated site workspace built from the HARNESS_88 auton
 
 - stack-neutral first-run guidance in `START_HERE.md`;
 - machine-checkable first-run intake in `SITE_INTAKE.md`;
+- machine-checkable delivery gates in `SITE_GATES.md`;
 - stack selection state in `STACK.md`;
 - Codex agent roles and harness templates in `agents/`;
 - the canonical site delivery workflow in `agents/workflows/agentic-site-delivery.md`;
@@ -18,6 +19,7 @@ This project is a clean generated site workspace built from the HARNESS_88 auton
 python -m unittest discover -s tests
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
+python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor
@@ -37,6 +39,7 @@ python tools/llm_wiki.py quality --skip-frontend
 9. Implement only from approved intake, approved briefs, selected stack state, approved references, and task ownership.
 10. Show frontend previews for approval, then implement backend/data/payment/request flows as approved.
 11. Run total agent audit, fix findings through tracked tasks, and show the final site for user approval before publish instructions.
-11. Run core checks with `python tools/llm_wiki.py quality --skip-frontend`.
+12. Record delivery gate evidence in `SITE_GATES.md` and check it with `python tools/llm_wiki.py site gates --json`.
+13. Run core checks with `python tools/llm_wiki.py quality --skip-frontend`.
 
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.
