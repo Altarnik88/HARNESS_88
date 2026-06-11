@@ -6,9 +6,13 @@ Move from an ambiguous website request to a verified, user-approved, publishable
 
 This workflow applies to landing pages, multi-page sites, catalog sites, and ecommerce projects. HARNESS_88 itself remains a stack-neutral core; concrete site implementation starts only after approved briefs, approved references, and a selected stack or explicitly approved custom stack.
 
+The Conductor coordinates agent-first work. If no suitable role, skill, plugin, MCP server, or tooling grant exists for a needed task, update the role/tooling contract before delegating.
+
 ## Phase 1: First-Run Intake
 
 Lead role: Product Strategist.
+
+Conversation rule: ask intake questions, clarifications, and approval prompts in the user's language from the latest user message. This is separate from the `SITE_INTAKE.md` `language` field, which records the site's primary language.
 
 Outputs:
 
@@ -56,18 +60,21 @@ Required skills/plugins/MCP:
 
 ## Phase 3: Reference Gate
 
-Lead roles: UX/Product Design and Visual Design.
+Lead roles: Reference Research, UX/Product Design, and Visual Design.
 
 Outputs:
 
 - User-provided reference sites, screenshots, brand examples, or competitor examples.
-- If the user has no references, agent-proposed examples based on the intake answers.
+- If the user has no references or cannot choose them, agent-proposed examples based on the intake answers.
 - Documented approval or rejection notes for each selected reference.
 - Visual direction summary carried into `DESIGN.md` or an approved wiki decision.
 
 Rules:
 
 - Do not start serious frontend implementation before references or reference substitutes are approved.
+- When references are missing or undecided, Conductor delegates Reference Research instead of selecting examples alone.
+- Agent-proposed reference discovery must include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`.
+- Reference shortlists must include URL, reason for inclusion, style tags, project applicability, cautions, and an explicit user approval prompt.
 - When examples are agent-proposed, clearly separate direct user preferences from agent suggestions.
 - Record unresolved reference disagreements as blockers, not assumptions.
 
@@ -101,6 +108,7 @@ Outputs:
 - Framework/routing structure.
 - Shared layout/component boundaries.
 - Implementation slices with disjoint ownership.
+- For large multi-page frontend work, a fan-out plan that splits UX, visual system, pages, components, animations, assets, QA, performance/SEO, and wiki closeout into disjoint agent tasks.
 - Preview, animation, responsive, and browser-verification plan.
 - Test/build commands.
 - Spec files and atomic task files for implementation work.
@@ -119,6 +127,7 @@ Supporting roles: UX/Product Design, Visual Design, QA & Accessibility.
 Outputs:
 
 - Pages, components, interactions, animations, banners, and responsive states in assigned files.
+- For large sites, many bounded frontend agents may run across page sections, product cards, posters/banners, motion, logo/image polish, responsive states, QA, performance/SEO, and knowledge updates, with disjoint ownership and explicit tools/skills in each brief.
 - Browser-visible previews for user review.
 - Progress/checkpoint updates for each assigned task.
 - Recorded user approval, or recorded feedback items that become follow-up tasks.
@@ -129,6 +138,7 @@ Rules:
 - Show meaningful frontend progress to the user before backend work begins unless the selected stack requires a small backend stub.
 - If the user has remarks, record them as tasks, fix them, and show the updated result again.
 - Do not treat silence as approval.
+- The Conductor coordinates the fan-out and reviews outputs; it does not become the sole frontend builder.
 
 Required skills/plugins/MCP:
 

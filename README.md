@@ -58,7 +58,7 @@ npm run build
 4. Fill in `PRODUCT.md` with the website goal, audience, scope, and acceptance criteria, then set `Status: approved` when accepted.
 5. Include commerce mode in the brief: no commerce, catalog only, online payment, offline payment, request to manager, or mixed.
 6. Fill in `DESIGN.md` with visual direction, UX constraints, reference expectations, and component rules, then set `Status: approved` when accepted.
-7. Approve user-provided or agent-proposed reference sites and set `references_status: approved` in `SITE_INTAKE.md` before serious frontend implementation.
+7. Approve user-provided or agent-proposed reference sites and set `references_status: approved` in `SITE_INTAKE.md` before serious frontend implementation; agent-proposed reference searches include Dribbble, Behance, and Awwwards.
 8. Create atomic task files with `python tools/llm_wiki.py task create ...`.
 9. Implement only from approved intake, approved briefs, selected stack state, approved references, and task ownership.
 10. Show frontend previews for approval, then implement backend/data/payment/request flows as approved.

@@ -28,9 +28,40 @@ class AgentInstructionTests(unittest.TestCase):
             "agents/protocols/mcp-policy.md",
             "agents/protocols/wiki-operations.md",
             "agents/protocols/skill-capture.md",
+            "agents/protocols/conversation-delegation.md",
         ]:
             self.assertIn(rel, text)
             self.assertTrue((ROOT / rel).exists())
+
+    def test_agent_first_language_reference_contract_is_documented(self) -> None:
+        protocol = (ROOT / "agents" / "protocols" / "conversation-delegation.md").read_text(encoding="utf-8")
+        team = (ROOT / "agents" / "TEAM.md").read_text(encoding="utf-8")
+        conductor = (ROOT / "agents" / "conductor.md").read_text(encoding="utf-8")
+        tooling = (ROOT / "agents" / "tooling-matrix.md").read_text(encoding="utf-8")
+        delegation = (ROOT / "agents" / "templates" / "delegation-brief.md").read_text(encoding="utf-8")
+        workflow = (ROOT / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
+        intake = (ROOT / "SITE_INTAKE.md").read_text(encoding="utf-8")
+
+        for needle in [
+            "user language",
+            "SITE_INTAKE.md",
+            "https://dribbble.com/",
+            "https://www.behance.net/",
+            "https://www.awwwards.com/",
+            "agent-first",
+        ]:
+            self.assertIn(needle, protocol)
+
+        self.assertIn("Reference Research", team)
+        self.assertIn("agent-first", conductor)
+        self.assertIn("Reference Research", tooling)
+        self.assertIn("User language", delegation)
+        self.assertIn("Reference/source scope", delegation)
+        self.assertIn("If no suitable role or tooling grant exists", team)
+        self.assertIn("update the role/tooling contract before delegating", workflow)
+        self.assertIn("update the role file and this matrix before delegating", tooling)
+        self.assertIn("stop and update that contract before delegating", delegation)
+        self.assertIn("primary site language, not the user/chat language", intake)
 
 
 if __name__ == "__main__":

@@ -33,6 +33,7 @@ Design page flows, interaction behavior, and responsive UX for the multi-page si
 - Default deny: use only UX/Product Design tooling listed in the matrix or explicitly granted in the delegation brief.
 - Use Product Design `get-context` before UX decisions.
 - Use Product Design `ideate` for visual/interaction alternatives.
+- Use read-only reference discovery only when delegated; include Dribbble, Behance, and Awwwards when references are missing or undecided.
 - Use `ui-ux-pro-max` and `huashu-design` for approved design-system reasoning, visual directions, hi-fi prototypes, and demos.
 - Use GSAP skills for motion specs only; do not implement production motion.
 - Use Figma MCP for Figma files, screenshots, or design-system lookups when provided.

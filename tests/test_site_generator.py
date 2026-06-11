@@ -149,6 +149,35 @@ class SiteGeneratorTests(unittest.TestCase):
                 (target / "agents" / "tasks" / "README.md").read_text(encoding="utf-8"),
             )
 
+    def test_generated_project_includes_conversation_delegation_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+            create_site_project(ROOT, target)
+
+            protocol = (target / "agents" / "protocols" / "conversation-delegation.md").read_text(encoding="utf-8")
+            workflow = (target / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
+            team = (target / "agents" / "TEAM.md").read_text(encoding="utf-8")
+            delegation = (target / "agents" / "templates" / "delegation-brief.md").read_text(encoding="utf-8")
+            tooling = (target / "AGENT_SITE_TOOLING.md").read_text(encoding="utf-8")
+            intake = (target / "SITE_INTAKE.md").read_text(encoding="utf-8")
+
+            for needle in [
+                "user language",
+                "https://dribbble.com/",
+                "https://www.behance.net/",
+                "https://www.awwwards.com/",
+                "agent-first",
+            ]:
+                self.assertIn(needle, protocol)
+            self.assertIn("Reference Research", team)
+            self.assertIn("Reference Research", workflow)
+            self.assertIn("User language", delegation)
+            self.assertIn("Reference/source scope", delegation)
+            self.assertIn("questions in the user's language", tooling)
+            self.assertIn("update the role/tooling contract before delegating", workflow)
+            self.assertIn("primary site language, not the user/chat language", intake)
+            self.assertIn("https://dribbble.com/", intake)
+
     def test_cli_site_init_creates_project(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"

@@ -33,9 +33,10 @@ product_catalog_document: unknown
 ## Notes
 
 - `site_type`: landing, multipage, catalog, ecommerce, app, or custom.
+- `language`: primary site language, not the user/chat language.
 - `catalog_mode`: none, catalog-only, product-catalog, service-catalog, mixed, or custom.
 - `payment_request_mode`: no-commerce, online-payment, offline-payment, request-to-manager, mixed, or custom.
 - `reference_mode`: user-provided, agent-suggested, mixed, or none-yet.
 - `references_status`: pending, approved, rejected, or needs-review.
 - `product_catalog_document`: not-required, needed, provided, or unknown.
-- If references are missing, agents propose suitable examples and wait for approval before serious frontend implementation.
+- If references are missing or undecided, Reference Research proposes suitable examples from the intake and includes `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`; agents wait for approval before serious frontend implementation.

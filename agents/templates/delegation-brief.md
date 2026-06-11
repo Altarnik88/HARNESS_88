@@ -24,9 +24,16 @@ Objective:
 Context to read:
 - AGENTS.md
 - agents/TEAM.md
+- agents/protocols/conversation-delegation.md
 - agents/tooling-matrix.md
 - agents/roles/<role>.md
 - <task-specific files>
+
+User language:
+<Language to use for questions, clarifications, and approval prompts. Infer from the latest user message. This is separate from SITE_INTAKE.md site language.>
+
+Reference/source scope:
+<For reference discovery, list required sources such as https://dribbble.com/, https://www.behance.net/, https://www.awwwards.com/, competitors, and any denied sources. Otherwise write "not applicable".>
 
 Ownership / scope:
 - Owned files: <exact files/directories, or "none; read-only">
@@ -34,8 +41,9 @@ Ownership / scope:
 - You are not alone in the codebase. Do not revert or overwrite changes made by others.
 
 Required plugins/MCP/skills:
-- <plugin/MCP/skill and when to use it, selected from agents/tooling-matrix.md>
+- <plugin/MCP/skill/tool, why it is granted, when to use it, and fallback if unavailable; selected from agents/tooling-matrix.md>
 - Default deny: all unlisted skills, plugins, MCP servers, and write scopes are forbidden.
+- If the needed grant is not in the matrix or role file, stop and update that contract before delegating.
 - Conditional tools require the trigger named in the matrix and must be reported if unavailable.
 
 Code permission:
@@ -56,6 +64,7 @@ Clean-context resume instructions:
 
 - If the task involves current framework/library behavior, include Context7 MCP.
 - If the task involves design or UI direction, include Product Design skill guidance.
+- If the task involves missing or undecided references, assign Reference Research and include Dribbble, Behance, and Awwwards in the source scope.
 - If the task changes frontend UI, require Browser or Playwright verification.
 - If the task touches GitHub, require GitHub plugin or `gh-cli` skill.
 - If the task needs Supabase, Remotion, Sentry, Figma, Canva, or Creative Production, include the matrix trigger and whether writes are allowed.

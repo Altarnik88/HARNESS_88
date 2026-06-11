@@ -9,7 +9,7 @@ Open Codex or another coding-agent chat in the root of this repository and start
 ```text
 Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
 Check intake, gates, and readiness with python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
-The stack is not selected yet. Run a first-run intake for my site, including country, language, site type, style, ecommerce/catalog/payment/request mode, references, and content sources. Record accepted answers in SITE_INTAKE.md. Then recommend a stack/fullstack profile, update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness only after approvals are recorded.
+The stack is not selected yet. Run a first-run intake for my site, asking questions in my language, including country, site language, site type, style, ecommerce/catalog/payment/request mode, references, and content sources. Record accepted answers in SITE_INTAKE.md. Then recommend a stack/fullstack profile, update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness only after approvals are recorded.
 ```
 
 If you are not sure, ask the agent to run the intake before recommending a stack.
@@ -24,7 +24,7 @@ Before implementation, the agent must collect or explicitly mark unknown:
 - desired design style, visual constraints, and references;
 - required pages, forms, integrations, content sources, analytics/SEO needs, deployment expectations, backend/data/auth/admin/integration needs, and product/catalog document status.
 
-If the user has no reference sites, the agent should propose relevant examples based on the intake and wait for approval before serious frontend implementation.
+If the user has no reference sites or cannot choose them, the Conductor delegates Reference Research to propose relevant examples based on the intake. Agent-proposed searches must include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`, then wait for approval before serious frontend implementation.
 
 Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: approved` is required before serious frontend implementation.
 
