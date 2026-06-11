@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-wiki-base"
+version = "0.1.0"
+description = "A lightweight LLM Wiki foundation with Markdown storage and a SQLite search/graph index."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "LLM Wiki Maintainers" }]
+dependencies = []
+
+[project.optional-dependencies]
+frontmatter = ["PyYAML>=6.0"]
+extract = ["pypdf>=4.0", "python-docx>=1.1"]
+all = ["PyYAML>=6.0", "pypdf>=4.0", "python-docx>=1.1"]
+
+[project.scripts]
+llm-wiki = "llm_wiki.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

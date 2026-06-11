@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Local LLM Wiki runtime state
+data/*.sqlite
+data/*.sqlite-*
+data/*.db
+data/*.db-*
+.llm-wiki/
+backups/
+.serena/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

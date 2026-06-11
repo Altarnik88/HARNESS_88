@@ -1,0 +1,17 @@
+# LLM Site Tooling Index
+
+Canonical wiki: `wiki/`
+
+Read these files before site design or implementation work:
+
+- `AGENT_SITE_TOOLING.md`
+- `agents/TEAM.md`
+- `wiki/concepts/ai-site-development-workflow.md`
+- `wiki/concepts/agent-site-tooling-routing.md`
+- `wiki/concepts/site-resource-manifest.md`
+- `purpose.md`
+- `schema.md`
+- `wiki/index.md`
+- recent entries in `wiki/log.md`
+
+Do not start frontend implementation until a product/design brief, frontend stack, and selected visual direction are recorded in the wiki.
