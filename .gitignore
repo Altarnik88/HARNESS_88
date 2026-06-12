@@ -19,6 +19,7 @@ data/*.db-*
 .llm-wiki/
 backups/
 .serena/
+outputs/
 
 # OS/editor noise
 .DS_Store
