@@ -30,6 +30,7 @@ class AgentInstructionTests(unittest.TestCase):
             "agents/protocols/skill-capture.md",
             "agents/protocols/conversation-delegation.md",
             "agents/protocols/design-resources.md",
+            "agents/protocols/tooling-onboarding.md",
         ]:
             self.assertIn(rel, text)
             self.assertTrue((ROOT / rel).exists())
@@ -85,6 +86,25 @@ class AgentInstructionTests(unittest.TestCase):
 
         for text in [tooling, ux, visual, reference, frontend, workflow, delegation]:
             self.assertIn("agents/protocols/design-resources.md", text)
+
+    def test_tooling_onboarding_contract_is_documented(self) -> None:
+        protocol = (ROOT / "agents" / "protocols" / "tooling-onboarding.md").read_text(encoding="utf-8")
+        conductor = (ROOT / "agents" / "conductor.md").read_text(encoding="utf-8")
+        tooling = (ROOT / "AGENT_SITE_TOOLING.md").read_text(encoding="utf-8")
+        start_here = (ROOT / "START_HERE.md").read_text(encoding="utf-8")
+
+        for needle in [
+            "python tools/llm_wiki.py tools audit --json",
+            "next_actions",
+            "agents/resources/tooling-sources.json",
+            "permission",
+            "GitHub",
+            "Codex plugin",
+        ]:
+            self.assertIn(needle, protocol)
+
+        for text in [conductor, tooling, start_here]:
+            self.assertIn("agents/protocols/tooling-onboarding.md", text)
 
 
 if __name__ == "__main__":

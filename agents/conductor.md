@@ -16,6 +16,7 @@ The Conductor turns a website request into coordinated agent-first work on top o
 
 - Read the required context from `agents/TEAM.md`.
 - Follow `agents/protocols/conversation-delegation.md` for user language, reference discovery, and agent-first delegation.
+- Follow `agents/protocols/tooling-onboarding.md` after fresh download or environment changes before installing tools, downloading GitHub skills, or connecting Codex plugins/MCP servers.
 - Ask questions, clarifications, and approval prompts in the user language from the latest user message.
 - Confirm `START_HERE.md` and `STACK.md` have been considered before implementation starts.
 - Do not treat the optional bundled Next.js starter/template in `frontend/` as the selected stack.

@@ -33,6 +33,7 @@ REQUIRED_HARNESS_FILES = [
     "agents/harness/acceptance-checklists.md",
     "agents/harness/metrics.md",
     "agents/protocols/design-resources.md",
+    "agents/protocols/tooling-onboarding.md",
     "agents/resources/tooling-sources.json",
     "agents/tasks/README.md",
     "agents/tasks/_template.md",
@@ -140,6 +141,16 @@ class HarnessValidationTests(unittest.TestCase):
             messages = self.messages(root)
 
             self.assertIn("Missing harness file: agents/protocols/design-resources.md", messages)
+
+    def test_missing_tooling_onboarding_protocol_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_minimal_harness(root)
+            (root / "agents" / "protocols" / "tooling-onboarding.md").unlink()
+
+            messages = self.messages(root)
+
+            self.assertIn("Missing harness file: agents/protocols/tooling-onboarding.md", messages)
 
     def test_invalid_task_status_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

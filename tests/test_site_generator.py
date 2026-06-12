@@ -209,6 +209,9 @@ class SiteGeneratorTests(unittest.TestCase):
             for text in [start_here, tooling, readme]:
                 self.assertIn("python tools/llm_wiki.py tools audit", text)
                 self.assertIn("agents/resources/tooling-sources.json", text)
+            self.assertIn("agents/protocols/tooling-onboarding.md", start_here)
+            self.assertIn("agents/protocols/tooling-onboarding.md", tooling)
+            self.assertTrue((target / "agents" / "protocols" / "tooling-onboarding.md").exists())
             self.assertIn("asks permission before installing", tooling)
 
     def test_cli_site_init_creates_project(self) -> None:

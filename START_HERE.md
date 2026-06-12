@@ -7,7 +7,7 @@ Use this file after a fresh clone of HARNESS_88. It is a practical first-chat sc
 Open Codex or another coding-agent chat in the root of this repository and start with something like:
 
 ```text
-Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
+Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/protocols/tooling-onboarding.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
 Check local tools/skills/plugins, intake, gates, and readiness with python tools/llm_wiki.py tools audit --json, python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
 The stack is not selected yet. Run a first-run intake for my site, asking questions in my language, including country, site language, site type, style, ecommerce/catalog/payment/request mode, references, and content sources. Record accepted answers in SITE_INTAKE.md. Then recommend a stack/fullstack profile, update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness only after approvals are recorded.
 ```
@@ -101,5 +101,7 @@ Secrets must never be pasted into chat or project files. Use `agents/workflows/s
 ## Tooling Onboarding
 
 After downloading HARNESS_88, run `python tools/llm_wiki.py tools audit` before serious work. The audit reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities. It does not install anything. If something is missing, the agent must ask permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
+
+Follow `agents/protocols/tooling-onboarding.md` for the exact permission flow from `tools audit --json` `next_actions` to user approval.
 
 GitHub-backed resource links are recorded in `agents/resources/tooling-sources.json`. Before any GitHub download, the exact repository URL must be present there and approved by the user. If the URL is blank or missing, the agent asks the user for the correct link first.

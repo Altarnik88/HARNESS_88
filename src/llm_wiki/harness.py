@@ -36,6 +36,7 @@ REQUIRED_HARNESS_FILES = [
     Path("agents") / "harness" / "acceptance-checklists.md",
     Path("agents") / "harness" / "metrics.md",
     Path("agents") / "protocols" / "design-resources.md",
+    Path("agents") / "protocols" / "tooling-onboarding.md",
     Path("agents") / "resources" / "tooling-sources.json",
     Path("agents") / "tasks" / "README.md",
     Path("agents") / "tasks" / "_template.md",
