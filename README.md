@@ -22,6 +22,7 @@ HARNESS_88 separates core engineering from concrete site implementation.
 
 - Core work can continue while root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` are still draft or unselected.
 - Site implementation starts only after `SITE_INTAKE.md`, `PRODUCT.md`, `DESIGN.md`, approved references, selected stack, and task ownership are ready.
+- A downloaded copy can audit the user's local tools, Codex skills, plugins, and MCP-related capabilities before serious work starts.
 - Delivery is tracked through `SITE_GATES.md`: frontend preview approval, backend/data readiness, total audit, remediation, final user approval, and publish handoff.
 - Agents ask questions in the user's language, while `SITE_INTAKE.md` `language` records the site's primary language.
 - If the user has no references, Reference Research proposes examples from Dribbble, Behance, Awwwards, and relevant competitors before frontend work starts.
@@ -55,6 +56,7 @@ Core local tools:
 - `python tools/llm_wiki.py site doctor` - unified diagnostics for readiness, wiki, task graph, frontend, security, and generated starter checks.
 - `python tools/llm_wiki.py quality --skip-frontend` - stack-neutral core quality gate.
 - `python tools/llm_wiki.py rebuild` and `python tools/llm_wiki.py lint` - wiki index and Markdown quality checks.
+- `python tools/llm_wiki.py tools audit` - local tools, Codex skills, plugins, and MCP capability audit.
 
 Agent routing supports:
 
@@ -65,6 +67,8 @@ Agent routing supports:
 - **GitHub plugin / `gh-cli` skill:** repository, pull request, issue, and CI workflows.
 - **Reference discovery:** Dribbble, Behance, Awwwards, competitors, and market examples.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets, and Remotion when the task and tooling matrix allow them.
+
+The tooling audit is read-only. It reports what appears available, what is missing, and what the agent should ask permission to install, download from GitHub, or connect through Codex plugins/skills. HARNESS_88 must not install or connect anything automatically.
 
 ## Repository Contracts
 
@@ -86,6 +90,7 @@ Agent routing supports:
 ## First Run
 
 ```powershell
+python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py site gates --json

@@ -178,6 +178,19 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertIn("primary site language, not the user/chat language", intake)
             self.assertIn("https://dribbble.com/", intake)
 
+    def test_generated_project_includes_tooling_audit_onboarding(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+            create_site_project(ROOT, target)
+
+            start_here = (target / "START_HERE.md").read_text(encoding="utf-8")
+            tooling = (target / "AGENT_SITE_TOOLING.md").read_text(encoding="utf-8")
+            readme = (target / "README.md").read_text(encoding="utf-8")
+
+            for text in [start_here, tooling, readme]:
+                self.assertIn("python tools/llm_wiki.py tools audit", text)
+            self.assertIn("asks permission before installing", tooling)
+
     def test_cli_site_init_creates_project(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"

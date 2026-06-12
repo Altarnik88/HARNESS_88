@@ -17,6 +17,7 @@ This project is a clean generated site workspace built from the HARNESS_88 auton
 
 ```powershell
 python -m unittest discover -s tests
+python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py site gates --json
@@ -43,3 +44,5 @@ python tools/llm_wiki.py quality --skip-frontend
 13. Run core checks with `python tools/llm_wiki.py quality --skip-frontend`.
 
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.
+
+Run `python tools/llm_wiki.py tools audit` after download or environment changes. It reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities, then asks permission before any install, GitHub skill download, or Codex plugin connection.

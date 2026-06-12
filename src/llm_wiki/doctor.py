@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .capabilities import capability_audit
 from .db import collect_lint_issues
 from .harness import validate_harness
 from .security import run_security_audit
@@ -31,6 +32,7 @@ def build_doctor_report(root: Path, skip_self_test: bool = False, run_security: 
         },
         "frontend": frontend_state(root),
         "security": security_state(root, run_security),
+        "tooling": capability_audit(root),
         "generated_project_self_test": generated_self_test_state(root, skip_self_test),
     }
     report["status"] = doctor_status(report)

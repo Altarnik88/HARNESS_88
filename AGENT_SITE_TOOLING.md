@@ -28,6 +28,7 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Preserve files under `raw/` during ingest.
 - For multi-agent website work, read `agents/TEAM.md` before delegation.
 - Real implementation requires a concrete task file in `agents/tasks/` or an equivalent approved plan.
+- Run `python tools/llm_wiki.py tools audit` after download or environment changes. The audit reports missing tools/skills/plugins and asks permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
 
 ## Optional Frontend Template
 
@@ -46,6 +47,7 @@ Core checks:
 
 ```powershell
 python -m unittest discover -s tests
+python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py site gates --json

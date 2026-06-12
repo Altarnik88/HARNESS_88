@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .capabilities import capability_audit
 from .doctor import build_doctor_report
 from .evidence import evidence_report
 from .gates import gates_status
@@ -91,6 +92,12 @@ def build_parser() -> argparse.ArgumentParser:
     quality_parser.add_argument("--full", action="store_true", help="Also run slower full checks such as frontend build.")
     quality_parser.add_argument("--skip-frontend", action="store_true", help="Run core checks without optional frontend checks.")
     quality_parser.add_argument("--json", action="store_true", help="Emit JSON quality results.")
+
+    tools_parser = subparsers.add_parser("tools", help="Audit local tools, Codex skills, plugins, and MCP setup.")
+    tools_subparsers = tools_parser.add_subparsers(dest="tools_command", required=True)
+    tools_audit_parser = tools_subparsers.add_parser("audit", help="Report available and missing tools/skills/plugins.")
+    tools_audit_parser.add_argument("--json", action="store_true", help="Emit JSON tooling audit.")
+    tools_audit_parser.add_argument("--codex-home", default="", help="Override Codex home directory for skill/plugin detection.")
 
     stack_parser = subparsers.add_parser("stack", help="Inspect and select the project stack profile.")
     stack_subparsers = stack_parser.add_subparsers(dest="stack_command", required=True)
@@ -266,6 +273,18 @@ def cmd_quality(root: Path, full: bool, skip_frontend: bool, as_json: bool) -> i
             if result.stderr.strip():
                 print(result.stderr.rstrip())
     return quality_exit_code(results)
+
+
+def cmd_tools(args: argparse.Namespace, root: Path) -> int:
+    if args.tools_command == "audit":
+        codex_home = Path(args.codex_home) if args.codex_home else None
+        report = capability_audit(root, codex_home=codex_home)
+        if args.json:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+        else:
+            print_tools_audit(report)
+        return 0
+    raise ValueError(f"Unknown tools command: {args.tools_command}")
 
 
 def cmd_stack(args: argparse.Namespace, root: Path) -> int:
@@ -513,6 +532,11 @@ def print_doctor_report(report: dict[str, object]) -> None:
     print(f"Site implementation: {'ready' if readiness['site_implementation_ready'] else 'not configured'}")
     print(f"Delivery gates: {'ready' if readiness['delivery_gates_ready'] else 'pending'}")
     print(f"Publish handoff: {'ready' if readiness['publish_ready'] else 'blocked'}")
+    tooling = report.get("tooling", {})
+    if isinstance(tooling, dict):
+        summary = tooling.get("summary", {})
+        if isinstance(summary, dict):
+            print(f"Tooling: {tooling.get('status', 'unknown')} ({summary.get('available', 0)} available, {summary.get('missing', 0)} missing)")
     print(f"Next command: {readiness['next_command']}")
     blockers = readiness.get("blockers", [])
     if blockers:
@@ -520,6 +544,29 @@ def print_doctor_report(report: dict[str, object]) -> None:
         for blocker in blockers:
             assert isinstance(blocker, dict)
             print(f"- {blocker['path']}: {blocker['message']}")
+
+
+def print_tools_audit(report: dict[str, object]) -> None:
+    print(f"Tooling status: {report['status']}")
+    summary = report["summary"]
+    assert isinstance(summary, dict)
+    print(f"Available: {summary['available']} / {summary['total']}")
+    print(f"Missing required: {summary['required_missing']}")
+    print(f"Missing recommended: {summary['recommended_missing']}")
+    print(f"Missing optional: {summary['optional_missing']}")
+    print(str(report["setup_policy"]))
+    print("Capabilities:")
+    for item in report["items"]:
+        assert isinstance(item, dict)
+        print(f"- {item['status']} [{item['importance']}] {item['name']}: {item['description']}")
+        if item.get("install_hint"):
+            print(f"  Next: {item['install_hint']}")
+    actions = report.get("next_actions", [])
+    if actions:
+        print("Permission prompts:")
+        for action in actions:
+            assert isinstance(action, dict)
+            print(f"- {action['prompt']}")
 
 
 def print_intake_status(status: dict[str, object]) -> None:
@@ -678,6 +725,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_events(root, args.limit, args.json)
     if args.command == "quality":
         return cmd_quality(root, args.full, args.skip_frontend, args.json)
+    if args.command == "tools":
+        return cmd_tools(args, root)
     if args.command == "stack":
         return cmd_stack(args, root)
     if args.command == "site":

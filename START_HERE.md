@@ -8,7 +8,7 @@ Open Codex or another coding-agent chat in the root of this repository and start
 
 ```text
 Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
-Check intake, gates, and readiness with python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
+Check local tools/skills/plugins, intake, gates, and readiness with python tools/llm_wiki.py tools audit --json, python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
 The stack is not selected yet. Run a first-run intake for my site, asking questions in my language, including country, site language, site type, style, ecommerce/catalog/payment/request mode, references, and content sources. Record accepted answers in SITE_INTAKE.md. Then recommend a stack/fullstack profile, update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness only after approvals are recorded.
 ```
 
@@ -43,6 +43,7 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
 1. Check the core harness:
 
    ```powershell
+   python tools/llm_wiki.py tools audit --json
    python tools/llm_wiki.py site intake --json
    python tools/llm_wiki.py site gates --json
    python tools/llm_wiki.py task readiness --json
@@ -96,3 +97,7 @@ HARNESS_88 does not choose Next.js or fullstack by default. The `frontend/` dire
 Use `python tools/llm_wiki.py site doctor` for a unified readiness, wiki, task, frontend, security, and generated-starter self-test report.
 
 Secrets must never be pasted into chat or project files. Use `agents/workflows/secret-broker.md` as the contract for future backend/deployment secret handling.
+
+## Tooling Onboarding
+
+After downloading HARNESS_88, run `python tools/llm_wiki.py tools audit` before serious work. The audit reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities. It does not install anything. If something is missing, the agent must ask permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.

@@ -22,6 +22,7 @@ HARNESS_88 разделяет работу над ядром и реализац
 
 - Core-разработка может продолжаться, пока корневые `PRODUCT.md`, `DESIGN.md` и `STACK.md` остаются в draft/unselected состоянии.
 - Реализация сайта начинается только после готовности `SITE_INTAKE.md`, `PRODUCT.md`, `DESIGN.md`, утвержденных референсов, выбранного стека и task ownership.
+- Скачанная копия может проверить локальные tools, Codex skills, plugins и MCP-related capabilities до начала серьезной работы.
 - Доставка отслеживается через `SITE_GATES.md`: approval frontend-превью, backend/data readiness, total audit, remediation, финальное одобрение пользователя и publish handoff.
 - Агенты задают вопросы на языке пользователя, а поле `language` в `SITE_INTAKE.md` описывает основной язык сайта.
 - Если у пользователя нет референсов, Reference Research предлагает варианты из Dribbble, Behance, Awwwards и релевантных конкурентов до начала frontend-работ.
@@ -55,6 +56,7 @@ HARNESS_88 использует agent-first модель:
 - `python tools/llm_wiki.py site doctor` - единая диагностика readiness, wiki, task graph, frontend, security и generated starter checks.
 - `python tools/llm_wiki.py quality --skip-frontend` - stack-neutral quality gate для ядра.
 - `python tools/llm_wiki.py rebuild` и `python tools/llm_wiki.py lint` - индекс wiki и Markdown quality checks.
+- `python tools/llm_wiki.py tools audit` - аудит локальных tools, Codex skills, plugins и MCP capabilities.
 
 Маршрутизация tools/skills для агентов:
 
@@ -65,6 +67,8 @@ HARNESS_88 использует agent-first модель:
 - **GitHub plugin / `gh-cli` skill:** repository, pull request, issue и CI workflows.
 - **Reference discovery:** Dribbble, Behance, Awwwards, конкуренты и market examples.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets и Remotion, когда задача и tooling matrix это разрешают.
+
+Tooling audit работает read-only. Он показывает, что доступно, чего не хватает, и на что агент должен спросить разрешение: установка локальных tools, скачивание skills из GitHub или подключение Codex plugins/skills. HARNESS_88 не должен ничего устанавливать или подключать автоматически.
 
 ## Контракты репозитория
 
@@ -86,6 +90,7 @@ HARNESS_88 использует agent-first модель:
 ## Первый запуск
 
 ```powershell
+python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py site gates --json
