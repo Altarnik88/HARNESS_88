@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 from collections.abc import Callable
@@ -10,6 +11,22 @@ from typing import Any
 
 
 SecurityRunner = Callable[[list[str], Path], tuple[int, str, str]]
+
+PROVIDER_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
+VARIABLE_NAME_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+LONG_SECRET_TOKEN_RE = re.compile(r"[A-Za-z0-9_./+=-]{32,}")
+SECRET_MARKERS = (
+    "sk-",
+    "ghp_",
+    "github_pat_",
+    "xoxb-",
+    "eyj",
+    "service_role=",
+    "secret=",
+    "token=",
+    "password=",
+    "api_key=",
+)
 
 
 @dataclass(frozen=True)
@@ -45,6 +62,7 @@ class SecurityAuditResult:
     issues: list[SecurityIssue]
     message: str
     recorded_review: bool = False
+    availability_reason: str = ""
 
     @property
     def unresolved_count(self) -> int:
@@ -61,12 +79,68 @@ class SecurityAuditResult:
             "cwd": self.cwd,
             "exit_code": self.exit_code,
             "message": self.message,
+            "availability_reason": self.availability_reason,
             "unresolved_count": self.unresolved_count,
             "allowed_count": self.allowed_count,
             "recorded_review": self.recorded_review,
             "issues": [issue.to_json() for issue in self.issues],
             "stderr": self.stderr,
         }
+
+
+def build_secret_plan(provider: str, variable_names: list[str], operation: str) -> dict[str, object]:
+    provider_id = provider.strip().casefold()
+    operation_text = operation.strip()
+    validate_secret_plan_metadata(provider_id, variable_names, operation_text)
+    return {
+        "provider": provider_id,
+        "required_variable_names": variable_names,
+        "operation": operation_text,
+        "status": "dry-run",
+        "secret_values_visible": False,
+        "next_action": (
+            "Ask the user to run the local secret broker and provide these variable values there; "
+            "do not paste secret values into chat, project files, MCP arguments, or logs."
+        ),
+    }
+
+
+def validate_secret_plan_metadata(provider: str, variable_names: list[str], operation: str) -> None:
+    if not provider or not PROVIDER_RE.fullmatch(provider):
+        raise ValueError("Provider must be a non-secret provider id such as supabase, stripe, vercel, or custom.")
+    if not variable_names:
+        raise ValueError("At least one required variable name is required.")
+    for name in variable_names:
+        if not VARIABLE_NAME_RE.fullmatch(name):
+            raise ValueError("Secret-plan --vars accepts variable names only; do not pass values or key=value pairs.")
+        if looks_like_secret_value(name):
+            raise ValueError("Secret-plan --vars accepts variable names only; do not pass secret values.")
+    if not operation:
+        raise ValueError("Operation must describe the non-secret broker action.")
+    if looks_like_secret_value(operation):
+        raise ValueError("Operation must not contain secret-looking values.")
+
+
+def looks_like_secret_value(value: str) -> bool:
+    normalized = value.strip().casefold()
+    if "=" in value:
+        return True
+    if any(marker in normalized for marker in SECRET_MARKERS):
+        return True
+    if LONG_SECRET_TOKEN_RE.fullmatch(value) and "_" not in value:
+        return True
+    if LONG_SECRET_TOKEN_RE.search(value) and not VARIABLE_NAME_RE.fullmatch(value):
+        return True
+    return False
+
+
+def rejected_secret_plan_receipt(message: str) -> dict[str, object]:
+    return {
+        "status": "rejected",
+        "message": message,
+        "secret_values_visible": False,
+        "next_action": "Provide only non-secret metadata: provider id, variable names, and operation description.",
+    }
 
 
 def run_security_audit(
@@ -126,15 +200,17 @@ def run_security_audit(
             recorded_review=recorded,
         )
     if exit_code != 0:
+        availability_reason = audit_unavailable_reason(stdout, stderr)
         return SecurityAuditResult(
-            status="unavailable",
+            status="network-unavailable" if availability_reason == "network" else "unavailable",
             command=command,
             cwd=str(frontend),
             exit_code=exit_code,
             stdout=stdout,
             stderr=stderr,
             issues=[],
-            message="npm audit did not return parseable vulnerability JSON.",
+            message=unavailable_message(availability_reason),
+            availability_reason=availability_reason,
         )
     return SecurityAuditResult(
         status="clean",
@@ -162,6 +238,33 @@ def run_npm_audit(command: list[str], cwd: Path) -> tuple[int, str, str]:
     except OSError as exc:
         return 1, "", str(exc)
     return completed.returncode, completed.stdout, completed.stderr
+
+
+def audit_unavailable_reason(stdout: str, stderr: str) -> str:
+    combined = f"{stdout}\n{stderr}".casefold()
+    network_markers = [
+        " eacces ",
+        " econnreset ",
+        " enotfound ",
+        " etimedout ",
+        " eai_again ",
+        "network",
+        "could not resolve",
+        "connect timeout",
+        "connection refused",
+    ]
+    padded = f" {combined} "
+    if "registry.npmjs.org" in combined and any(marker in padded for marker in network_markers):
+        return "network"
+    if any(marker in padded for marker in network_markers):
+        return "network"
+    return "parse-error"
+
+
+def unavailable_message(reason: str) -> str:
+    if reason == "network":
+        return "npm audit could not reach the npm registry; network access may be unavailable or blocked."
+    return "npm audit did not return parseable vulnerability JSON."
 
 
 def resolve_command(command: list[str]) -> list[str]:

@@ -9,6 +9,7 @@ from typing import Any
 
 STACK_PATH = Path("STACK.md")
 STACK_PROFILES_PATH = Path("agents") / "harness" / "stack-profiles.json"
+DEPLOY_HANDOFF_TEMPLATE_PATH = Path("agents") / "harness" / "deploy-handoff-template.md"
 PACKAGE_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -115,6 +116,49 @@ def select_stack_profile(root: Path, profile_name: str) -> dict[str, str]:
     path = root / STACK_PATH
     path.write_text(render_selected_stack(profile_name, root), encoding="utf-8")
     return read_stack_status(root)
+
+
+def deploy_template_path(root: Path | None = None) -> Path:
+    if root is not None and (root / DEPLOY_HANDOFF_TEMPLATE_PATH).exists():
+        return root / DEPLOY_HANDOFF_TEMPLATE_PATH
+    return PACKAGE_PROJECT_ROOT / DEPLOY_HANDOFF_TEMPLATE_PATH
+
+
+def deploy_template_payload(root: Path, profile_name: str) -> dict[str, object]:
+    profiles = profiles_by_name(root)
+    if profile_name not in profiles:
+        raise ValueError(f"Unknown stack profile: {profile_name}. Allowed profiles: {allowed_profile_text(root)}.")
+    profile = profiles[profile_name]
+    template = deploy_template_path(root)
+    return {
+        "profile": profile.name,
+        "status": "inactive-until-stack-approved",
+        "template_path": DEPLOY_HANDOFF_TEMPLATE_PATH.as_posix(),
+        "template_exists": template.exists(),
+        "selects_stack": False,
+        "handoff": {
+            "profile": profile.name,
+            "description": profile.description,
+            "frontend": profile.frontend,
+            "backend": profile.backend,
+            "commands": profile.commands,
+            "required_tools": profile.required_tools,
+            "ci_policy": profile.ci_policy,
+            "deploy_notes": profile.deploy_notes,
+            "required_approvals": [
+                "STACK.md status selected with this profile or an explicitly approved custom approach",
+                "PRODUCT.md and DESIGN.md approved",
+                "SITE_INTAKE.md and SITE_REFERENCES.md approved before frontend/site implementation",
+                "SITE_GATES.md final approval before publish/operate handoff is marked complete",
+            ],
+            "secret_handling": (
+                "Use `python tools/llm_wiki.py security secret-plan --provider <provider> "
+                "--vars <NAMES...> --operation \"<operation>\" --json` for dry-run evidence; "
+                "never paste or store secret values."
+            ),
+            "inactive_notice": "This template is inactive until stack/profile approval and final delivery gates are recorded.",
+        },
+    }
 
 
 def render_selected_stack(profile_name: str, root: Path | None = None) -> str:

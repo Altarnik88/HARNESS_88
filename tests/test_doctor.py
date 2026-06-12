@@ -62,10 +62,13 @@ class SiteDoctorTests(unittest.TestCase):
 
         self.assertEqual(code, 0, output)
         self.assertIn("Core workflow: ready", output)
+        self.assertIn("Core work may proceed: yes", output)
         self.assertIn("Site implementation: not configured", output)
+        self.assertIn("Site implementation lock: locked", output)
         self.assertIn("Site intake: pending", output)
         self.assertIn("Delivery gates: pending", output)
         self.assertIn("Publish handoff: blocked", output)
+        self.assertIn("use --json for full detail", output)
 
 
 if __name__ == "__main__":

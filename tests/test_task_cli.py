@@ -142,6 +142,14 @@ class TaskCliTests(unittest.TestCase):
             self.assertFalse(payload["publish_ready"])
             self.assertIn("SITE_GATES.md", payload["pending_delivery_gates"])
 
+    def test_task_readiness_human_output_compacts_core_and_site_state(self) -> None:
+        code, output = self.run_cli("--root", str(ROOT), "task", "readiness")
+
+        self.assertEqual(code, 0, output)
+        self.assertIn("Core work may proceed: yes", output)
+        self.assertIn("Site implementation lock: locked", output)
+        self.assertIn("use --json for full detail", output)
+
     def test_task_set_status_requires_force_for_invalid_transition(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

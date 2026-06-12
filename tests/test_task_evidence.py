@@ -195,11 +195,13 @@ class TaskEvidenceTests(unittest.TestCase):
             self.assertEqual(report["summary"]["missing_support_files"]["count"], 0)
             self.assertEqual(report["summary"]["verification_evidence"]["count"], 1)
             self.assertEqual(report["summary"]["implementation_evidence"]["paths"], ["agents/tasks/2026-06-11-evidence-task.md"])
-            self.assertEqual(report["summary"]["residual_risk"]["count"], 1)
+            self.assertEqual(report["summary"]["residual_risk"]["count"], 0)
+            self.assertEqual(report["summary"]["residual_risk_states"]["deferred"]["count"], 1)
             self.assertEqual(report["issues"], [])
             row = report["tasks"][0]
             self.assertTrue(row["support_files"]["progress"]["exists"])
             self.assertTrue(row["support_files"]["checkpoint"]["exists"])
+            self.assertEqual(row["residual_risk_state"], "deferred")
             self.assertEqual(
                 row["evidence"],
                 {
@@ -207,7 +209,7 @@ class TaskEvidenceTests(unittest.TestCase):
                     "verification": True,
                     "review": True,
                     "wiki_log": True,
-                    "residual_risk": True,
+                    "residual_risk": False,
                 },
             )
 
@@ -257,6 +259,42 @@ class TaskEvidenceTests(unittest.TestCase):
 
             self.assertEqual(report["summary"]["residual_risk"]["count"], 0)
             self.assertFalse(report["tasks"][0]["evidence"]["residual_risk"])
+            self.assertEqual(report["tasks"][0]["residual_risk_state"], "none")
+
+    def test_plain_none_residual_risk_does_not_count_as_residual_risk(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_bundle(root, residual_risk="- None.")
+
+            report = evidence_report(root)
+
+            self.assertEqual(report["summary"]["residual_risk"]["count"], 0)
+            self.assertEqual(report["tasks"][0]["residual_risk_state"], "none")
+
+    def test_accepted_residual_risk_does_not_count_as_unresolved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_bundle(root, residual_risk="- Known optional frontend audit item is accepted as non-blocking for this core task.")
+
+            report = evidence_report(root)
+
+            self.assertEqual(report["summary"]["residual_risk"]["count"], 0)
+            self.assertEqual(report["summary"]["residual_risk_states"]["accepted"]["count"], 1)
+            self.assertEqual(report["tasks"][0]["residual_risk_state"], "accepted")
+            self.assertFalse(report["tasks"][0]["evidence"]["residual_risk"])
+
+    def test_unresolved_residual_risk_counts_as_residual_risk(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_bundle(root, residual_risk="- Unresolved moderate npm audit finding remains open.")
+
+            report = evidence_report(root)
+
+            self.assertEqual(report["summary"]["residual_risk"]["count"], 1)
+            self.assertEqual(report["summary"]["residual_risk"]["paths"], ["agents/tasks/2026-06-11-evidence-task.md"])
+            self.assertEqual(report["summary"]["residual_risk_states"]["unresolved"]["count"], 1)
+            self.assertEqual(report["tasks"][0]["residual_risk_state"], "unresolved")
+            self.assertTrue(report["tasks"][0]["evidence"]["residual_risk"])
 
     def test_task_evidence_cli_json_outputs_stable_summary(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -4,30 +4,17 @@ import argparse
 import json
 from pathlib import Path
 
-from .capabilities import capability_audit
-from .doctor import build_doctor_report
-from .evidence import evidence_report
-from .gates import gates_status
-from .intake import intake_status
+from .cli_security import cmd_security
+from .cli_site import cmd_site
+from .cli_tasks import cmd_task
+from .cli_tools import cmd_tools
 from .quality import quality_exit_code, run_quality
-from .references import reference_status
-from .security import run_security_audit
-from .site_generator import create_site_project
-from .site_self_test import run_generated_site_self_test, run_site_init_self_test
 from .stack import (
     allowed_profile_text,
+    deploy_template_payload,
     load_stack_profiles,
     read_stack_status,
     select_stack_profile,
-)
-from .tasks import (
-    create_task,
-    list_tasks,
-    next_task,
-    readiness_report,
-    set_task_status,
-    task_metrics,
-    validate_task_queue,
 )
 from .db import (
     add_source,
@@ -109,6 +96,9 @@ def build_parser() -> argparse.ArgumentParser:
     stack_select_parser = stack_subparsers.add_parser("select", help="Record the selected stack profile in STACK.md.")
     stack_select_parser.add_argument("profile", help="Stack profile name.")
     stack_select_parser.add_argument("--json", action="store_true", help="Emit JSON stack status.")
+    stack_deploy_parser = stack_subparsers.add_parser("deploy-template", help="Show inactive stack-neutral publish handoff guidance for a profile.")
+    stack_deploy_parser.add_argument("profile", help="Stack profile name.")
+    stack_deploy_parser.add_argument("--json", action="store_true", help="Emit JSON deploy handoff template payload.")
 
     site_parser = subparsers.add_parser("site", help="Create clean site-development projects.")
     site_subparsers = site_parser.add_subparsers(dest="site_command", required=True)
@@ -136,6 +126,11 @@ def build_parser() -> argparse.ArgumentParser:
     security_audit_parser.add_argument("--blocking", action="store_true", help="Exit 1 when unresolved security items are found.")
     security_audit_parser.add_argument("--no-record", action="store_true", help="Do not record unresolved items in wiki/review.md.")
     security_audit_parser.add_argument("--allowlist", default="", help="JSON allowlist path for accepted audit items.")
+    security_secret_parser = security_subparsers.add_parser("secret-plan", help="Create a redacted dry-run secret broker plan.")
+    security_secret_parser.add_argument("--provider", required=True, help="Non-secret provider id such as supabase or custom.")
+    security_secret_parser.add_argument("--vars", nargs="+", required=True, help="Required environment variable names only; values are rejected.")
+    security_secret_parser.add_argument("--operation", required=True, help="Non-secret operation description.")
+    security_secret_parser.add_argument("--json", action="store_true", help="Emit JSON dry-run receipt.")
 
     task_parser = subparsers.add_parser("task", help="Inspect and update Harness Engineering task files.")
     task_subparsers = task_parser.add_subparsers(dest="task_command", required=True)
@@ -278,18 +273,6 @@ def cmd_quality(root: Path, full: bool, skip_frontend: bool, as_json: bool) -> i
     return quality_exit_code(results)
 
 
-def cmd_tools(args: argparse.Namespace, root: Path) -> int:
-    if args.tools_command == "audit":
-        codex_home = Path(args.codex_home) if args.codex_home else None
-        report = capability_audit(root, codex_home=codex_home)
-        if args.json:
-            print(json.dumps(report, ensure_ascii=False, indent=2))
-        else:
-            print_tools_audit(report)
-        return 0
-    raise ValueError(f"Unknown tools command: {args.tools_command}")
-
-
 def cmd_stack(args: argparse.Namespace, root: Path) -> int:
     if args.stack_command == "list":
         profiles = load_stack_profiles(root)
@@ -326,350 +309,25 @@ def cmd_stack(args: argparse.Namespace, root: Path) -> int:
             print("STACK.md updated. No dependencies were installed and frontend/ was not changed.")
         return 0
 
-    raise ValueError(f"Unknown stack command: {args.stack_command}")
-
-
-def cmd_site(args: argparse.Namespace, root: Path) -> int:
-    if args.site_command == "init":
-        result = create_site_project(root, Path(args.target))
-        self_test = run_site_init_self_test(root, result.target) if args.self_test else None
-        if args.json:
-            payload = {
-                "target": str(result.target),
-                "copied_files": result.copied_files,
-                "self_test": self_test.to_json() if self_test else None,
-            }
-            print(json.dumps(payload, ensure_ascii=False, indent=2))
-            return 0 if self_test is None or self_test.status == "passed" else 1
-        print(f"Created clean site project: {result.target}")
-        print(f"Copied files: {result.copied_files}")
-        if self_test is not None:
-            print_self_test_result(self_test.to_json())
-            return 0 if self_test.status == "passed" else 1
-        print("Next: fill PRODUCT.md and DESIGN.md, then run python tools/llm_wiki.py task readiness")
-        return 0
-    if args.site_command == "self-test":
-        result = run_generated_site_self_test(root)
-        if args.json:
-            print(json.dumps(result.to_json(), ensure_ascii=False, indent=2))
-        else:
-            print_self_test_result(result.to_json())
-        return 0 if result.status == "passed" else 1
-    if args.site_command == "intake":
-        status = intake_status(root)
-        if args.json:
-            print(json.dumps(status, ensure_ascii=False, indent=2))
-        else:
-            print_intake_status(status)
-        return 0
-    if args.site_command == "references":
-        status = reference_status(root)
-        if args.json:
-            print(json.dumps(status, ensure_ascii=False, indent=2))
-        else:
-            print_reference_status(status)
-        return 0
-    if args.site_command == "gates":
-        status = gates_status(root)
-        if args.json:
-            print(json.dumps(status, ensure_ascii=False, indent=2))
-        else:
-            print_gates_status(status)
-        return 0
-    if args.site_command == "doctor":
-        report = build_doctor_report(root, skip_self_test=args.skip_self_test, run_security=args.run_security)
-        if args.json:
-            print(json.dumps(report, ensure_ascii=False, indent=2))
-        else:
-            print_doctor_report(report)
-        return 0 if report["status"] == "ok" else 1
-    raise ValueError(f"Unknown site command: {args.site_command}")
-
-
-def cmd_security(args: argparse.Namespace, root: Path) -> int:
-    if args.security_command == "audit":
-        allowlist_path = Path(args.allowlist) if args.allowlist else None
-        if allowlist_path is not None and not allowlist_path.is_absolute():
-            allowlist_path = root / allowlist_path
-        result = run_security_audit(
-            root,
-            blocking=args.blocking,
-            no_record=args.no_record,
-            allowlist_path=allowlist_path,
-        )
-        if args.json:
-            print(json.dumps(result.to_json(), ensure_ascii=False, indent=2))
-        else:
-            print_security_result(result.to_json())
-        return 1 if args.blocking and result.unresolved_count else 0
-    raise ValueError(f"Unknown security command: {args.security_command}")
-
-
-def cmd_task(args: argparse.Namespace, root: Path) -> int:
-    if args.task_command == "list":
-        records = list_tasks(root, status=args.status or None)
-        if args.json:
-            print(json.dumps([record.to_json() for record in records], ensure_ascii=False, indent=2))
-        elif not records:
-            print("No tasks found.")
-        else:
-            for record in records:
-                print_task_record(record)
-        return 0
-
-    if args.task_command == "next":
-        record = next_task(root)
-        if args.json:
-            print(json.dumps(record.to_json() if record else None, ensure_ascii=False, indent=2))
-        elif record is None:
-            print("No ready or planned tasks.")
-        else:
-            print_task_record(record)
-        return 0
-
-    if args.task_command == "validate":
-        issues = validate_task_queue(root)
-        if args.json:
-            print(json.dumps([issue.__dict__ for issue in issues], ensure_ascii=False, indent=2))
-        elif not issues:
-            print("No task validation issues found.")
-        else:
-            for issue in issues:
-                print(f"{issue.severity.upper()} {issue.path}: {issue.message}")
-        return 1 if args.strict and issues else 0
-
-    if args.task_command == "set-status":
+    if args.stack_command == "deploy-template":
         try:
-            record = set_task_status(root, args.path, args.status, force=args.force)
+            payload = deploy_template_payload(root, args.profile)
         except ValueError as exc:
             print(str(exc))
             return 2
         if args.json:
-            print(json.dumps(record.to_json(), ensure_ascii=False, indent=2))
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
         else:
-            print(f"Updated {record.path}: {record.status}")
+            handoff = payload["handoff"]
+            assert isinstance(handoff, dict)
+            print(f"Deploy handoff template: {payload['profile']} ({payload['status']})")
+            print(f"Template: {payload['template_path']}")
+            print(f"Selects stack: {str(payload['selects_stack']).lower()}")
+            print(f"Deploy notes: {handoff['deploy_notes']}")
+            print(f"Secret handling: {handoff['secret_handling']}")
         return 0
 
-    if args.task_command == "create":
-        result = create_task(
-            root,
-            title=args.title,
-            objective=args.objective,
-            role_owner=args.owner,
-            status=args.status,
-            owned_files=args.owned or None,
-            do_not_edit=args.do_not_edit or None,
-            verification_command=args.verification,
-            created=args.created or None,
-        )
-        if args.json:
-            print(json.dumps(result.to_json(), ensure_ascii=False, indent=2))
-        else:
-            print(f"Created {result.task.path}")
-            print(f"Progress: {result.progress_path}")
-            print(f"Checkpoint: {result.checkpoint_path}")
-        return 0
-
-    if args.task_command == "report":
-        metrics = task_metrics(root)
-        if args.json:
-            print(json.dumps(metrics, ensure_ascii=False, indent=2))
-        else:
-            print(f"Tasks: {metrics['total']} total, {metrics['open']} open, {metrics['closed']} closed")
-            by_status = metrics["by_status"]
-            assert isinstance(by_status, dict)
-            for status, count in by_status.items():
-                if count:
-                    print(f"- {status}: {count}")
-        return 0
-
-    if args.task_command == "evidence":
-        report = evidence_report(root)
-        if args.json:
-            print(json.dumps(report, ensure_ascii=False, indent=2))
-        else:
-            print_evidence_report(report)
-        return 0
-
-    if args.task_command == "readiness":
-        report = readiness_report(root)
-        if args.json:
-            print(json.dumps(report, ensure_ascii=False, indent=2))
-        else:
-            env = "ready" if report["environment_ready"] else "has issues"
-            product = "ready" if report["product_design_ready"] else "pending decisions"
-            print(f"Environment: {env}")
-            print(f"Core development: {'ready' if report['core_development_ready'] else 'has issues'}")
-            print(f"Product/design: {product}")
-            print(f"Site intake: {'ready' if report['intake_ready'] else 'pending'}")
-            print(f"References: {'ready' if report['references_ready'] else 'pending'}")
-            print(f"Site implementation: {'ready' if report['site_implementation_ready'] else 'not configured'}")
-            print(f"Delivery gates: {'ready' if report['delivery_gates_ready'] else 'pending'}")
-            print(f"Publish handoff: {'ready' if report['publish_ready'] else 'blocked'}")
-            pending = report["pending_decisions"]
-            if pending:
-                print("Pending decisions:")
-                for item in pending:
-                    print(f"- {item}")
-            print(f"Next command: {report['next_command']}")
-        return 0
-
-    raise ValueError(f"Unknown task command: {args.task_command}")
-
-
-def print_task_record(record) -> None:
-    print(f"{record.status:11} {record.path} | {record.title}")
-    if record.objective:
-        print(f"  {record.objective}")
-
-
-def print_self_test_result(payload: dict[str, object]) -> None:
-    print(f"Generated project self-test: {payload['status']}")
-    print(f"Target: {payload['target']}")
-    for result in payload["quality_results"]:
-        assert isinstance(result, dict)
-        status = "PASS" if result["exit_code"] == 0 else "FAIL"
-        print(f"{status} {result['name']} ({result['exit_code']})")
-
-
-def print_doctor_report(report: dict[str, object]) -> None:
-    print(f"Doctor status: {report['status']}")
-    readiness = report["readiness"]
-    assert isinstance(readiness, dict)
-    print(f"Core workflow: {'ready' if readiness['core_development_ready'] else 'has issues'}")
-    print(f"Site intake: {'ready' if readiness['intake_ready'] else 'pending'}")
-    print(f"References: {'ready' if readiness['references_ready'] else 'pending'}")
-    print(f"Site implementation: {'ready' if readiness['site_implementation_ready'] else 'not configured'}")
-    print(f"Delivery gates: {'ready' if readiness['delivery_gates_ready'] else 'pending'}")
-    print(f"Publish handoff: {'ready' if readiness['publish_ready'] else 'blocked'}")
-    tooling = report.get("tooling", {})
-    if isinstance(tooling, dict):
-        summary = tooling.get("summary", {})
-        if isinstance(summary, dict):
-            print(f"Tooling: {tooling.get('status', 'unknown')} ({summary.get('available', 0)} available, {summary.get('missing', 0)} missing)")
-    print(f"Next command: {readiness['next_command']}")
-    blockers = readiness.get("blockers", [])
-    if blockers:
-        print("Blockers:")
-        for blocker in blockers:
-            assert isinstance(blocker, dict)
-            print(f"- {blocker['path']}: {blocker['message']}")
-
-
-def print_tools_audit(report: dict[str, object]) -> None:
-    print(f"Tooling status: {report['status']}")
-    summary = report["summary"]
-    assert isinstance(summary, dict)
-    print(f"Available: {summary['available']} / {summary['total']}")
-    print(f"Missing required: {summary['required_missing']}")
-    print(f"Missing recommended: {summary['recommended_missing']}")
-    print(f"Missing optional: {summary['optional_missing']}")
-    print(str(report["setup_policy"]))
-    print("Capabilities:")
-    for item in report["items"]:
-        assert isinstance(item, dict)
-        print(f"- {item['status']} [{item['importance']}] {item['name']}: {item['description']}")
-        if item.get("resource_url"):
-            print(f"  Source: {item['resource_url']}")
-        if item.get("install_hint"):
-            print(f"  Next: {item['install_hint']}")
-    actions = report.get("next_actions", [])
-    if actions:
-        print("Permission prompts:")
-        for action in actions:
-            assert isinstance(action, dict)
-            print(f"- {action['prompt']}")
-
-
-def print_intake_status(status: dict[str, object]) -> None:
-    print(f"Site intake: {'ready' if status['intake_ready'] else 'pending'}")
-    print(f"References: {'ready' if status['references_ready'] else 'pending'}")
-    print(f"Path: {status['path']}")
-    print(f"Status: {status['status']}")
-    missing = status.get("missing_fields", [])
-    if missing:
-        print("Missing fields:")
-        for field in missing:
-            print(f"- {field}")
-    blockers = status.get("blockers", [])
-    if blockers:
-        print("Blockers:")
-        for blocker in blockers:
-            assert isinstance(blocker, dict)
-            print(f"- {blocker['message']}")
-
-
-def print_reference_status(status: dict[str, object]) -> None:
-    print(f"Reference analysis: {'ready' if status['reference_analysis_ready'] else 'pending'}")
-    print(f"Path: {status['path']}")
-    print(f"Status: {status['status']}")
-    pending = status.get("pending_reference_gates", [])
-    if pending:
-        print("Pending reference gates:")
-        for gate in pending:
-            print(f"- {gate}")
-    manifest = status.get("manifest", {})
-    if isinstance(manifest, dict):
-        print(f"Manifest: {'valid' if manifest.get('valid') else 'pending'}")
-        print(f"Captured pages: {manifest.get('captured_page_count', 0)}")
-    blockers = status.get("blockers", [])
-    if blockers:
-        print("Blockers:")
-        for blocker in blockers:
-            assert isinstance(blocker, dict)
-            print(f"- {blocker['message']}")
-
-
-def print_gates_status(status: dict[str, object]) -> None:
-    print(f"Delivery gates: {'ready' if status['delivery_gates_ready'] else 'pending'}")
-    print(f"Publish handoff: {'ready' if status['publish_ready'] else 'blocked'}")
-    print(f"Path: {status['path']}")
-    print(f"Status: {status['status']}")
-    pending = status.get("pending_delivery_gates", [])
-    if pending:
-        print("Pending delivery gates:")
-        for gate in pending:
-            print(f"- {gate}")
-    blockers = status.get("blockers", [])
-    if blockers:
-        print("Blockers:")
-        for blocker in blockers:
-            assert isinstance(blocker, dict)
-            print(f"- {blocker['message']}")
-
-
-def print_security_result(payload: dict[str, object]) -> None:
-    print(f"Security audit: {payload['status']}")
-    print(f"Unresolved items: {payload['unresolved_count']}")
-    if payload.get("message"):
-        print(str(payload["message"]))
-
-
-def print_evidence_report(report: dict[str, object]) -> None:
-    metrics = report["task_metrics"]
-    assert isinstance(metrics, dict)
-    summary = report["summary"]
-    assert isinstance(summary, dict)
-    print(f"Tasks: {metrics['total']} total, {metrics['open']} open, {metrics['closed']} closed")
-    print(f"Missing support files: {summary_count(summary, 'missing_support_files')}")
-    print(f"Verified without verification evidence: {summary_count(summary, 'verified_without_verification')}")
-    print(f"Implementation evidence: {summary_count(summary, 'implementation_evidence')}")
-    print(f"Verification evidence: {summary_count(summary, 'verification_evidence')}")
-    print(f"Review evidence: {summary_count(summary, 'review_evidence')}")
-    print(f"Wiki/log evidence: {summary_count(summary, 'wiki_log_evidence')}")
-    print(f"Residual risk: {summary_count(summary, 'residual_risk')}")
-    issues = report.get("issues", [])
-    if issues:
-        print("Issues:")
-        for issue in issues:
-            assert isinstance(issue, dict)
-            print(f"- {issue['path']}: {issue['message']}")
-
-
-def summary_count(summary: dict[str, object], key: str) -> object:
-    bucket = summary[key]
-    assert isinstance(bucket, dict)
-    return bucket["count"]
+    raise ValueError(f"Unknown stack command: {args.stack_command}")
 
 
 def cmd_ingest(args: argparse.Namespace, root: Path) -> int:

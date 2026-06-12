@@ -14,6 +14,7 @@ EVIDENCE_KEYS = [
     "wiki_log",
     "residual_risk",
 ]
+RESIDUAL_RISK_STATES = ["none", "deferred", "accepted", "unresolved"]
 
 SECTION_RE_TEMPLATE = r"^##\s+{title}\s*$\n(?P<body>.*?)(?=^##\s+|\Z)"
 
@@ -32,10 +33,13 @@ def evidence_report(root: Path) -> dict[str, object]:
     missing_support_paths: list[str] = []
     verified_without_verification: list[str] = []
     evidence_paths: dict[str, list[str]] = {key: [] for key in EVIDENCE_KEYS}
+    residual_risk_paths: dict[str, list[str]] = {state: [] for state in RESIDUAL_RISK_STATES}
 
     for record in records:
         row = task_evidence_row(root, record)
         rows.append(row)
+        risk_state = str(row["residual_risk_state"])
+        residual_risk_paths.setdefault(risk_state, []).append(record.path)
 
         support_files = row["support_files"]
         assert isinstance(support_files, dict)
@@ -79,6 +83,10 @@ def evidence_report(root: Path) -> dict[str, object]:
             "review_evidence": evidence_bucket(evidence_paths["review"]),
             "wiki_log_evidence": evidence_bucket(evidence_paths["wiki_log"]),
             "residual_risk": evidence_bucket(evidence_paths["residual_risk"]),
+            "residual_risk_states": {
+                state: evidence_bucket(residual_risk_paths.get(state, []))
+                for state in RESIDUAL_RISK_STATES
+            },
         },
         "tasks": rows,
         "issues": issues,
@@ -96,13 +104,14 @@ def task_evidence_row(root: Path, record: TaskRecord) -> dict[str, object]:
     progress_text = read_text(progress_path)
     checkpoint_text = read_text(checkpoint_path)
     combined_text = "\n".join([task_text, progress_text, checkpoint_text])
+    residual_risk = classify_residual_risk(section_body(checkpoint_text, "Residual Risk"))
 
     evidence = {
         "implementation": section_has_evidence(checkpoint_text, "Implementation Evidence", "implementation"),
         "verification": has_verification_evidence(combined_text),
         "review": section_has_evidence(checkpoint_text, "Review Evidence", "review"),
         "wiki_log": section_has_evidence(checkpoint_text, "Wiki and Log Updates", "wiki_log"),
-        "residual_risk": section_has_evidence(checkpoint_text, "Residual Risk", "residual_risk"),
+        "residual_risk": residual_risk == "unresolved",
     }
 
     return {
@@ -116,6 +125,7 @@ def task_evidence_row(root: Path, record: TaskRecord) -> dict[str, object]:
             "checkpoint": {"path": checkpoint_rel.as_posix(), "exists": checkpoint_path.exists()},
         },
         "evidence": evidence,
+        "residual_risk_state": residual_risk,
     }
 
 
@@ -131,6 +141,59 @@ def section_has_evidence(text: str, title: str, key: str) -> bool:
     if not normalized:
         return False
     return normalized not in PLACEHOLDER_TEXT[key]
+
+
+def classify_residual_risk(body: str | None) -> str:
+    if body is None:
+        return "none"
+    normalized = normalize_text(body)
+    if not normalized or normalized in PLACEHOLDER_TEXT["residual_risk"]:
+        return "none"
+    if contains_any(
+        normalized,
+        [
+            "no residual risk",
+            "no known residual risk",
+            "no unresolved risk",
+            "none",
+            "none recorded",
+        ],
+    ):
+        return "none"
+    if contains_any(normalized, ["accepted", "allowlist", "allowlisted", "allowed"]):
+        return "accepted"
+    if contains_any(
+        normalized,
+        [
+            "unresolved",
+            "blocking",
+            "open security",
+            "open issue",
+            "finding remains",
+            "findings remain",
+            "vulnerability",
+            "vulnerabilities",
+            "npm audit finding",
+            "npm audit item",
+        ],
+    ):
+        return "unresolved"
+    if contains_any(
+        normalized,
+        [
+            "deferred",
+            "future work",
+            "future task",
+            "separate task",
+            "separate approved task",
+            "not implemented in this task",
+            "requires a separate",
+            "after provider",
+            "after platform",
+        ],
+    ):
+        return "deferred"
+    return "unresolved"
 
 
 def section_body(text: str, title: str) -> str | None:
@@ -150,6 +213,10 @@ def normalize_text(text: str) -> str:
         if line:
             stripped_lines.append(line)
     return re.sub(r"\s+", " ", " ".join(stripped_lines).casefold()).strip().rstrip(".")
+
+
+def contains_any(text: str, needles: list[str]) -> bool:
+    return any(needle in text for needle in needles)
 
 
 def read_text(path: Path) -> str:

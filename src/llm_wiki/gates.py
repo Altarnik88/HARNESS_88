@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-import re
 from pathlib import Path
+
+from .status_fields import missing_required_fields as shared_missing_required_fields
+from .status_fields import parse_fields as shared_parse_fields
+from .status_fields import parse_status, value_is_unknown as shared_value_is_unknown
 
 
 GATES_PATH = Path("SITE_GATES.md")
@@ -24,10 +27,6 @@ DELIVERY_GATE_FIELDS = [
     "final_user_approval",
 ]
 REQUIRED_FIELDS = DELIVERY_GATE_FIELDS + ["publish_operate_handoff"]
-
-STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
-FIELD_RE = re.compile(r"^(?P<key>[A-Za-z][A-Za-z0-9_-]*):\s*(?P<value>.*?)\s*$", re.MULTILINE)
-
 
 def gates_status(root: Path) -> dict[str, object]:
     path = root / GATES_PATH
@@ -92,25 +91,12 @@ def missing_gates_status() -> dict[str, object]:
     }
 
 
-def parse_status(text: str) -> str:
-    match = STATUS_RE.search(text)
-    if match is None:
-        return "missing"
-    return match.group("status").strip().casefold()
-
-
 def parse_fields(text: str) -> dict[str, str]:
-    fields: dict[str, str] = {}
-    for match in FIELD_RE.finditer(text):
-        key = match.group("key").strip().replace("-", "_").casefold()
-        if key == "status":
-            continue
-        fields[key] = normalize(match.group("value"))
-    return fields
+    return shared_parse_fields(text, normalize_values=True)
 
 
 def missing_required_fields(fields: dict[str, str]) -> list[str]:
-    return [field for field in REQUIRED_FIELDS if value_is_unknown(fields.get(field, ""))]
+    return shared_missing_required_fields(fields, REQUIRED_FIELDS, unknown_values=UNKNOWN_VALUES)
 
 
 def pending_gates(fields: dict[str, str]) -> list[str]:
@@ -181,9 +167,5 @@ def gate_blockers(
     return blockers
 
 
-def normalize(value: str) -> str:
-    return value.strip().casefold().replace(" ", "-").replace("_", "-")
-
-
 def value_is_unknown(value: str) -> bool:
-    return normalize(value) in UNKNOWN_VALUES
+    return shared_value_is_unknown(value, unknown_values=UNKNOWN_VALUES)

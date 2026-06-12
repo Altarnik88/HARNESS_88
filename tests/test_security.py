@@ -95,6 +95,127 @@ class SecurityAuditTests(unittest.TestCase):
             self.assertEqual(result.unresolved_count, 0)
             self.assertEqual(result.allowed_count, 1)
 
+    def test_security_audit_reports_network_unavailable_separately(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            frontend = root / "frontend"
+            frontend.mkdir()
+            (frontend / "package.json").write_text("{}", encoding="utf-8")
+            (frontend / "package-lock.json").write_text("{}", encoding="utf-8")
+
+            def fake_runner(command: list[str], cwd: Path) -> tuple[int, str, str]:
+                return (
+                    1,
+                    "",
+                    "npm warn audit request to https://registry.npmjs.org/-/npm/v1/security/advisories/bulk failed, reason: connect EACCES 198.20.0.36:443",
+                )
+
+            result = run_security_audit(root, no_record=True, runner=fake_runner)
+
+            self.assertEqual(result.status, "network-unavailable")
+            self.assertEqual(result.unresolved_count, 0)
+            self.assertIn("network access", result.message)
+            self.assertEqual(result.to_json()["availability_reason"], "network")
+
+    def test_security_audit_reports_malformed_output_as_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            frontend = root / "frontend"
+            frontend.mkdir()
+            (frontend / "package.json").write_text("{}", encoding="utf-8")
+            (frontend / "package-lock.json").write_text("{}", encoding="utf-8")
+
+            def fake_runner(command: list[str], cwd: Path) -> tuple[int, str, str]:
+                return 1, "not-json", "npm error audit endpoint returned an error"
+
+            result = run_security_audit(root, no_record=True, runner=fake_runner)
+
+            self.assertEqual(result.status, "unavailable")
+            self.assertEqual(result.to_json()["availability_reason"], "parse-error")
+
+    def test_secret_plan_cli_returns_redacted_dry_run_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+
+            code, output = self.run_cli(
+                "--root",
+                str(root),
+                "security",
+                "secret-plan",
+                "--provider",
+                "supabase",
+                "--vars",
+                "SUPABASE_URL",
+                "SUPABASE_SERVICE_ROLE_KEY",
+                "--operation",
+                "configure deployment env",
+                "--json",
+            )
+
+            self.assertEqual(code, 0, output)
+            payload = json.loads(output)
+            self.assertEqual(payload["provider"], "supabase")
+            self.assertEqual(payload["required_variable_names"], ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"])
+            self.assertEqual(payload["operation"], "configure deployment env")
+            self.assertEqual(payload["status"], "dry-run")
+            self.assertFalse(payload["secret_values_visible"])
+            self.assertIn("broker", payload["next_action"].casefold())
+            self.assertFalse((root / ".env").exists())
+
+    def test_secret_plan_rejects_secret_values_without_echoing_them(self) -> None:
+        secret_value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.super-secret-payload"
+        with tempfile.TemporaryDirectory() as tmp:
+            code, output = self.run_cli(
+                "--root",
+                tmp,
+                "security",
+                "secret-plan",
+                "--provider",
+                "supabase",
+                "--vars",
+                f"SUPABASE_SERVICE_ROLE_KEY={secret_value}",
+                "--operation",
+                "configure deployment env",
+                "--json",
+            )
+
+            self.assertEqual(code, 2, output)
+            payload = json.loads(output)
+            self.assertEqual(payload["status"], "rejected")
+            self.assertFalse(payload["secret_values_visible"])
+            self.assertNotIn(secret_value, output)
+            self.assertIn("variable names only", payload["message"])
+
+    def test_secret_plan_rejects_uppercase_token_without_echoing_it(self) -> None:
+        secret_value = "A" * 40
+        with tempfile.TemporaryDirectory() as tmp:
+            code, output = self.run_cli(
+                "--root",
+                tmp,
+                "security",
+                "secret-plan",
+                "--provider",
+                "supabase",
+                "--vars",
+                secret_value,
+                "--operation",
+                "configure deployment env",
+                "--json",
+            )
+
+            self.assertEqual(code, 2, output)
+            payload = json.loads(output)
+            self.assertEqual(payload["status"], "rejected")
+            self.assertFalse(payload["secret_values_visible"])
+            self.assertNotIn(secret_value, output)
+
+    def test_secret_broker_protocol_documents_secret_plan_command(self) -> None:
+        text = (ROOT / "agents" / "workflows" / "secret-broker.md").read_text(encoding="utf-8")
+
+        self.assertIn("security secret-plan", text)
+        self.assertIn("dry-run", text)
+        self.assertIn("Secret values: not visible to agents", text)
+
 
 if __name__ == "__main__":
     unittest.main()

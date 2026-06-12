@@ -7,6 +7,21 @@ from dataclasses import dataclass
 from pathlib import Path
 
 RESOURCE_REGISTRY_REL = Path("agents/resources/tooling-sources.json")
+NEXT_ACTION_GROUP_KEYS = [
+    "required_local_tools",
+    "recommended_local_tools",
+    "codex_skills",
+    "codex_plugins",
+    "host_managed_mcp",
+    "optional_design_resources",
+]
+OPTIONAL_DESIGN_RESOURCE_IDS = {
+    "skill.huashu-design",
+    "skill.impeccable",
+    "skill.ui-ux-pro-max",
+    "library.gsap",
+    "plugin.canva",
+}
 
 
 @dataclass(frozen=True)
@@ -312,6 +327,7 @@ def capability_audit(root: Path, codex_home: Path | None = None) -> dict[str, ob
     items = [capability_item(spec, codex_home, installed_names, resource_sources.get(spec.id, {})) for spec in CAPABILITY_SPECS]
     summary = capability_summary(items)
     next_actions = build_next_actions(items)
+    next_action_groups = build_next_action_groups(items, next_actions)
     return {
         "status": "ready" if summary["required_missing"] == 0 and summary["recommended_missing"] == 0 else "needs-setup",
         "root": str(root),
@@ -321,6 +337,7 @@ def capability_audit(root: Path, codex_home: Path | None = None) -> dict[str, ob
         "summary": summary,
         "items": items,
         "next_actions": next_actions,
+        "next_action_groups": next_action_groups,
     }
 
 
@@ -392,8 +409,21 @@ def capability_item(
     resource_source: dict[str, str],
 ) -> dict[str, object]:
     available = detect_capability(spec, installed_names)
-    status = "available" if available else "missing"
-    install_hint = "" if available else install_hint_with_source(spec, resource_source)
+    if available:
+        status = "available"
+        install_hint = ""
+        requires_permission = False
+        detected_by = detection_label(spec, codex_home, available)
+    elif spec.kind == "mcp-server":
+        status = "host-managed"
+        install_hint = "MCP server availability is managed by the Codex host; this audit does not install, auto-connect, or request connection."
+        requires_permission = False
+        detected_by = "host-managed:mcp-server"
+    else:
+        status = "missing"
+        install_hint = install_hint_with_source(spec, resource_source)
+        requires_permission = True
+        detected_by = detection_label(spec, codex_home, available)
     return {
         "id": spec.id,
         "name": spec.name,
@@ -401,9 +431,9 @@ def capability_item(
         "importance": spec.importance,
         "status": status,
         "description": spec.description,
-        "detected_by": detection_label(spec, codex_home, available),
+        "detected_by": detected_by,
         "install_hint": install_hint,
-        "requires_permission": not available,
+        "requires_permission": requires_permission,
         "resource_source": resource_source,
         "resource_url": resource_source.get("url", ""),
         "source_registry": resource_source.get("registry_path", RESOURCE_REGISTRY_REL.as_posix()),
@@ -446,6 +476,7 @@ def capability_summary(items: list[dict[str, object]]) -> dict[str, int]:
     summary = {
         "total": len(items),
         "available": 0,
+        "host_managed": 0,
         "missing": 0,
         "required_missing": 0,
         "recommended_missing": 0,
@@ -456,6 +487,8 @@ def capability_summary(items: list[dict[str, object]]) -> dict[str, int]:
         importance = str(item["importance"])
         if status == "available":
             summary["available"] += 1
+        elif status == "host-managed":
+            summary["host_managed"] += 1
         else:
             summary["missing"] += 1
             if importance == "required":
@@ -467,19 +500,27 @@ def capability_summary(items: list[dict[str, object]]) -> dict[str, int]:
     return summary
 
 
-def build_next_actions(items: list[dict[str, object]]) -> list[dict[str, str]]:
-    actions: list[dict[str, str]] = []
+def build_next_actions(items: list[dict[str, object]]) -> list[dict[str, object]]:
+    actions: list[dict[str, object]] = []
     for item in items:
-        if item["status"] == "available":
+        if item["status"] != "missing":
             continue
         resource_url = str(item.get("resource_url", ""))
         source_registry = str(item.get("source_registry", RESOURCE_REGISTRY_REL.as_posix()))
         resource_source = item.get("resource_source", {})
         is_github = isinstance(resource_source, dict) and str(resource_source.get("source_type", "")).casefold() == "github"
+        group = action_group_for_item(item)
+        permission_kind = permission_kind_for_item(item)
+        blocked = is_github and not resource_url
         if is_github and not resource_url:
             prompt = (
                 f"No approved GitHub URL is recorded for {item['name']} in {source_registry}. "
                 "Ask the user to provide and approve the exact repository link before any GitHub download."
+            )
+        elif resource_url.startswith("plugin://"):
+            prompt = (
+                f"Ask user permission before connecting Codex support for {item['name']} "
+                f"using the recorded plugin URI: {resource_url}."
             )
         elif resource_url:
             prompt = (
@@ -493,6 +534,9 @@ def build_next_actions(items: list[dict[str, object]]) -> list[dict[str, str]]:
                 "id": str(item["id"]),
                 "name": str(item["name"]),
                 "importance": str(item["importance"]),
+                "group": group,
+                "permission_kind": permission_kind,
+                "blocked": blocked,
                 "prompt": prompt,
                 "suggested_action": str(item["install_hint"]),
                 "resource_url": resource_url,
@@ -500,6 +544,71 @@ def build_next_actions(items: list[dict[str, object]]) -> list[dict[str, str]]:
             }
         )
     return actions
+
+
+def build_next_action_groups(
+    items: list[dict[str, object]],
+    next_actions: list[dict[str, object]],
+) -> dict[str, list[dict[str, object]]]:
+    groups: dict[str, list[dict[str, object]]] = {key: [] for key in NEXT_ACTION_GROUP_KEYS}
+    for action in next_actions:
+        group = str(action.get("group", ""))
+        if group in groups:
+            groups[group].append(action)
+    for item in items:
+        if item["status"] != "host-managed" or item["kind"] != "mcp-server":
+            continue
+        groups["host_managed_mcp"].append(host_managed_action(item))
+    return groups
+
+
+def host_managed_action(item: dict[str, object]) -> dict[str, object]:
+    return {
+        "id": str(item["id"]),
+        "name": str(item["name"]),
+        "importance": str(item["importance"]),
+        "group": "host_managed_mcp",
+        "permission_kind": "host-managed-mcp",
+        "blocked": False,
+        "prompt": "",
+        "suggested_action": str(item["install_hint"]),
+        "resource_url": str(item.get("resource_url", "")),
+        "source_registry": str(item.get("source_registry", RESOURCE_REGISTRY_REL.as_posix())),
+        "requires_permission": False,
+    }
+
+
+def action_group_for_item(item: dict[str, object]) -> str:
+    capability_id = str(item["id"])
+    kind = str(item["kind"])
+    importance = str(item["importance"])
+    if capability_id in OPTIONAL_DESIGN_RESOURCE_IDS:
+        return "optional_design_resources"
+    if kind == "local-tool":
+        return "required_local_tools" if importance == "required" else "recommended_local_tools"
+    if kind == "codex-skill":
+        return "codex_skills"
+    if kind == "codex-plugin":
+        return "codex_plugins"
+    if kind == "mcp-server":
+        return "host_managed_mcp"
+    return "optional_design_resources"
+
+
+def permission_kind_for_item(item: dict[str, object]) -> str:
+    kind = str(item["kind"])
+    resource_url = str(item.get("resource_url", ""))
+    if resource_url.startswith("plugin://") or kind == "codex-plugin":
+        return "codex-plugin-connect"
+    if kind == "codex-skill":
+        return "codex-skill-download"
+    if kind == "local-tool":
+        return "local-tool-install"
+    if kind == "frontend-library":
+        return "frontend-resource-approval"
+    if kind == "mcp-server":
+        return "host-managed-mcp"
+    return "user-permission"
 
 
 def normalize(value: str) -> str:

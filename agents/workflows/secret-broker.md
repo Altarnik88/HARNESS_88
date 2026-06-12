@@ -47,6 +47,22 @@ A safe broker program should:
 5. Broker performs the action and returns redacted status.
 6. Agent records redacted verification evidence.
 
+## Dry-Run Planning Command
+
+Agents can create a redacted planning receipt without invoking a broker or writing any files:
+
+```powershell
+python tools/llm_wiki.py security secret-plan --provider supabase --vars SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY --operation "configure deployment env" --json
+```
+
+The command accepts only non-secret metadata:
+
+- provider id;
+- required variable names;
+- operation description.
+
+It must not accept secret values, `VAR=value` pairs, `.env` writes, secret-store reads, screenshots, or MCP secret arguments. The JSON receipt is evidence-safe and uses `status: dry-run` plus `secret_values_visible: false`.
+
 ## Example Non-Secret Record
 
 ```text

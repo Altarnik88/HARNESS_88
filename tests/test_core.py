@@ -187,6 +187,45 @@ See [[Missing Page]].
             results = search(root, "UniqueExtractedNeedle", limit=5)
             self.assertTrue(any(row["kind"] == "source" for row in results))
 
+    def test_db_search_helpers_are_extractable_read_side_helpers(self) -> None:
+        from llm_wiki.db_search import fts_query, list_event_rows, search_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            ensure_project(root)
+            (root / "wiki" / "log.md").write_text(
+                "# Wiki Log\n\n## [2026-06-11] query | Search helper\n\n- Path: `wiki/index.md`\n",
+                encoding="utf-8",
+            )
+            (root / "wiki" / "concepts" / "search-helper.md").write_text(
+                """---
+title: Search Helper
+type: concept
+status: draft
+confidence: medium
+sources: []
+tags: []
+created: 2026-06-11
+updated: 2026-06-11
+summary: UniqueSearchHelperNeedle is indexed for read-only helper tests.
+---
+
+# Search Helper
+""",
+                encoding="utf-8",
+            )
+            rebuild_index(root)
+            conn = connect(root)
+            try:
+                self.assertEqual(fts_query('"UniqueSearchHelperNeedle"'), "UniqueSearchHelperNeedle")
+                search_results = search_rows(conn, "UniqueSearchHelperNeedle", limit=5)
+                events = list_event_rows(conn, limit=5)
+            finally:
+                conn.close()
+
+            self.assertTrue(any(row["path"].endswith("search-helper.md") for row in search_results))
+            self.assertEqual(events[0]["kind"], "query")
+
     def test_rebuild_indexes_task_records(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

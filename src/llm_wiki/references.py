@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 from .paths import relative_posix
+from .status_fields import missing_required_fields as shared_missing_required_fields
+from .status_fields import normalize, parse_fields, parse_status, value_is_unknown as shared_value_is_unknown
 
 
 REFERENCES_PATH = Path("SITE_REFERENCES.md")
@@ -33,10 +35,6 @@ FIELD_READY_VALUES = {
     "ux_visual_analysis": {"complete"},
     "user_reference_approval": {"approved"},
 }
-
-STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
-FIELD_RE = re.compile(r"^(?P<key>[A-Za-z][A-Za-z0-9_-]*):\s*(?P<value>.*?)\s*$", re.MULTILINE)
-
 
 def reference_status(root: Path) -> dict[str, object]:
     path = root / REFERENCES_PATH
@@ -106,25 +104,8 @@ def missing_reference_status() -> dict[str, object]:
     }
 
 
-def parse_status(text: str) -> str:
-    match = STATUS_RE.search(text)
-    if match is None:
-        return "missing"
-    return match.group("status").strip().casefold()
-
-
-def parse_fields(text: str) -> dict[str, str]:
-    fields: dict[str, str] = {}
-    for match in FIELD_RE.finditer(text):
-        key = match.group("key").strip().replace("-", "_").casefold()
-        if key == "status":
-            continue
-        fields[key] = match.group("value").strip()
-    return fields
-
-
 def missing_required_fields(fields: dict[str, str]) -> list[str]:
-    return [field for field in REQUIRED_FIELDS if value_is_unknown(fields.get(field, ""))]
+    return shared_missing_required_fields(fields, REQUIRED_FIELDS, unknown_values=UNKNOWN_VALUES)
 
 
 def pending_gates(fields: dict[str, str], manifest: dict[str, object]) -> list[str]:
@@ -383,9 +364,5 @@ def valid_figma_design_url(value: str) -> bool:
     return bool(FIGMA_DESIGN_RE.search(value.strip()))
 
 
-def normalize(value: str) -> str:
-    return value.strip().casefold().replace(" ", "-").replace("_", "-")
-
-
 def value_is_unknown(value: str) -> bool:
-    return normalize(value) in UNKNOWN_VALUES
+    return shared_value_is_unknown(value, unknown_values=UNKNOWN_VALUES)

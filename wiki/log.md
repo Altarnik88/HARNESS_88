@@ -53,3 +53,20 @@ Append durable project events using:
 - Path: `agents/workflows/agentic-site-delivery.md`
 - Path: `raw/assets/references/manifest.json`
 - Path: `agents/tasks/2026-06-11-task-evidence-summaries.md`
+
+## [2026-06-12] maintenance | Refactored core diagnostics, gate parsing, evidence, tooling, and security audit reporting
+- Path: `src/llm_wiki/status_fields.py`
+- Path: `src/llm_wiki/evidence.py`
+- Path: `src/llm_wiki/capabilities.py`
+- Path: `src/llm_wiki/security.py`
+- Path: `src/llm_wiki/cli.py`
+- Path: `agents/tasks/2026-06-12-core-harness-refactor-diagnostics-evidence-semantics.md`
+
+## [2026-06-12] maintenance | Improved core CLI split, secret planning, tooling readiness, DB read helpers, and deploy handoff templates
+- Path: `src/llm_wiki/cli.py`
+- Path: `src/llm_wiki/cli_tasks.py`
+- Path: `src/llm_wiki/security.py`
+- Path: `src/llm_wiki/capabilities.py`
+- Path: `src/llm_wiki/db_search.py`
+- Path: `agents/harness/deploy-handoff-template.md`
+- Path: `agents/tasks/2026-06-12-core-maintainability-security-tooling-db-delivery-adapters.md`

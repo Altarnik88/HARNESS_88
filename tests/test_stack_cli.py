@@ -100,6 +100,37 @@ class StackCliTests(unittest.TestCase):
             self.assertEqual(payload["status"], "selected")
             self.assertEqual(payload["selected_profile"], "sveltekit")
 
+    def test_stack_deploy_template_json_is_profile_aware_and_inactive(self) -> None:
+        code, output = self.run_cli("--root", str(ROOT), "stack", "deploy-template", "next-static", "--json")
+
+        self.assertEqual(code, 0, output)
+        payload = json.loads(output)
+        self.assertEqual(payload["profile"], "next-static")
+        self.assertEqual(payload["status"], "inactive-until-stack-approved")
+        self.assertEqual(payload["template_path"], "agents/harness/deploy-handoff-template.md")
+        self.assertFalse(payload["selects_stack"])
+        self.assertTrue(payload["handoff"]["frontend"])
+        self.assertFalse(payload["handoff"]["backend"])
+        self.assertIn("security secret-plan", payload["handoff"]["secret_handling"])
+
+    def test_stack_deploy_template_does_not_update_stack_md(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            stack = root / "STACK.md"
+            stack.write_text("status: unselected\nselected_profile: none\nnote: untouched\n", encoding="utf-8")
+
+            code, output = self.run_cli("--root", str(root), "stack", "deploy-template", "sveltekit", "--json")
+
+            self.assertEqual(code, 0, output)
+            self.assertEqual(stack.read_text(encoding="utf-8"), "status: unselected\nselected_profile: none\nnote: untouched\n")
+
+    def test_deploy_handoff_template_mentions_all_profiles_and_is_inactive(self) -> None:
+        text = (ROOT / "agents" / "harness" / "deploy-handoff-template.md").read_text(encoding="utf-8")
+
+        self.assertIn("inactive until stack/profile approval", text.casefold())
+        for profile in ["next-static", "next-fullstack", "astro-content", "sveltekit", "custom"]:
+            self.assertIn(profile, text)
+
 
 if __name__ == "__main__":
     unittest.main()
