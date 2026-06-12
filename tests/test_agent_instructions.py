@@ -34,6 +34,7 @@ class AgentInstructionTests(unittest.TestCase):
         ]:
             self.assertIn(rel, text)
             self.assertTrue((ROOT / rel).exists())
+        self.assertIn("SITE_REFERENCES.md", text)
 
     def test_agent_first_language_reference_contract_is_documented(self) -> None:
         protocol = (ROOT / "agents" / "protocols" / "conversation-delegation.md").read_text(encoding="utf-8")
@@ -43,6 +44,7 @@ class AgentInstructionTests(unittest.TestCase):
         delegation = (ROOT / "agents" / "templates" / "delegation-brief.md").read_text(encoding="utf-8")
         workflow = (ROOT / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
         intake = (ROOT / "SITE_INTAKE.md").read_text(encoding="utf-8")
+        references = (ROOT / "SITE_REFERENCES.md").read_text(encoding="utf-8")
 
         for needle in [
             "user language",
@@ -64,6 +66,10 @@ class AgentInstructionTests(unittest.TestCase):
         self.assertIn("update the role file and this matrix before delegating", tooling)
         self.assertIn("stop and update that contract before delegating", delegation)
         self.assertIn("primary site language, not the user/chat language", intake)
+        self.assertIn("SITE_REFERENCES.md", protocol)
+        self.assertIn("Bounded", workflow)
+        self.assertIn("Figma reference artifact", workflow)
+        self.assertIn("raw/assets/references/manifest.json", references)
 
     def test_design_resources_contract_is_documented(self) -> None:
         protocol = (ROOT / "agents" / "protocols" / "design-resources.md").read_text(encoding="utf-8")

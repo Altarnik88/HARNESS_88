@@ -58,32 +58,42 @@ Required skills/plugins/MCP:
 - Product Design `get-context` for missing product/UI decisions.
 - Context7 only when a stack decision depends on current framework/platform behavior.
 
-## Phase 3: Reference Gate
+## Phase 3: Reference Analysis Gate
 
-Lead roles: Reference Research, UX/Product Design, and Visual Design.
+Lead roles: Reference Research, UX/Product Design, Visual Design, and QA & Accessibility.
 
 Outputs:
 
 - User-provided reference sites, screenshots, brand examples, or competitor examples.
 - If the user has no references or cannot choose them, agent-proposed examples based on the intake answers.
 - Documented approval or rejection notes for each selected reference.
+- Bounded page inventory for every approved reference: same-origin public sitemap/navigation/footer pages, max 50 normalized pages per reference by default.
+- Desktop and mobile screenshot evidence recorded under `raw/assets/references/` and indexed by `raw/assets/references/manifest.json`.
+- Figma reference artifact in a Figma design file. If the user does not provide a Figma file, create one after confirming Figma access/team.
+- UX/visual analysis summary: page patterns, layout systems, component motifs, typography/color/spacing cues, interaction notes, cautions, and applicability.
 - Visual direction summary carried into `DESIGN.md` or an approved wiki decision.
+- `SITE_REFERENCES.md` updated to `Status: approved` only after the user accepts the reference-analysis evidence.
 
 Rules:
 
 - Do not start serious frontend implementation before references or reference substitutes are approved.
+- Do not start serious frontend implementation until `python tools/llm_wiki.py site references --json` reports `reference_analysis_ready: true`.
 - When references are missing or undecided, Conductor delegates Reference Research instead of selecting examples alone.
 - Agent-proposed reference discovery must include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`.
 - Reference shortlists must include URL, reason for inclusion, style tags, project applicability, cautions, and an explicit user approval prompt.
 - When examples are agent-proposed, clearly separate direct user preferences from agent suggestions.
 - Record unresolved reference disagreements as blockers, not assumptions.
+- Bounded crawl excludes login, private, admin, account, checkout/cart, destructive, and form-submission flows unless the user explicitly approves them.
+- Skipped pages and crawl blockers must be recorded with reasons in the screenshot manifest.
 
 Required skills/plugins/MCP:
 
+- Product Design `get-context` before product/UI assumptions.
 - Browser or web search only when current public references are needed.
+- Browser plugin or Playwright skill for page inventory, screenshots, responsive captures, and local evidence checks.
+- Figma MCP for the Figma reference artifact; Figma writes require explicit Figma workflow scope and access confirmation.
 - Product Design `ideate` for visual variants after the brief is clear.
 - Design resources from `agents/protocols/design-resources.md` when reference research feeds UX, visual direction, critique, or motion decisions.
-- Figma only when a Figma URL or explicit Figma workflow is requested.
 
 ## Phase 4: Sitemap, Content Model, and User Journeys
 

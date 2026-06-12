@@ -20,10 +20,12 @@ Use this protocol for user-facing questions, reference discovery, and Conductor 
 ## Reference Discovery
 
 - If the user has no references, cannot choose references, or asks the agent to propose them, the Conductor delegates reference discovery to Reference Research with UX/Product Design and Visual Design support as needed.
+- After references are approved, the Conductor delegates strict reference analysis before serious frontend work: bounded crawl, desktop/mobile screenshots, Figma artifact, UX/visual analysis, manifest coverage, and user approval.
 - Agent-proposed reference discovery must include these sources:
   - `https://dribbble.com/`
   - `https://www.behance.net/`
   - `https://www.awwwards.com/`
 - Add relevant competitor, market, or domain examples when useful, but do not replace the required sources above.
 - Return a short shortlist with URL, reason for inclusion, style tags, applicability to the project, and any visual or implementation cautions.
-- Separate user-provided preferences from agent suggestions, then wait for explicit user approval before setting `references_status: approved` or starting serious frontend implementation.
+- Separate user-provided preferences from agent suggestions, then wait for explicit user approval before setting `references_status: approved`.
+- Do not start serious frontend implementation until `SITE_REFERENCES.md` is approved and `python tools/llm_wiki.py site references --json` reports the reference-analysis gate ready.

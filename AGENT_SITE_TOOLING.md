@@ -7,6 +7,7 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Workspace: `<project-root>`
 - Stack state: `STACK.md` starts unselected and must be updated before production implementation.
 - Intake state: `SITE_INTAKE.md` starts draft and must record accepted first-run intake decisions before production implementation.
+- Reference analysis state: `SITE_REFERENCES.md` starts draft and must record bounded crawl, screenshots, Figma, UX/visual analysis, and user approval before serious frontend implementation.
 - Delivery gate state: `SITE_GATES.md` starts draft and must record preview approval, backend/data readiness, audit, remediation, final approval, and publish handoff before release.
 - Optional frontend template: `frontend/` contains a bundled Next.js starter/template.
 - Canonical LLM Wiki: `wiki/`
@@ -17,7 +18,9 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Do not begin website implementation until `STACK.md` has a selected profile or the user explicitly confirms a custom approach.
 - Do not begin website implementation until `SITE_INTAKE.md` has `Status: approved`.
 - Do not begin website implementation until `PRODUCT.md` and `DESIGN.md` have `Status: approved`, or equivalent approved wiki decisions define the product and design direction.
-- Do not begin serious frontend implementation until reference sites, screenshots, or approved agent-proposed reference examples are recorded and `references_status: approved` is set in `SITE_INTAKE.md`.
+- Do not begin serious frontend implementation until `references_status: approved` is set in `SITE_INTAKE.md`, `SITE_REFERENCES.md` is `Status: approved`, and `python tools/llm_wiki.py site references --json` reports complete reference analysis.
+- Reference analysis uses bounded crawl by default: same-origin public sitemap/nav/footer pages, max 50 normalized pages per reference, with login/private/admin/cart/account/form-submit flows excluded unless explicitly approved.
+- Reference evidence must include desktop/mobile screenshots in `raw/assets/references/manifest.json`, UX/visual analysis, and a Figma design reference artifact.
 - Ask questions in the user's language from the latest user message; `SITE_INTAKE.md` `language` records the site language, not necessarily the conversation language.
 - If references are missing or the user cannot choose them, delegate Reference Research and include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/` in the source scope.
 - For site design work, use `agents/protocols/design-resources.md` to grant huashu-design, impeccable, ui-ux-pro-max, GSAP, or Canva only when the role and task need them.
@@ -53,6 +56,7 @@ python -m unittest discover -s tests
 python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
+python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor --skip-self-test

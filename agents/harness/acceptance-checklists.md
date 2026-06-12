@@ -19,7 +19,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 - Scope is respected.
 - Assigned files only are changed.
 - Approved product and design direction exists before implementation.
-- Approved `SITE_INTAKE.md`, selected stack state, and approved references exist before implementation.
+- Approved `SITE_INTAKE.md`, selected stack state, and complete `SITE_REFERENCES.md` exist before implementation.
 - Layout is responsive across target viewports.
 - Text fits its containers and does not overlap adjacent content.
 - Keyboard and screen-reader basics are preserved.

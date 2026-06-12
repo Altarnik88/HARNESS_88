@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
@@ -91,6 +92,20 @@ integrations: contact form
 product_catalog_document: not-required
 """
 
+APPROVED_REFERENCES = """# Site References
+
+Status: approved
+
+reference_analysis_status: complete
+crawl_policy: bounded-crawl
+page_inventory: complete
+screenshot_manifest: raw/assets/references/manifest.json
+figma_policy: create-file
+figma_reference: https://figma.com/design/ABC123/Reference-Analysis
+ux_visual_analysis: complete
+user_reference_approval: approved
+"""
+
 
 class TaskQueueTests(unittest.TestCase):
     def write_task(
@@ -115,6 +130,33 @@ class TaskQueueTests(unittest.TestCase):
             encoding="utf-8",
         )
         return path
+
+    def write_reference_analysis(self, root: Path) -> None:
+        (root / "SITE_REFERENCES.md").write_text(APPROVED_REFERENCES, encoding="utf-8")
+        assets = root / "raw" / "assets" / "references"
+        assets.mkdir(parents=True)
+        (assets / "home-desktop.png").write_bytes(b"desktop")
+        (assets / "home-mobile.png").write_bytes(b"mobile")
+        manifest = {
+            "figma_file": "https://figma.com/design/ABC123/Reference-Analysis",
+            "references": [
+                {
+                    "url": "https://example.com",
+                    "crawl_policy": "bounded-crawl",
+                    "pages": [
+                        {
+                            "url": "https://example.com/",
+                            "desktop_screenshot": "raw/assets/references/home-desktop.png",
+                            "mobile_screenshot": "raw/assets/references/home-mobile.png",
+                            "figma_node": "https://figma.com/design/ABC123/Reference-Analysis?node-id=1-2",
+                        }
+                    ],
+                    "skipped_urls": [],
+                    "blockers": [],
+                }
+            ],
+        }
+        (assets / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
 
     def test_list_tasks_reads_top_level_task_files_and_ignores_support_dirs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -274,6 +316,18 @@ class TaskQueueTests(unittest.TestCase):
             self.assertTrue(report["product_design_ready"])
             self.assertTrue(report["stack_ready"])
             self.assertTrue(report["intake_ready"])
+            self.assertTrue(report["intake_references_ready"])
+            self.assertFalse(report["reference_analysis_ready"])
+            self.assertFalse(report["references_ready"])
+            self.assertFalse(report["site_implementation_ready"])
+            self.assertFalse(report["implementation_ready"])
+            self.assertIn("references", report["pending_decisions"])
+
+            self.write_reference_analysis(root)
+
+            report = readiness_report(root)
+
+            self.assertTrue(report["reference_analysis_ready"])
             self.assertTrue(report["references_ready"])
             self.assertFalse(report["core_development_ready"])
             self.assertTrue(report["site_implementation_ready"])

@@ -4,7 +4,7 @@ Status: draft
 
 Allowed statuses: draft, approved, needs-review
 
-This file records machine-checkable delivery approval gates after first-run intake. It gates publish/operate handoff together with approved intake, approved briefs, selected stack state, approved references, tracked tasks, audit evidence, remediation evidence, and final user approval.
+This file records machine-checkable delivery approval gates after first-run intake and reference analysis. It gates publish/operate handoff together with approved intake, approved briefs, selected stack state, approved `SITE_REFERENCES.md`, tracked tasks, audit evidence, remediation evidence, and final user approval.
 
 Agents may update this file from accepted review evidence, but must not treat silence or missing evidence as approval. Keep secrets out of this file.
 

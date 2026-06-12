@@ -46,4 +46,10 @@ Append durable project events using:
 - Path: `src/llm_wiki/evidence.py`
 - Path: `src/llm_wiki/cli.py`
 - Path: `agents/tasks/README.md`
+
+## [2026-06-12] maintenance | Added strict reference analysis gate
+- Path: `SITE_REFERENCES.md`
+- Path: `src/llm_wiki/references.py`
+- Path: `agents/workflows/agentic-site-delivery.md`
+- Path: `raw/assets/references/manifest.json`
 - Path: `agents/tasks/2026-06-11-task-evidence-summaries.md`

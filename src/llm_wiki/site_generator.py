@@ -17,6 +17,7 @@ ROOT_FILES = [
     "README.md",
     "SITE_GATES.md",
     "SITE_INTAKE.md",
+    "SITE_REFERENCES.md",
     "STACK.md",
     "START_HERE.md",
     "llms.txt",

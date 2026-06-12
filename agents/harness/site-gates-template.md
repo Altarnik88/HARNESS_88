@@ -1,6 +1,6 @@
 # Site Delivery Gates Template
 
-This template becomes the concrete post-intake delivery gate tracker for a generated site project.
+This template becomes the concrete post-intake and post-reference-analysis delivery gate tracker for a generated site project.
 
 Status: draft
 

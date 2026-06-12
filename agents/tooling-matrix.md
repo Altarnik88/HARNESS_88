@@ -23,9 +23,9 @@ This is the source of truth for role-level access to skills, plugins, and MCP se
 | Context7 MCP | Current docs for libraries, frameworks, SDKs, CLIs, and cloud services | General refactoring, business logic debugging, or design brainstorming |
 | Serena MCP | Symbol-level discovery and references before code work | Bulk reading as a substitute for targeted discovery |
 | SQLite MCP | Read-only inspection by Backend/Data and Knowledge Steward | Direct mutation of SQLite data |
-| Browser plugin / Playwright skill | Local UI diagnostics, screenshots, flows, responsive and accessibility checks; read-only public reference discovery when delegated | Remote browsing as a shortcut for unrelated research or any external write action |
+| Browser plugin / Playwright skill | Local UI diagnostics, screenshots, flows, responsive and accessibility checks; read-only public reference discovery and screenshot evidence when delegated | Remote browsing as a shortcut for unrelated research or any external write action |
 | GitHub plugin / gh-cli skill | PR, issue, CI, and release context; read-only by default | Write operations unless user explicitly asks |
-| Figma MCP | Figma URLs, design-system lookup, design sync, FigJam diagrams | Creating or editing Figma files unless user explicitly asks |
+| Figma MCP | Figma URLs, design-system lookup, design sync, FigJam diagrams, approved reference-analysis artifacts | Creating or editing Figma files unless user explicitly asks or the reference-analysis gate grants it |
 | Canva plugin | Mood boards, editable design assets, handoff decks, social/campaign visuals when delegated | Connecting Canva or writing/editing external designs without explicit user approval |
 | Sentry skill/plugin | Read-only production error inspection with `SENTRY_AUTH_TOKEN` env var | Printing/storing tokens, raw stack dumps, or PII |
 | Supabase | Backend/Data tasks only, conditional on available MCP/plugin or Context7 docs | Schema/data mutations without explicit delegation |
@@ -43,7 +43,7 @@ This is the source of truth for role-level access to skills, plugins, and MCP se
 | `impeccable` | Visual Design, Frontend Implementation, QA & Accessibility, Performance/SEO | UI critique, audit, polish, responsive/a11y/perf design checks |
 | GSAP skills | UX/Product Design, Visual Design, Frontend Implementation, Performance/SEO | Motion specs or assigned motion after stable layout and approved motion intent |
 | `imagegen` | Visual Design | Bitmap assets, variants, mockups; not repo-native SVG/icon systems |
-| `playwright` | Frontend Implementation, QA & Accessibility, Performance/SEO, Conductor | Local verification and screenshots |
+| `playwright` | Reference Research, Frontend Implementation, QA & Accessibility, Performance/SEO, Conductor | Local verification, public reference screenshot evidence, and screenshots |
 | `gh-cli` | Conductor, DevOps/Release | GitHub tasks; prefer authenticated `gh` over raw GitHub HTTP |
 | `sentry` | Backend/Data, QA & Accessibility, Performance/SEO, DevOps/Release | Read-only, env-token based |
 | Documents / Spreadsheets | IA & Content, Knowledge Steward | Only when those artifact types are supplied or requested |
@@ -61,7 +61,7 @@ All other global or plugin skills are denied unless a delegation brief grants th
 | --- | --- | --- | --- | --- | --- | --- |
 | Conductor | LLM Wiki search/events, Playwright for final verification, gh-cli for GitHub tasks | Product Design routing, plugin/skill creator when user asks | GitHub read-only by default, Browser, Figma only for explicit Figma tasks | Serena, Context7, filesystem read | No serious production code; docs/team protocol edits only | Relevant tests/builds, wiki rebuild/lint after wiki edits |
 | Product Strategist | `product-design:get-context`, `ui-ux-pro-max`, LLM Wiki search | Data Analytics for source-backed market/KPI questions | Product Design | filesystem read | No code edits | Requirements/acceptance criteria review |
-| Reference Research | `product-design:get-context`, Product Design `ideate`, LLM Wiki search | Browser or web search for read-only public references, including Dribbble, Behance, Awwwards, and competitors | Browser, Product Design | filesystem read | No code edits; docs/wiki only if delegated | Shortlist with URLs, reasons, style tags, applicability, cautions, and approval prompt |
+| Reference Research | `product-design:get-context`, Product Design `ideate`, LLM Wiki search, Playwright for screenshot evidence | Browser or web search for read-only public references, including Dribbble, Behance, Awwwards, and competitors; Figma MCP for approved reference-analysis artifacts | Browser, Product Design, Figma conditional | filesystem read | No code edits; docs/wiki/reference artifacts only if delegated | Shortlist, bounded crawl manifest, screenshots, Figma reference artifact, UX/visual notes, cautions, and approval prompt |
 | IA & Content | LLM Wiki search, `ui-ux-pro-max` | Documents, Spreadsheets, Data Analytics, Context7 for CMS/routing docs | Documents/Data only when requested | Context7, filesystem read | Docs-only if delegated; no production code | Content model and metadata checklist |
 | UX/Product Design | `product-design:get-context`, Product Design `ideate`, `ui-ux-pro-max`, `huashu-design` | Figma, GSAP specs | Product Design, Figma | filesystem read | No production code | Flow/responsive/accessibility handoff review |
 | Visual Design | `ui-ux-pro-max`, `huashu-design`, `impeccable`, `imagegen` | Figma, Canva, Creative Production, GSAP specs, Remotion | Figma, Canva, Creative Production | filesystem read | No production code except delegated tokens/assets/specs | Visual system and asset checklist |

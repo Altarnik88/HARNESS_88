@@ -53,8 +53,8 @@ Production-code changes are permitted in fallback mode only through that worker-
 - `Playwright skill`: automated UI-flow and screenshot checks.
 - `GitHub plugin` and `gh-cli skill`: PR/issues/CI only when requested or needed.
 - `Product Design plugin`: design brief, ideation, and design QA routing.
-- `Reference Research`: read-only reference discovery when user references are missing or undecided; include Dribbble, Behance, and Awwwards.
-- `Figma MCP`: only for Figma URLs or explicit Figma tasks.
+- `Reference Research`: read-only reference discovery when user references are missing or undecided; include Dribbble, Behance, and Awwwards, then coordinate bounded crawl, screenshot, Figma, and UX/visual evidence before frontend work.
+- `Figma MCP`: only for Figma URLs, explicit Figma tasks, or approved reference-analysis artifacts.
 - `Sentry skill/plugin`: read-only release/QA context only when env auth is configured.
 - `Supabase` and `Remotion`: conditional only; route to Backend/Data or Visual/Motion when explicitly required.
 

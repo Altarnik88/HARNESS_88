@@ -16,6 +16,7 @@ Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflo
 
 - `START_HERE.md` - first-run workflow for new users.
 - `SITE_INTAKE.md` - first-run site intake and reference approval gate.
+- `SITE_REFERENCES.md` - strict pre-frontend reference analysis gate.
 - `STACK.md` - selected stack state; implementation waits until selected or custom is explicitly confirmed.
 - `PRODUCT.md` - durable product contract.
 - `DESIGN.md` - durable design contract.
@@ -53,6 +54,7 @@ Before production implementation:
 
 - Confirm `STACK.md` is selected, or the user explicitly confirmed a custom approach.
 - Confirm `SITE_INTAKE.md` is approved and references are approved.
+- Confirm `SITE_REFERENCES.md` is approved and `python tools/llm_wiki.py site references --json` reports complete reference analysis before serious frontend work.
 - Confirm product/design direction is explicitly approved in `PRODUCT.md`, `DESIGN.md`, or equivalent wiki decisions.
 - Create or update a concrete task file in `agents/tasks/`.
 - Keep linked progress and checkpoint files current for clean handoff.
@@ -62,6 +64,7 @@ Before production implementation:
 ```powershell
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
+python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend

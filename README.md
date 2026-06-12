@@ -8,10 +8,10 @@ Start fresh clones with [START_HERE.md](START_HERE.md).
 
 ## What It Solves
 
-- Prevents agents from starting site implementation before stack, product, design, and references are approved.
+- Prevents agents from starting site implementation before stack, product, design, references, and strict reference analysis are approved.
 - Turns one vague website request into a controlled workflow with durable decisions and approval gates.
 - Splits work across specialist roles instead of letting one assistant design, build, test, and release everything alone.
-- Keeps product, design, stack, reference, task, audit, and publish decisions in project files that survive context resets.
+- Keeps product, design, stack, reference analysis, task, audit, and publish decisions in project files that survive context resets.
 - Reduces chaotic frontend work by requiring approved references and disjoint implementation ownership.
 - Supports catalog, ecommerce, online payment, offline payment, and manager-request flows through explicit intake decisions.
 - Keeps secrets out of project files and treats runtime outputs as generated state.
@@ -21,7 +21,7 @@ Start fresh clones with [START_HERE.md](START_HERE.md).
 HARNESS_88 separates core engineering from concrete site implementation.
 
 - Core work can continue while root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` are still draft or unselected.
-- Site implementation starts only after `SITE_INTAKE.md`, `PRODUCT.md`, `DESIGN.md`, approved references, selected stack, and task ownership are ready.
+- Site implementation starts only after `SITE_INTAKE.md`, `SITE_REFERENCES.md`, `PRODUCT.md`, `DESIGN.md`, selected stack, and task ownership are ready.
 - A downloaded copy can audit the user's local tools, Codex skills, plugins, and MCP-related capabilities before serious work starts.
 - Delivery is tracked through `SITE_GATES.md`: frontend preview approval, backend/data readiness, total audit, remediation, final user approval, and publish handoff.
 - Agents ask questions in the user's language, while `SITE_INTAKE.md` `language` records the site's primary language.
@@ -33,7 +33,7 @@ HARNESS_88 uses an agent-first operating model:
 
 - **Conductor:** plans, delegates, reviews, verifies, and coordinates handoff.
 - **Product Strategist:** goals, audience, user jobs, acceptance criteria.
-- **Reference Research:** reference discovery and shortlist approval.
+- **Reference Research:** reference discovery, shortlist approval, bounded crawl evidence, screenshot/Figma handoff, and analysis gate support.
 - **IA & Content:** sitemap, slugs, page models, content and metadata briefs.
 - **UX/Product Design:** flows, responsive behavior, interactions, and states.
 - **Visual Design:** visual system, tokens, imagery direction, asset guidance.
@@ -50,7 +50,8 @@ HARNESS_88 uses an agent-first operating model:
 Core local tools:
 
 - `python tools/llm_wiki.py task readiness --json` - readiness and pending decisions.
-- `python tools/llm_wiki.py site intake --json` - first-run intake and reference gate status.
+- `python tools/llm_wiki.py site intake --json` - first-run intake and reference approval status.
+- `python tools/llm_wiki.py site references --json` - strict pre-frontend reference analysis gate status.
 - `python tools/llm_wiki.py site gates --json` - delivery, audit, remediation, approval, and publish handoff status.
 - `python tools/llm_wiki.py stack list/status/select` - stack profile discovery and selection.
 - `python tools/llm_wiki.py site doctor` - unified diagnostics for readiness, wiki, task graph, frontend, security, and generated starter checks.
@@ -77,6 +78,7 @@ GitHub-backed resource links live in `agents/resources/tooling-sources.json`. Be
 
 - `START_HERE.md`: first-chat instructions for a new user.
 - `SITE_INTAKE.md`: machine-checkable first-run intake and reference approval gate.
+- `SITE_REFERENCES.md`: machine-checkable bounded crawl, screenshots, Figma artifact, UX/visual analysis, and user reference approval gate.
 - `SITE_GATES.md`: machine-checkable delivery gate state.
 - `STACK.md`: controlled stack selection state.
 - `PRODUCT.md` and `DESIGN.md`: durable product and design contracts.
@@ -97,6 +99,7 @@ GitHub-backed resource links live in `agents/resources/tooling-sources.json`. Be
 python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
+python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
@@ -120,8 +123,9 @@ npm run build
 3. Choose a stack/fullstack profile and record it in `STACK.md`.
 4. Fill `PRODUCT.md` and `DESIGN.md`, then set them to `Status: approved` when accepted.
 5. Approve user-provided or agent-proposed references and set `references_status: approved`.
-6. Create atomic task files with `python tools/llm_wiki.py task create ...`.
-7. Implement only from approved intake, approved briefs, selected stack state, approved references, and task ownership.
-8. Show frontend previews, run total audit, fix findings through tracked tasks, and get final user approval before publish instructions.
+6. Complete `SITE_REFERENCES.md`: bounded crawl, desktop/mobile screenshots, Figma reference artifact, UX/visual analysis, and explicit user approval.
+7. Create atomic task files with `python tools/llm_wiki.py task create ...`.
+8. Implement only from approved intake, approved briefs, selected stack state, approved reference analysis, and task ownership.
+9. Show frontend previews, run total audit, fix findings through tracked tasks, and get final user approval before publish instructions.
 
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.

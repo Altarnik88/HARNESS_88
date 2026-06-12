@@ -10,6 +10,7 @@ HARNESS_88 is a stack-neutral autonomous core. The stack state lives in root `ST
 - Each real implementation starts from product, design, stack, spec, task, progress, checkpoint, and acceptance artifacts.
 - Production implementation waits until `STACK.md` is selected or the user explicitly confirms a custom approach.
 - Production implementation waits until `SITE_INTAKE.md` is `Status: approved` and its `references_status` is `approved`.
+- Serious frontend implementation also waits until `SITE_REFERENCES.md` is approved with bounded crawl, desktop/mobile screenshots, UX/visual analysis, and Figma reference evidence.
 - `PRODUCT.md` and `DESIGN.md` must use explicit statuses: `draft`, `approved`, or `needs-review`. Only `approved` unlocks implementation.
 - The Conductor creates or assigns atomic task files before production implementation.
 - Workers update progress and checkpoint files as work moves through preflight, implementation, verification, and review.
@@ -35,6 +36,7 @@ assigned checkpoint file
 
 - `prd-template.md` captures the product problem, audience, requirements, and acceptance criteria.
 - `site-intake-template.md` captures first-run site intake decisions before product/design/stack approval.
+- `site-references-template.md` captures the strict pre-frontend reference analysis gate.
 - `site-gates-template.md` captures machine-checkable delivery gates from frontend preview approval through publish/operate handoff.
 - `spec-template.md` turns an approved product/design brief into implementation decisions.
 - `task-template.md` defines one atomic unit of work with owner, scope, tooling, and evidence.
@@ -51,6 +53,8 @@ assigned checkpoint file
 Use `python tools/llm_wiki.py site doctor` for a unified readiness, stack, brief, task, wiki, frontend, security, and generated-starter self-test report.
 
 Use `python tools/llm_wiki.py site intake --json` for machine-readable first-run intake and reference approval state.
+
+Use `python tools/llm_wiki.py site references --json` for machine-readable reference analysis readiness.
 
 Use `python tools/llm_wiki.py site gates --json` for machine-readable delivery approval, audit, remediation, final approval, and publish handoff state.
 

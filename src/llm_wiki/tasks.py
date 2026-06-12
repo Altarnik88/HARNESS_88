@@ -10,6 +10,7 @@ from .harness import ALLOWED_TASK_STATUSES, ROLE_OWNER_RE, STATUS_RE, validate_h
 from .intake import intake_status
 from .markdown import slugify
 from .paths import relative_posix
+from .references import reference_status
 from .stack import stack_is_selected
 
 
@@ -209,7 +210,10 @@ def readiness_report(root: Path) -> dict[str, object]:
         pending_decisions.append("STACK.md")
     intake = intake_status(root)
     intake_ready = bool(intake["intake_ready"])
-    references_ready = bool(intake["references_ready"])
+    intake_references_ready = bool(intake["references_ready"])
+    references = reference_status(root)
+    reference_analysis_ready = bool(references["reference_analysis_ready"])
+    references_ready = intake_references_ready and reference_analysis_ready
     if not intake_ready:
         pending_decisions.append("SITE_INTAKE.md")
     if not references_ready:
@@ -217,7 +221,7 @@ def readiness_report(root: Path) -> dict[str, object]:
     gates = gates_status(root)
     delivery_gates_ready = bool(gates["delivery_gates_ready"])
     publish_ready = bool(gates["publish_ready"])
-    blockers = readiness_blockers(root, issues, briefs, stack_ready, intake)
+    blockers = readiness_blockers(root, issues, briefs, stack_ready, intake, references)
     files_to_edit = sorted({blocker["path"] for blocker in blockers if blocker.get("path")})
     core_development_ready = not issues
     site_implementation_ready = not pending_decisions
@@ -227,6 +231,8 @@ def readiness_report(root: Path) -> dict[str, object]:
         "product_design_ready": not product_design_pending,
         "stack_ready": stack_ready,
         "intake_ready": intake_ready,
+        "intake_references_ready": intake_references_ready,
+        "reference_analysis_ready": reference_analysis_ready,
         "references_ready": references_ready,
         "site_implementation_ready": site_implementation_ready,
         "implementation_ready": site_implementation_ready,
@@ -238,6 +244,7 @@ def readiness_report(root: Path) -> dict[str, object]:
         "task_metrics": task_metrics(root),
         "briefs": briefs,
         "intake": intake,
+        "references": references,
         "delivery_gates": gates,
         "blockers": blockers,
         "publish_blockers": gates["publish_blockers"],
@@ -299,6 +306,7 @@ def readiness_blockers(
     briefs: dict[str, dict[str, object]],
     stack_ready: bool,
     intake: dict[str, object],
+    references: dict[str, object],
 ) -> list[dict[str, str]]:
     blockers: list[dict[str, str]] = []
     for issue in issues:
@@ -330,6 +338,9 @@ def readiness_blockers(
             }
         )
     for blocker in intake.get("blockers", []):
+        assert isinstance(blocker, dict)
+        blockers.append({key: str(value) for key, value in blocker.items()})
+    for blocker in references.get("blockers", []):
         assert isinstance(blocker, dict)
         blockers.append({key: str(value) for key, value in blocker.items()})
     if not list_tasks(root):
@@ -382,7 +393,7 @@ def suggested_readiness_tasks(pending_decisions: list[str]) -> list[dict[str, st
         suggestions.append(
             {
                 "title": "Approve Site References",
-                "objective": "Record user-provided or agent-suggested references and set references_status: approved in SITE_INTAKE.md.",
+                "objective": "Record approved references, complete SITE_REFERENCES.md, and set references_status: approved in SITE_INTAKE.md.",
             }
         )
     return suggestions

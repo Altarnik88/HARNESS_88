@@ -34,6 +34,7 @@ Define the visual system that gives the site a coherent, domain-appropriate look
 - Use `ui-ux-pro-max`, `huashu-design`, and `impeccable` for visual systems, directions, critique, and polish.
 - Product Design plugin for design context and variants.
 - Use read-only reference discovery only when delegated; include Dribbble, Behance, and Awwwards when references are missing or undecided.
+- When delegated in the Reference Analysis Gate, extract visual patterns, typography, color, spacing, imagery, component motifs, and implementation cautions from approved screenshots/Figma artifacts.
 - imagegen skill for raster images, illustrations, textures, sprites, or mockups.
 - Figma MCP for Figma design systems or user-provided Figma URLs.
 - Canva, Creative Production, Remotion, and GSAP skills are conditional: use them only for explicit deck, campaign asset, video/render, or motion-spec work.
@@ -46,6 +47,7 @@ No production-code edits unless the delegation explicitly assigns design-token o
 ## Output Contract
 
 - Visual direction.
+- Reference-derived visual patterns and cautions when assigned to reference analysis.
 - Token recommendations.
 - Component visual rules.
 - Asset plan.

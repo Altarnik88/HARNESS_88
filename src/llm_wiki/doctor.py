@@ -20,6 +20,7 @@ def build_doctor_report(root: Path, skip_self_test: bool = False, run_security: 
         "stack": read_stack_status(root),
         "briefs": readiness["briefs"],
         "intake": readiness["intake"],
+        "references": readiness["references"],
         "gates": readiness["delivery_gates"],
         "tasks": {
             "metrics": task_metrics(root),

@@ -35,6 +35,7 @@ Design page flows, interaction behavior, and responsive UX for the multi-page si
 - Use Product Design `get-context` before UX decisions.
 - Use Product Design `ideate` for visual/interaction alternatives.
 - Use read-only reference discovery only when delegated; include Dribbble, Behance, and Awwwards when references are missing or undecided.
+- When delegated in the Reference Analysis Gate, extract flow, interaction, responsive, and accessibility-sensitive UX notes from approved reference screenshots and Figma artifacts.
 - Use `ui-ux-pro-max` and `huashu-design` for approved design-system reasoning, visual directions, hi-fi prototypes, and demos.
 - Use GSAP skills for motion specs only; do not implement production motion.
 - Use Figma MCP for Figma files, screenshots, or design-system lookups when provided.
@@ -47,6 +48,7 @@ No production-code edits. UX/Product Design outputs specs, flows, and handoff no
 ## Output Contract
 
 - Flow summary.
+- Reference-derived UX patterns and cautions when assigned to reference analysis.
 - Responsive behavior.
 - Interaction/state requirements.
 - Accessibility-sensitive UX notes.

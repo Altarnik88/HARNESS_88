@@ -10,6 +10,7 @@ from .evidence import evidence_report
 from .gates import gates_status
 from .intake import intake_status
 from .quality import quality_exit_code, run_quality
+from .references import reference_status
 from .security import run_security_audit
 from .site_generator import create_site_project
 from .site_self_test import run_generated_site_self_test, run_site_init_self_test
@@ -119,6 +120,8 @@ def build_parser() -> argparse.ArgumentParser:
     site_self_test_parser.add_argument("--json", action="store_true", help="Emit JSON self-test results.")
     site_intake_parser = site_subparsers.add_parser("intake", help="Report first-run site intake and reference gates.")
     site_intake_parser.add_argument("--json", action="store_true", help="Emit JSON site intake status.")
+    site_references_parser = site_subparsers.add_parser("references", help="Report strict pre-frontend reference analysis gate status.")
+    site_references_parser.add_argument("--json", action="store_true", help="Emit JSON site reference analysis status.")
     site_gates_parser = site_subparsers.add_parser("gates", help="Report delivery approval and publish gates.")
     site_gates_parser.add_argument("--json", action="store_true", help="Emit JSON site delivery gate status.")
     site_doctor_parser = site_subparsers.add_parser("doctor", help="Report unified project health and next actions.")
@@ -359,6 +362,13 @@ def cmd_site(args: argparse.Namespace, root: Path) -> int:
         else:
             print_intake_status(status)
         return 0
+    if args.site_command == "references":
+        status = reference_status(root)
+        if args.json:
+            print(json.dumps(status, ensure_ascii=False, indent=2))
+        else:
+            print_reference_status(status)
+        return 0
     if args.site_command == "gates":
         status = gates_status(root)
         if args.json:
@@ -581,6 +591,27 @@ def print_intake_status(status: dict[str, object]) -> None:
         print("Missing fields:")
         for field in missing:
             print(f"- {field}")
+    blockers = status.get("blockers", [])
+    if blockers:
+        print("Blockers:")
+        for blocker in blockers:
+            assert isinstance(blocker, dict)
+            print(f"- {blocker['message']}")
+
+
+def print_reference_status(status: dict[str, object]) -> None:
+    print(f"Reference analysis: {'ready' if status['reference_analysis_ready'] else 'pending'}")
+    print(f"Path: {status['path']}")
+    print(f"Status: {status['status']}")
+    pending = status.get("pending_reference_gates", [])
+    if pending:
+        print("Pending reference gates:")
+        for gate in pending:
+            print(f"- {gate}")
+    manifest = status.get("manifest", {})
+    if isinstance(manifest, dict):
+        print(f"Manifest: {'valid' if manifest.get('valid') else 'pending'}")
+        print(f"Captured pages: {manifest.get('captured_page_count', 0)}")
     blockers = status.get("blockers", [])
     if blockers:
         print("Blockers:")

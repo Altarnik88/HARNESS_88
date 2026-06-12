@@ -34,7 +34,7 @@ User language:
 <Language to use for questions, clarifications, and approval prompts. Infer from the latest user message. This is separate from SITE_INTAKE.md site language.>
 
 Reference/source scope:
-<For reference discovery, list required sources such as https://dribbble.com/, https://www.behance.net/, https://www.awwwards.com/, competitors, and any denied sources. Otherwise write "not applicable".>
+<For reference discovery or analysis, list required sources such as https://dribbble.com/, https://www.behance.net/, https://www.awwwards.com/, competitors, approved reference URLs, bounded-crawl limits, Figma file policy, and any denied sources. Otherwise write "not applicable".>
 
 Ownership / scope:
 - Owned files: <exact files/directories, or "none; read-only">

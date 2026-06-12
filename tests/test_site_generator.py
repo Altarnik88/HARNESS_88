@@ -44,6 +44,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertTrue((target / "START_HERE.md").exists())
             self.assertTrue((target / "SITE_GATES.md").exists())
             self.assertTrue((target / "SITE_INTAKE.md").exists())
+            self.assertTrue((target / "SITE_REFERENCES.md").exists())
             self.assertTrue((target / "STACK.md").exists())
             self.assertTrue((target / "LICENSE").exists())
             self.assertTrue((target / "NOTICE" / "THIRD_PARTY.md").exists())
@@ -97,6 +98,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertEqual(payload["pending_decisions"], ["PRODUCT.md", "DESIGN.md", "STACK.md", "SITE_INTAKE.md", "references"])
             self.assertFalse(payload["intake_ready"])
             self.assertFalse(payload["references_ready"])
+            self.assertFalse(payload["reference_analysis_ready"])
             self.assertFalse(payload["delivery_gates_ready"])
             self.assertFalse(payload["publish_ready"])
 
@@ -108,6 +110,15 @@ class SiteGeneratorTests(unittest.TestCase):
             intake = json.loads(stdout.getvalue())
             self.assertEqual(intake["path"], "SITE_INTAKE.md")
             self.assertFalse(intake["intake_ready"])
+
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                code = main(["--root", str(target), "site", "references", "--json"])
+
+            self.assertEqual(code, 0)
+            references = json.loads(stdout.getvalue())
+            self.assertEqual(references["path"], "SITE_REFERENCES.md")
+            self.assertFalse(references["reference_analysis_ready"])
 
             stdout = io.StringIO()
             with contextlib.redirect_stdout(stdout):
@@ -130,7 +141,10 @@ class SiteGeneratorTests(unittest.TestCase):
             for needle in [
                 "ecommerce with online payment",
                 "purchase request/lead form for a manager",
-                "Reference Gate",
+                "Reference Analysis Gate",
+                "SITE_REFERENCES.md",
+                "Bounded",
+                "Figma reference artifact",
                 "Total Agent Audit",
                 "Remediation Plan and Fix Loop",
                 "Final User Approval",
@@ -138,11 +152,14 @@ class SiteGeneratorTests(unittest.TestCase):
             ]:
                 self.assertIn(needle, workflow)
             self.assertIn("Do not begin serious frontend implementation", tooling)
+            self.assertIn("site references --json", tooling)
             self.assertIn("Never ask the user to paste secrets into chat", tooling)
             self.assertIn("ecommerce/catalog/payment/request mode", start_here)
             self.assertIn("site intake --json", start_here)
+            self.assertIn("site references --json", start_here)
             self.assertIn("site gates --json", start_here)
             self.assertIn("SITE_INTAKE.md", tooling)
+            self.assertIn("SITE_REFERENCES.md", tooling)
             self.assertIn("SITE_GATES.md", tooling)
             self.assertTrue((target / "agents" / "workflows" / "secret-broker.md").exists())
             self.assertIn(

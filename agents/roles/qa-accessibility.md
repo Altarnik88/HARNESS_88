@@ -41,6 +41,7 @@ Validate that the multi-page site works, is accessible, and meets acceptance cri
 - Default deny: use only QA & Accessibility tooling listed in the matrix or explicitly granted in the delegation brief.
 - Use Browser plugin for local UI inspection and screenshots.
 - Use Playwright skill for automated navigation, form, and responsive checks.
+- When delegated in the Reference Analysis Gate, verify manifest coverage, screenshot paths, skipped-page reasons, and Figma reference links before frontend work starts.
 - Use `impeccable` for UI critique, accessibility, responsive, and design-quality audits.
 - Use Sentry read-only only when production error context is required and `SENTRY_AUTH_TOKEN` is set in the environment.
 - Use repo test/build commands.
@@ -56,5 +57,6 @@ No feature implementation. Test files or tiny test fixtures only when explicitly
 - Commands/checks run.
 - Bugs with steps and expected/actual behavior.
 - Accessibility issues.
+- Reference-analysis coverage findings when assigned before frontend work.
 - Total-audit findings when this role participates in release review.
 - Residual risk.

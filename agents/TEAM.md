@@ -37,7 +37,7 @@ Role agents read `agents/tooling-matrix.md`, their own role file, and the delega
 | --- | --- | --- | --- |
 | Conductor | `agents/conductor.md` | Plan, delegation, review, final integration notes | No major production code |
 | Product Strategist | `agents/roles/product-strategist.md` | Goals, audience, user journeys, acceptance criteria | No code |
-| Reference Research | `agents/roles/reference-research.md` | Reference shortlist, source notes, approval prompt | No code |
+| Reference Research | `agents/roles/reference-research.md` | Reference shortlist, bounded crawl, screenshots, Figma evidence, approval prompt | No code |
 | IA & Content | `agents/roles/ia-content.md` | Sitemap, page model, slugs, metadata/content briefs | No code unless docs-only |
 | UX/Product Design | `agents/roles/ux-product-design.md` | Flows, responsive behavior, interaction design | No production code |
 | Visual Design | `agents/roles/visual-design.md` | Visual system, tokens, imagery direction | No production code unless asset specs |
@@ -89,8 +89,8 @@ Fallback production-code changes are allowed only when the agent follows the har
 - `Browser plugin`: Use for local UI opening, visual checks, screenshots, and interactions.
 - `Playwright skill`: Use for browser automation, screenshots, flow QA, and canvas/visual checks.
 - `Product Design plugin`: Use for product UI work, design briefs, ideation, image-to-code, and design QA.
-- `Reference Research`: Use read-only web/reference discovery when the user has no references or cannot choose them; include Dribbble, Behance, and Awwwards.
-- `Figma MCP`: Use only when the user provides a Figma URL, asks for Figma, or a design task explicitly needs Figma.
+- `Reference Research`: Use read-only web/reference discovery when the user has no references or cannot choose them; include Dribbble, Behance, and Awwwards, then complete strict reference analysis before frontend work.
+- `Figma MCP`: Use when the user provides a Figma URL, asks for Figma, or the approved reference-analysis gate needs a Figma design artifact.
 - `GitHub plugin` and `gh-cli skill`: Use for GitHub PR/issues/CI/release work. Keep GitHub read-only unless write operations are requested.
 - `Sentry skill/plugin`: Use for read-only production error inspection when `SENTRY_AUTH_TOKEN` is set in the environment.
 - `Supabase`: Backend/Data only, conditional on an available MCP/plugin or Context7 documentation; no schema/data mutation unless explicitly delegated.

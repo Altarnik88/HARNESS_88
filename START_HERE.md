@@ -7,8 +7,8 @@ Use this file after a fresh clone of HARNESS_88. It is a practical first-chat sc
 Open Codex or another coding-agent chat in the root of this repository and start with something like:
 
 ```text
-Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/protocols/tooling-onboarding.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
-Check local tools/skills/plugins, intake, gates, and readiness with python tools/llm_wiki.py tools audit --json, python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
+Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_REFERENCES.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/protocols/tooling-onboarding.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
+Check local tools/skills/plugins, intake, reference analysis, gates, and readiness with python tools/llm_wiki.py tools audit --json, python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site references --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
 The stack is not selected yet. Run a first-run intake for my site, asking questions in my language, including country, site language, site type, style, ecommerce/catalog/payment/request mode, references, and content sources. Record accepted answers in SITE_INTAKE.md. Then recommend a stack/fullstack profile, update PRODUCT.md, DESIGN.md, and STACK.md, create the first task, and begin the site through the autonomous harness only after approvals are recorded.
 ```
 
@@ -36,7 +36,7 @@ Before implementation, the agent must collect or explicitly mark unknown:
 
 If the user has no reference sites or cannot choose them, the Conductor delegates Reference Research to propose relevant examples based on the intake. Agent-proposed searches must include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`, then wait for approval before serious frontend implementation.
 
-Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: approved` is required before serious frontend implementation.
+Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: approved` and complete `SITE_REFERENCES.md` evidence are required before serious frontend implementation.
 
 ## First-Run Checklist
 
@@ -45,6 +45,7 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
    ```powershell
    python tools/llm_wiki.py tools audit --json
    python tools/llm_wiki.py site intake --json
+   python tools/llm_wiki.py site references --json
    python tools/llm_wiki.py site gates --json
    python tools/llm_wiki.py task readiness --json
    python tools/llm_wiki.py stack status
@@ -69,6 +70,7 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
    - `DESIGN.md`: visual direction, UX constraints, accessibility, component rules, and explicit `Status: approved` when accepted.
    - `STACK.md`: selected stack/fullstack profile and any stack notes.
    - `SITE_INTAKE.md`: required intake fields, `Status: approved`, and `references_status: approved`.
+   - `SITE_REFERENCES.md`: bounded crawl, screenshot manifest, Figma reference artifact, UX/visual analysis, and user approval.
 
 5. Create the first task:
 
@@ -80,13 +82,14 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
 
 7. Follow the site delivery gates in `agents/workflows/agentic-site-delivery.md`:
 
-   - approve references before serious frontend work;
+   - approve references and complete the strict reference-analysis gate before serious frontend work;
    - build and show frontend previews before backend expansion when possible;
    - implement backend/data/payment/request flows according to the approved commerce mode;
    - request a product/catalog document before product ingest;
    - run a total agent audit after implementation;
    - fix audit findings through tracked tasks;
    - show the final site for user approval, repeat corrections until accepted;
+   - record reference evidence in `SITE_REFERENCES.md` and check it with `python tools/llm_wiki.py site references --json`;
    - record delivery gate evidence in `SITE_GATES.md` and check it with `python tools/llm_wiki.py site gates --json`;
    - provide VPS publish, update, backup, rollback, and maintenance instructions after final approval.
 
