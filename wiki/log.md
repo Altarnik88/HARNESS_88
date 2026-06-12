@@ -70,3 +70,8 @@ Append durable project events using:
 - Path: `src/llm_wiki/db_search.py`
 - Path: `agents/harness/deploy-handoff-template.md`
 - Path: `agents/tasks/2026-06-12-core-maintainability-security-tooling-db-delivery-adapters.md`
+
+## [2026-06-12] release | Blocked HARNESS_88 v0.1.0 full-repo release prep
+- Path: `RELEASE_NOTES.md`
+- Path: `agents/tasks/2026-06-12-github-core-engine-release.md`
+- Path: `wiki/review.md`
