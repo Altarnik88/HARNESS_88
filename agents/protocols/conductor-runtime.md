@@ -48,7 +48,7 @@ The task must include:
 - `Delegation packet: agents/delegations/<task>.md`
 - `Role owner: <non-Conductor role>`
 
-The packet must include role, task file, progress file, checkpoint file, user language, ownership/scope, allowed tooling, code permission, expected output, verification, and clean-context resume instructions.
+The packet must include role, phase, task file, progress file, checkpoint file, user language, ownership/scope, allowed tooling, code permission, expected output, verification, and clean-context resume instructions.
 
 The packet separates `Reference/source scope` from `Denied scope`. Source scope says what evidence or inputs are allowed; denied scope says what the worker must not do.
 

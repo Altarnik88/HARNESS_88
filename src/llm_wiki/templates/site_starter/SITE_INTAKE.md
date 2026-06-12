@@ -40,4 +40,3 @@ product_catalog_document: unknown
 - `references_status`: pending, approved, rejected, or needs-review. Serious frontend implementation also requires complete `SITE_REFERENCES.md` evidence.
 - If references are missing or undecided, Reference Research proposes suitable examples from the intake and includes `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`; agents wait for approval before serious frontend implementation.
 - `product_catalog_document`: not-required, needed, provided, or unknown.
-- If references are missing, agents propose suitable examples and wait for approval before serious frontend implementation.

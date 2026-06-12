@@ -35,9 +35,9 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Treat `data/wiki.sqlite` as generated state.
 - Preserve files under `raw/` during ingest.
 - For multi-agent website work, read `agents/TEAM.md` before delegation.
-- Real implementation requires a concrete task file in `agents/tasks/` or an equivalent approved plan.
+- Real implementation requires a concrete task file in `agents/tasks/`.
 - Follow `agents/protocols/tooling-onboarding.md` for first-run tools/skills/plugins audit and permission prompts.
-- Run `python tools/llm_wiki.py tools audit` after download or environment changes. The audit reports missing tools/skills/plugins and asks permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
+- Run `python tools/llm_wiki.py tools audit --json` after download or environment changes. The audit is read-only and reports `next_actions`; the agent asks permission before installing local tools, downloading GitHub-backed skills/resources, connecting Codex plugins/MCP, or adding frontend dependencies.
 - Before downloading any GitHub-backed tool, skill, or MCP resource, confirm its exact URL is recorded in `agents/resources/tooling-sources.json` and approved by the user. If the URL is blank or missing, ask for the correct repository link first.
 
 ## Stack Scaffolding

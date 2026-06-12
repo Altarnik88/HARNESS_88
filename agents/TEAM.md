@@ -72,12 +72,12 @@ Use `agents/templates/delegation-brief.md` as the default prompt shape.
 
 ## One-Agent Fallback
 
-If `multi_agent_v1` is unavailable, the current agent may temporarily take the needed worker role. The agent must state the worker role it is assuming before making changes.
+If `multi_agent_v1` is unavailable, the current agent may temporarily take the needed worker role. Before making changes, the agent must state the worker role it is assuming and ensure the task, progress, checkpoint, and `agents/delegations/` delegation packet exist.
 
 Fallback production-code changes are allowed only when the agent follows the harness protocol:
 
 - Confirm `STACK.md` is selected and `PRODUCT.md`/`DESIGN.md` are `Status: approved`, or record the remaining blocker.
-- Create or update the task file for the work.
+- Create or update the task file and `agents/delegations/` delegation packet for the work.
 - Create or update the linked progress and checkpoint files.
 - Respect ownership and do-not-edit scopes from the task.
 - Run the required quality gates and record verification evidence.

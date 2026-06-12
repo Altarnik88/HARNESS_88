@@ -31,7 +31,7 @@ HARNESS_88 separates core engineering from concrete site implementation.
 
 ## What The Core Does Step By Step
 
-1. Audits local tools, Codex skills, plugins, and MCP-related capabilities in read-only mode. It reports gaps and asks before any install, download, or connector setup.
+1. Audits local tools, Codex skills, plugins, and MCP-related capabilities in read-only mode with `python tools/llm_wiki.py tools audit --json`. It reports gaps through `next_actions`; the agent asks permission before installing local tools, downloading GitHub-backed skills/resources, connecting Codex plugins/MCP, or adding frontend dependencies.
 2. Runs site intake: goal, audience, country, site language, site type, content model, catalog/ecommerce/payment/request needs, backend/data/admin/integration needs, and launch constraints.
 3. Recommends 2-4 stack or fullstack options with languages, frameworks, services, pros, cons, operational complexity, scaffold policy, and best-fit use cases. It waits for explicit approval or a custom stack before updating `STACK.md`.
 4. Records accepted product and design decisions in `PRODUCT.md` and `DESIGN.md`, then waits for approval before implementation.
@@ -71,7 +71,7 @@ Core local tools:
 - `python tools/llm_wiki.py site doctor --skip-self-test` - fast unified diagnostics for readiness, wiki, task graph, frontend, security, and tooling.
 - `python tools/llm_wiki.py quality --skip-frontend` - stack-neutral core quality gate.
 - `python tools/llm_wiki.py rebuild` and `python tools/llm_wiki.py lint` - wiki index and Markdown quality checks.
-- `python tools/llm_wiki.py tools audit` - local tools, Codex skills, plugins, and MCP capability audit.
+- `python tools/llm_wiki.py tools audit --json` - local tools, Codex skills, plugins, and MCP capability audit.
 - `python tools/llm_wiki.py conductor start/route/delegate` - Conductor bootstrap, phase routing, and delegation-packet creation.
 
 Agent routing supports:
@@ -85,7 +85,7 @@ Agent routing supports:
 - **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP, Canva, and Creative Production are granted through `agents/protocols/design-resources.md` and tracked in `agents/resources/tooling-sources.json`.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets, and Remotion when the task and tooling matrix allow them.
 
-The tooling audit is read-only. It reports what appears available, what is missing, and what the agent should ask permission to install, download from GitHub, or connect through Codex plugins/skills. HARNESS_88 must not install or connect anything automatically.
+The tooling audit is read-only. `python tools/llm_wiki.py tools audit --json` reports what appears available, what is missing, and `next_actions`; the agent must ask permission before installing local tools, downloading GitHub-backed skills/resources, connecting Codex plugins/MCP, or adding frontend dependencies. HARNESS_88 must not install or connect anything automatically.
 
 GitHub-backed resource links live in `agents/resources/tooling-sources.json`. Before any GitHub download, the exact repository URL must be recorded there and approved by the user. If the URL is blank, the agent must ask for the correct link instead of guessing.
 

@@ -122,7 +122,7 @@ Secrets must never be pasted into chat or project files. Use `agents/workflows/s
 
 ## Tooling Onboarding
 
-After downloading HARNESS_88, run `python tools/llm_wiki.py tools audit` before serious work. The audit reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities. It does not install anything. If something is missing, the agent must ask permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
+After downloading HARNESS_88, run `python tools/llm_wiki.py tools audit --json` before serious work. The audit is read-only and reports available and missing local tools, Codex skills, plugins, MCP-related capabilities, and `next_actions`. The agent must ask permission before installing local tools, downloading GitHub-backed skills/resources, connecting Codex plugins/MCP, or adding frontend dependencies.
 
 Follow `agents/protocols/tooling-onboarding.md` for the exact permission flow from `tools audit --json` `next_actions` to user approval.
 

@@ -55,7 +55,7 @@ Reserve `python tools/llm_wiki.py site self-test` for generator changes.
 
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.
 
-Run `python tools/llm_wiki.py tools audit` after download or environment changes. It reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities, then asks permission before any install, GitHub skill download, or Codex plugin connection.
+Run `python tools/llm_wiki.py tools audit --json` after download or environment changes. The audit is read-only and reports available and missing local tools, Codex skills, plugins, MCP-related capabilities, and `next_actions`; the agent asks permission before installing local tools, downloading GitHub-backed skills/resources, connecting Codex plugins/MCP, or adding frontend dependencies.
 
 GitHub-backed source links are tracked in `agents/resources/tooling-sources.json`. If a required resource has no recorded URL, the agent must ask the user to provide or approve the exact repository before downloading it.
 

@@ -79,15 +79,19 @@ WORKER_PHASES = {
 }
 REQUIRED_DELEGATION_PACKET_FIELDS = [
     "Role:",
+    "Phase:",
     "Task file:",
     "Progress file:",
     "Checkpoint file:",
     "User language:",
+    "Reference/source scope:",
+    "Denied scope:",
     "Ownership / scope:",
     "Required plugins/MCP/skills:",
     "Code permission:",
     "Expected output:",
     "Verification:",
+    "Clean-context resume instructions:",
 ]
 PACKET_STRUCTURED_FIELDS = ["Role", "Phase", "Task file", "Progress file", "Checkpoint file"]
 

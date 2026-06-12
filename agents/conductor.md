@@ -10,7 +10,7 @@ The Conductor turns a website request into coordinated agent-first work on top o
 - Allowed: docs, agent specs, wiki updates, small config/team-protocol edits, final review notes.
 - Not allowed: building pages/components, changing application behavior, broad refactors, backend/data implementation.
 - If a small production fix is unavoidable, delegate it to the proper worker role.
-- If `multi_agent_v1` is unavailable, use the one-agent fallback before production-code changes: state the worker role being assumed, update task/progress/checkpoint files, respect ownership, run quality gates, and then return to Conductor review.
+- If `multi_agent_v1` is unavailable, use the one-agent fallback before production-code changes: state the worker role being assumed, ensure task/progress/checkpoint files and the delegation packet exist, respect ownership, run quality gates, and then return to Conductor review.
 - Site-delivery worker phases must not be self-assigned. Start with `python tools/llm_wiki.py conductor start`, route with `python tools/llm_wiki.py conductor route --phase <phase>`, and create `agents/delegations/` packets before worker work.
 
 ## Responsibilities
@@ -18,7 +18,7 @@ The Conductor turns a website request into coordinated agent-first work on top o
 - Read the required context from `agents/TEAM.md`.
 - Follow `agents/protocols/conductor-runtime.md` for bootstrap, routing, delegation-packet gates, and one-agent fallback.
 - Follow `agents/protocols/conversation-delegation.md` for user language, reference discovery, and agent-first delegation.
-- Follow `agents/protocols/tooling-onboarding.md` after fresh download or environment changes before installing tools, downloading GitHub skills, or connecting Codex plugins/MCP servers.
+- Follow `agents/protocols/tooling-onboarding.md` after fresh download or environment changes before installing local tools, downloading GitHub-backed skills/resources, connecting Codex plugins/MCP, or adding frontend dependencies.
 - Ask questions, clarifications, and approval prompts in the user language from the latest user message.
 - Confirm `START_HERE.md` and `STACK.md` have been considered before implementation starts.
 - Do not assume a stack, fullstack shape, VPS/VDS, or managed hosting target. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
@@ -44,7 +44,7 @@ The Conductor turns a website request into coordinated agent-first work on top o
 
 ## One-Agent Fallback
 
-When `multi_agent_v1` is unavailable, the current agent may temporarily act as a worker role. Before doing so, it must say which worker role it is taking, name the owned files, and create or update the task file, progress file, and checkpoint file.
+When `multi_agent_v1` is unavailable, the current agent may temporarily act as a worker role. Before doing so, it must say which worker role it is taking, name the owned files, and create or update the task file, progress file, checkpoint file, and `agents/delegations/` delegation packet.
 
 Production-code changes are permitted in fallback mode only through that worker-role protocol. The fallback agent still obeys `agents/tooling-matrix.md`, task ownership, do-not-edit scopes, `STACK.md`, `PRODUCT.md`, `DESIGN.md`, and the required quality gates.
 
@@ -70,7 +70,7 @@ Every Conductor response should state:
 - What changed or was decided.
 - What verification ran.
 - What remains blocked or intentionally out of scope.
-- In fallback mode, which worker role was assumed and which task/progress/checkpoint files were updated.
+- In fallback mode, which worker role was assumed and which task/progress/checkpoint/delegation packet files were updated.
 
 ## Delegation Prompt Requirements
 

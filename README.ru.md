@@ -50,6 +50,7 @@ HARNESS_88 использует agent-first модель:
 - **IA & Content:** sitemap, slugs, модели страниц, content/metadata briefs.
 - **UX/Product Design:** пользовательские flow, responsive behavior, interactions и states.
 - **Visual Design:** визуальная система, tokens, imagery direction, asset guidance.
+- **Design Artifact:** Figma reference board, design artifact handoff и передача evidence для implementation.
 - **Frontend Architecture:** routing, границы компонентов, implementation slices.
 - **Frontend Implementation:** назначенные страницы, компоненты, стили и взаимодействия.
 - **Backend/Data:** API, каталог/ecommerce/payment/request flows, модели данных.
@@ -70,7 +71,7 @@ HARNESS_88 использует agent-first модель:
 - `python tools/llm_wiki.py site doctor` - единая диагностика readiness, wiki, task graph, frontend, security и generated starter checks.
 - `python tools/llm_wiki.py quality --skip-frontend` - stack-neutral quality gate для ядра.
 - `python tools/llm_wiki.py rebuild` и `python tools/llm_wiki.py lint` - индекс wiki и Markdown quality checks.
-- `python tools/llm_wiki.py tools audit` - аудит локальных tools, Codex skills, plugins и MCP capabilities.
+- `python tools/llm_wiki.py tools audit --json` - аудит локальных tools, Codex skills, plugins и MCP capabilities.
 
 Маршрутизация tools/skills для агентов:
 
@@ -80,10 +81,10 @@ HARNESS_88 использует agent-first модель:
 - **Product Design plugin:** product/UI context, design variants, image-to-code при выбранном mockup/reference.
 - **GitHub plugin / `gh-cli` skill:** repository, pull request, issue и CI workflows.
 - **Reference discovery:** Dribbble, Behance, Awwwards, конкуренты и market examples.
-- **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP и Canva выдаются через `agents/protocols/design-resources.md` и фиксируются в `agents/resources/tooling-sources.json`.
+- **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP, Canva и Creative Production выдаются через `agents/protocols/design-resources.md` и фиксируются в `agents/resources/tooling-sources.json`.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets и Remotion, когда задача и tooling matrix это разрешают.
 
-Tooling audit работает read-only. Он показывает, что доступно, чего не хватает, и на что агент должен спросить разрешение: установка локальных tools, скачивание skills из GitHub или подключение Codex plugins/skills. HARNESS_88 не должен ничего устанавливать или подключать автоматически.
+Tooling audit (`python tools/llm_wiki.py tools audit --json`) работает read-only. Он показывает, что доступно, чего не хватает, и `next_actions`; агент спрашивает разрешение перед установкой локальных tools, скачиванием GitHub-backed skills/resources, подключением Codex plugins/MCP или добавлением frontend dependencies. HARNESS_88 не должен ничего устанавливать или подключать автоматически.
 
 Ссылки на GitHub-ресурсы фиксируются в `agents/resources/tooling-sources.json`. Перед любой загрузкой из GitHub точный URL репозитория должен быть записан там и одобрен пользователем. Если URL пустой, агент должен спросить правильную ссылку, а не угадывать ее.
 

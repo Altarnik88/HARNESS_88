@@ -367,6 +367,63 @@ class ConductorRuntimeTests(unittest.TestCase):
             incomplete_messages = [issue.message for issue in validate_harness(root)]
             self.assertTrue(any("Delegation packet missing field" in message for message in incomplete_messages))
 
+    def test_task_validate_rejects_worker_delegation_packet_missing_phase_scope_or_resume_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            task = root / "agents" / "tasks" / "2026-06-12-reference-analysis.md"
+            task.parent.mkdir(parents=True, exist_ok=True)
+            packet_rel = "agents/delegations/2026-06-12-reference-analysis.md"
+            task.write_text(MINIMAL_TASK.format(owner="Reference Research", packet=packet_rel), encoding="utf-8")
+            support = root / "agents" / "tasks"
+            (support / "progress").mkdir(parents=True, exist_ok=True)
+            (support / "checkpoints").mkdir(parents=True, exist_ok=True)
+            (support / "progress" / task.name).write_text(
+                f"# Progress\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            (support / "checkpoints" / task.name).write_text(
+                f"# Checkpoint\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            packet = root / packet_rel
+            packet.parent.mkdir(parents=True, exist_ok=True)
+            packet.write_text(
+                """# Delegation Packet
+
+Role: Reference Research
+Task file: agents/tasks/2026-06-12-reference-analysis.md
+Progress file: agents/tasks/progress/2026-06-12-reference-analysis.md
+Checkpoint file: agents/tasks/checkpoints/2026-06-12-reference-analysis.md
+
+User language:
+Russian
+
+Ownership / scope:
+Owned files:
+- SITE_REFERENCES.md
+
+Required plugins/MCP/skills:
+- Use only tools granted in agents/tooling-matrix.md.
+
+Code permission:
+assigned files only
+
+Expected output:
+- Complete work.
+
+Verification:
+python tools/llm_wiki.py site references --json
+""",
+                encoding="utf-8",
+            )
+
+            messages = [issue.message for issue in validate_harness(root)]
+
+            self.assertIn("Delegation packet missing field: Phase:", messages)
+            self.assertIn("Delegation packet missing field: Reference/source scope:", messages)
+            self.assertIn("Delegation packet missing field: Denied scope:", messages)
+            self.assertIn("Delegation packet missing field: Clean-context resume instructions:", messages)
+
     def test_task_validate_rejects_delegation_packet_path_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

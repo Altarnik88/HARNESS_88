@@ -82,3 +82,12 @@ Append durable project events using:
 - Path: `agents/harness/stack-profiles.json`
 - Path: `START_HERE.md`
 - Path: `wiki/review.md`
+
+## [2026-06-12] maintenance | Hardened delegation packet validation and synced tooling docs
+- Path: `src/llm_wiki/harness.py`
+- Path: `tests/test_conductor_runtime.py`
+- Path: `agents/protocols/conductor-runtime.md`
+- Path: `agents/protocols/tooling-onboarding.md`
+- Path: `README.md`
+- Path: `README.ru.md`
+- Path: `src/llm_wiki/templates/site_starter/`
