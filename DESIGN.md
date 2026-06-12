@@ -16,6 +16,29 @@ No approved design goal has been recorded yet.
 
 No approved visual direction has been selected yet.
 
+## Creative Exploration
+
+- Status: pending.
+- No approved creative exploration has been recorded yet.
+- Open briefs should compare 2-4 materially different UX or visual directions before convergence.
+
+## Selected Direction
+
+No approved selected direction has been recorded yet.
+
+## Rejected Directions
+
+- No rejected directions have been recorded yet.
+
+## Evidence
+
+- No approved reference, screenshot, user preference, or design rationale evidence has been recorded yet.
+
+## Creative Constraints
+
+- Do not treat clean, modern, or professional as a sufficient design direction unless concrete layout, type, color, imagery, motion, and interaction choices are recorded.
+- Creative exploration remains proposal work until the user approves it or it is recorded as an approved `DESIGN.md` or wiki decision with evidence.
+
 ## UX Principles
 
 - No approved UX principles have been recorded yet.

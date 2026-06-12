@@ -28,7 +28,7 @@ This clean project starts with the portable, stack-neutral site-development harn
 - Open worker-phase tasks require a non-Conductor role owner and `Delegation packet: agents/delegations/<task>.md`; `python tools/llm_wiki.py task validate --strict` enforces this.
 - Ask questions in the user's language from the latest user message; `SITE_INTAKE.md` `language` records the site language, not necessarily the conversation language.
 - If references are missing or the user cannot choose them, delegate Reference Research and include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/` in the source scope.
-- For site design work, use `agents/protocols/design-resources.md` to grant huashu-design, impeccable, ui-ux-pro-max, GSAP, or Canva only when the role and task need them.
+- For site design work, use `agents/protocols/design-resources.md` to grant huashu-design, impeccable, ui-ux-pro-max, GSAP, Canva, or Creative Production only when the role and task need them.
 - Use agent-first delegation for substantial research, design, implementation, QA, release, and wiki closeout. If no suitable role or tooling grant exists, update the role/tooling contract before delegating.
 - Do not publish or provide final deployment instructions until `SITE_GATES.md` records completed audit/remediation/final approval gates and publish/operate handoff is complete.
 - Keep secrets in environment variables only.
@@ -68,6 +68,6 @@ python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py conductor route --phase reference-analysis
-python tools/llm_wiki.py site doctor
+python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```

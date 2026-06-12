@@ -6,19 +6,26 @@ Use this protocol when a delegated task involves site visual direction, UI/UX de
 
 All external design resources must be checked against `agents/resources/tooling-sources.json` before use. Do not install, download, connect, or add a dependency automatically. Ask user approval first.
 
-Required design resources:
+## Creative Exploration
+
+Creative exploration is a first-class deliverable. When the brief is open, design agents should produce 2-4 materially different UX or visual directions, each with a named thesis, audience signal, reference evidence, accessibility/responsive/performance cautions, and a recommendation. Do not treat clean, modern, or professional as a sufficient design direction unless the user explicitly chooses that aesthetic and the agent records what it means in concrete layout, type, color, imagery, motion, and interaction terms.
+
+Exploration outputs are proposals, not approval. A direction becomes implementation-ready only after the user approves it or it is recorded in `DESIGN.md` or the wiki as an approved decision with supporting evidence.
+
+## Registered design resources
 
 - `huashu-design`: `https://github.com/alchaincyf/huashu-design` for HTML-native high-fidelity prototypes, design directions, demos, animation concepts, and design review.
 - `impeccable`: `https://github.com/pbakaus/impeccable` for design-language critique, UI audit, polish, responsive/a11y/performance design checks, and stronger visual judgment.
 - `ui-ux-pro-max`: `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill` for UI/UX design intelligence, design-system reasoning, multi-platform UX specs, and product-interface structure.
 - `GSAP`: `https://github.com/greensock/GSAP/` for approved motion systems and assigned frontend animation implementation.
 - `Canva`: `plugin://canva@openai-curated-remote` for editable design assets, mood boards, handoff decks, social/campaign visuals, and presentation outputs.
+- `Creative Production plugin`: `plugin://creative-production@openai-curated-remote` for delegated visual territories, mood boards, scenes, ad directions, and campaign/offer exploration.
 
 ## Role Rules
 
 - Reference Research may cite these as design-method or inspiration resources, but still needs project-specific references and user approval.
 - Product Strategist and IA & Content may use `ui-ux-pro-max` for product/UI structure and acceptance criteria.
-- UX/Product Design may use `ui-ux-pro-max` and `huashu-design` for flows, interaction models, variants, and high-fidelity prototype direction.
+- UX/Product Design may use `ui-ux-pro-max`, `huashu-design`, and delegated Creative Production exploration for flows, interaction models, variants, and high-fidelity prototype direction.
 - Visual Design may use `huashu-design`, `impeccable`, Canva, and Creative Production for visual systems, critique, mood boards, asset direction, and presentation-ready design output.
 - Frontend Implementation may use GSAP only after the layout, motion intent, ownership, and verification command are approved.
 - QA & Accessibility and Performance/SEO may use `impeccable` and GSAP guidance for visual polish, accessibility, responsive behavior, and motion/performance checks.

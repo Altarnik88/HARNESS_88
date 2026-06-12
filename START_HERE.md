@@ -116,7 +116,7 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
 
 HARNESS_88 does not choose Next.js, fullstack, VPS/VDS, or hosting by default. No frontend app is bundled. Stack is selected through dialogue, and production implementation starts only after a stack profile is selected or the user explicitly confirms a custom approach.
 
-Use `python tools/llm_wiki.py site doctor` for a unified readiness, wiki, task, frontend, security, and generated-starter self-test report.
+Use `python tools/llm_wiki.py site doctor --skip-self-test` for fast unified readiness, wiki, task, frontend, security, and tooling diagnostics. Reserve `python tools/llm_wiki.py site self-test` for generator or starter-template changes.
 
 Secrets must never be pasted into chat or project files. Use `agents/workflows/secret-broker.md` as the contract for future backend/deployment secret handling.
 

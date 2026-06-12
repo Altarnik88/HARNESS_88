@@ -56,6 +56,12 @@
       "url": "plugin://canva@openai-curated-remote",
       "notes": "Codex Canva plugin resource for mood boards, editable design assets, presentation/deck handoff, campaign visuals, and social assets when delegated."
     },
+    "plugin.creative-production": {
+      "source_type": "codex-plugin",
+      "label": "Creative Production plugin",
+      "url": "plugin://creative-production@openai-curated-remote",
+      "notes": "Codex Creative Production plugin resource for delegated visual territories, mood boards, scenes, offers, ads, logos, and campaign exploration."
+    },
     "skill.playwright": {
       "source_type": "github",
       "label": "Playwright MCP",

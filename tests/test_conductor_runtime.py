@@ -15,7 +15,8 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from llm_wiki.cli import main
-from llm_wiki.harness import validate_harness
+from llm_wiki.conductor_runtime import ROUTES
+from llm_wiki.harness import WORKER_PHASES, validate_harness
 
 
 MINIMAL_TASK = """# Task: Reference Analysis
@@ -129,6 +130,19 @@ class ConductorRuntimeTests(unittest.TestCase):
         self.assertIn("form-submission", denied)
         self.assertIn("python tools/llm_wiki.py site references --json", payload["verification"])
 
+    def test_conductor_routes_cover_every_worker_phase(self) -> None:
+        self.assertEqual(set(ROUTES), WORKER_PHASES)
+
+        for phase in sorted(WORKER_PHASES):
+            code, output = self.run_cli("--root", str(ROOT), "conductor", "route", "--phase", phase, "--json")
+
+            self.assertEqual(code, 0, output)
+            payload = json.loads(output)
+            self.assertEqual(payload["phase"], phase)
+            self.assertTrue(payload["lead_roles"], phase)
+            self.assertTrue(payload["requires_delegation"], phase)
+            self.assertTrue(payload["verification"], phase)
+
     def test_conductor_delegate_creates_task_bundle_and_delegation_packet(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -180,8 +194,71 @@ class ConductorRuntimeTests(unittest.TestCase):
             self.assertIn(f"Delegation packet: {payload['delegation_packet']}", task_text)
             self.assertIn("Role: Reference Research", packet_text)
             self.assertIn("User language:", packet_text)
+            self.assertIn("Reference/source scope:", packet_text)
+            self.assertIn("- approved reference URLs and required discovery sources", packet_text)
+            self.assertIn("Denied scope:", packet_text)
+            self.assertIn("- private/login/account/admin pages", packet_text)
             self.assertIn("Code permission:", packet_text)
             self.assertIn("Expected output:", packet_text)
+
+    def test_conductor_delegate_rejects_conductor_owner_without_creating_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+
+            code, output = self.run_cli(
+                "--root",
+                str(root),
+                "conductor",
+                "delegate",
+                "--phase",
+                "reference-analysis",
+                "--title",
+                "Reference Analysis",
+                "--objective",
+                "Analyze references.",
+                "--owner",
+                "Conductor",
+                "--user-language",
+                "Russian",
+                "--created",
+                "2026-06-12",
+                "--json",
+            )
+
+            self.assertEqual(code, 2, output)
+            self.assertIn("cannot be owned by Conductor", output)
+            self.assertFalse((root / "agents").exists())
+
+    def test_conductor_delegate_defaults_to_route_verification(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+
+            code, output = self.run_cli(
+                "--root",
+                str(root),
+                "conductor",
+                "delegate",
+                "--phase",
+                "reference-analysis",
+                "--title",
+                "Reference Analysis",
+                "--objective",
+                "Analyze approved references.",
+                "--owner",
+                "Reference Research",
+                "--user-language",
+                "Russian",
+                "--created",
+                "2026-06-12",
+                "--json",
+            )
+
+            self.assertEqual(code, 0, output)
+            payload = json.loads(output)
+            packet_text = (root / payload["delegation_packet"]).read_text(encoding="utf-8")
+            task_text = (root / payload["task"]["path"]).read_text(encoding="utf-8")
+            self.assertIn("python tools/llm_wiki.py site references --json", packet_text)
+            self.assertIn("python tools/llm_wiki.py site references --json", task_text)
 
     def test_task_validate_rejects_worker_phase_owned_by_conductor(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -207,6 +284,56 @@ class ConductorRuntimeTests(unittest.TestCase):
             messages = [issue.message for issue in validate_harness(root)]
 
             self.assertTrue(any("Worker phase reference-analysis cannot be owned by Conductor" in message for message in messages))
+
+    def test_task_validate_rejects_closed_worker_phase_owned_by_conductor(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            task = root / "agents" / "tasks" / "2026-06-12-reference-analysis.md"
+            task.parent.mkdir(parents=True, exist_ok=True)
+            task.write_text(
+                MINIMAL_TASK.format(owner="Conductor", packet="agents/delegations/2026-06-12-reference-analysis.md").replace(
+                    "Status: ready", "Status: verified"
+                )
+                + "\n- Verification evidence: `python tools/llm_wiki.py site references --json` exited 0.\n",
+                encoding="utf-8",
+            )
+            support = root / "agents" / "tasks"
+            (support / "progress").mkdir(parents=True, exist_ok=True)
+            (support / "checkpoints").mkdir(parents=True, exist_ok=True)
+            (support / "progress" / task.name).write_text(
+                f"# Progress\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            (support / "checkpoints" / task.name).write_text(
+                f"# Checkpoint\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+
+            messages = [issue.message for issue in validate_harness(root)]
+
+            self.assertTrue(any("Worker phase reference-analysis cannot be owned by Conductor" in message for message in messages))
+
+    def test_task_validate_rejects_unknown_phase(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            task = root / "agents" / "tasks" / "2026-06-12-typo-phase.md"
+            task.parent.mkdir(parents=True, exist_ok=True)
+            task.write_text(MINIMAL_TASK.format(owner="Reference Research", packet="not-required").replace("reference-analysis", "referense-analysis"), encoding="utf-8")
+            support = root / "agents" / "tasks"
+            (support / "progress").mkdir(parents=True, exist_ok=True)
+            (support / "checkpoints").mkdir(parents=True, exist_ok=True)
+            (support / "progress" / task.name).write_text(
+                f"# Progress\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            (support / "checkpoints" / task.name).write_text(
+                f"# Checkpoint\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+
+            messages = [issue.message for issue in validate_harness(root)]
+
+            self.assertTrue(any("Unknown task phase: referense-analysis" in message for message in messages))
 
     def test_task_validate_rejects_missing_or_incomplete_delegation_packet(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -239,6 +366,90 @@ class ConductorRuntimeTests(unittest.TestCase):
 
             incomplete_messages = [issue.message for issue in validate_harness(root)]
             self.assertTrue(any("Delegation packet missing field" in message for message in incomplete_messages))
+
+    def test_task_validate_rejects_delegation_packet_path_traversal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            task = root / "agents" / "tasks" / "2026-06-12-reference-analysis.md"
+            task.parent.mkdir(parents=True, exist_ok=True)
+            task.write_text(
+                MINIMAL_TASK.format(owner="Reference Research", packet="agents/delegations/../../outside.md"),
+                encoding="utf-8",
+            )
+            support = root / "agents" / "tasks"
+            (support / "progress").mkdir(parents=True, exist_ok=True)
+            (support / "checkpoints").mkdir(parents=True, exist_ok=True)
+            (support / "progress" / task.name).write_text(
+                f"# Progress\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            (support / "checkpoints" / task.name).write_text(
+                f"# Checkpoint\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+
+            messages = [issue.message for issue in validate_harness(root)]
+
+            self.assertTrue(any("Delegation packet must stay under agents/delegations/" in message for message in messages))
+
+    def test_task_validate_rejects_packet_role_phase_and_path_mismatches(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            task = root / "agents" / "tasks" / "2026-06-12-reference-analysis.md"
+            task.parent.mkdir(parents=True, exist_ok=True)
+            packet_rel = "agents/delegations/2026-06-12-reference-analysis.md"
+            task.write_text(MINIMAL_TASK.format(owner="Reference Research", packet=packet_rel), encoding="utf-8")
+            support = root / "agents" / "tasks"
+            (support / "progress").mkdir(parents=True, exist_ok=True)
+            (support / "checkpoints").mkdir(parents=True, exist_ok=True)
+            (support / "progress" / task.name).write_text(
+                f"# Progress\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            (support / "checkpoints" / task.name).write_text(
+                f"# Checkpoint\n\nLinked task: `agents/tasks/{task.name}`\n",
+                encoding="utf-8",
+            )
+            packet = root / packet_rel
+            packet.parent.mkdir(parents=True, exist_ok=True)
+            packet.write_text(
+                """# Delegation Packet
+
+Role: UX/Product Design
+Sub-agent: UX/Product Design worker
+Phase: frontend-build
+
+Task file: agents/tasks/wrong.md
+Progress file: agents/tasks/progress/2026-06-12-reference-analysis.md
+Checkpoint file: agents/tasks/checkpoints/2026-06-12-reference-analysis.md
+
+User language:
+Russian
+
+Ownership / scope:
+Owned files:
+- SITE_REFERENCES.md
+
+Required plugins/MCP/skills:
+- Use only tools granted in agents/tooling-matrix.md.
+
+Code permission:
+assigned files only
+
+Expected output:
+- Complete work.
+
+Verification:
+python tools/llm_wiki.py site references --json
+""",
+                encoding="utf-8",
+            )
+
+            messages = [issue.message for issue in validate_harness(root)]
+
+            self.assertTrue(any("Delegation packet role must match task owner" in message for message in messages))
+            self.assertTrue(any("Delegation packet phase must match task phase" in message for message in messages))
+            self.assertTrue(any("Delegation packet Task file must be agents/tasks/2026-06-12-reference-analysis.md" in message for message in messages))
 
 
 if __name__ == "__main__":

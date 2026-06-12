@@ -89,6 +89,7 @@ REQUIRED_DELEGATION_PACKET_FIELDS = [
     "Expected output:",
     "Verification:",
 ]
+PACKET_STRUCTURED_FIELDS = ["Role", "Phase", "Task file", "Progress file", "Checkpoint file"]
 
 
 def validate_harness(root: Path) -> list[LintIssue]:
@@ -175,15 +176,22 @@ def validate_linked_support_files(root: Path, task_path: Path) -> list[LintIssue
 
 def validate_delegation_contract(root: Path, task_path: Path, text: str, status: str | None) -> list[LintIssue]:
     phase = task_phase(text)
-    if phase not in WORKER_PHASES or status not in OPEN_TASK_STATUSES:
+    if not phase:
         return []
 
     rel = relative_posix(task_path, root)
     issues: list[LintIssue] = []
+    if phase not in WORKER_PHASES:
+        allowed = ", ".join(sorted(WORKER_PHASES))
+        issues.append(LintIssue("warning", rel, f"Unknown task phase: {phase}. Allowed worker phases: {allowed}."))
+        return issues
+
     owner_match = ROLE_OWNER_RE.search(text)
     owner = owner_match.group("owner").strip() if owner_match else ""
     if owner.casefold() == "conductor":
         issues.append(LintIssue("warning", rel, f"Worker phase {phase} cannot be owned by Conductor. Use a role agent or declared fallback."))
+    elif not owner:
+        issues.append(LintIssue("warning", rel, f"Worker phase {phase} requires a non-Conductor role owner."))
 
     packet = delegation_packet(text)
     if not packet or packet.casefold() in {"pending", "none", "n/a"}:
@@ -205,7 +213,7 @@ def validate_delegation_contract(root: Path, task_path: Path, text: str, status:
         issues.append(LintIssue("warning", relative_posix(packet_path, root), f"Cannot read delegation packet: {exc}"))
         return issues
 
-    issues.extend(validate_delegation_packet_fields(root, task_path, packet_path, packet_text))
+    issues.extend(validate_delegation_packet_fields(root, task_path, packet_path, packet_text, owner, phase))
     return issues
 
 
@@ -216,10 +224,23 @@ def resolve_delegation_packet(root: Path, raw_packet: str) -> tuple[Path | None,
     normalized = rel.as_posix()
     if not normalized.startswith("agents/delegations/") or rel.suffix.lower() != ".md":
         return None, f"Delegation packet must be under agents/delegations/: {raw_packet}"
-    return root / rel, None
+    base = (root / "agents" / "delegations").resolve(strict=False)
+    target = (root / rel).resolve(strict=False)
+    try:
+        target.relative_to(base)
+    except ValueError:
+        return None, f"Delegation packet must stay under agents/delegations/: {raw_packet}"
+    return target, None
 
 
-def validate_delegation_packet_fields(root: Path, task_path: Path, packet_path: Path, packet_text: str) -> list[LintIssue]:
+def validate_delegation_packet_fields(
+    root: Path,
+    task_path: Path,
+    packet_path: Path,
+    packet_text: str,
+    owner: str,
+    phase: str,
+) -> list[LintIssue]:
     rel = relative_posix(packet_path, root)
     issues: list[LintIssue] = []
     for field in REQUIRED_DELEGATION_PACKET_FIELDS:
@@ -228,10 +249,49 @@ def validate_delegation_packet_fields(root: Path, task_path: Path, packet_path: 
     task_rel = relative_posix(task_path, root)
     progress_rel = f"agents/tasks/progress/{task_path.name}"
     checkpoint_rel = f"agents/tasks/checkpoints/{task_path.name}"
-    for required_path in [task_rel, progress_rel, checkpoint_rel]:
-        if required_path not in packet_text:
-            issues.append(LintIssue("warning", rel, f"Delegation packet must reference {required_path}"))
+    expected_values = {
+        "Role": owner,
+        "Phase": phase,
+        "Task file": task_rel,
+        "Progress file": progress_rel,
+        "Checkpoint file": checkpoint_rel,
+    }
+    for label, expected in expected_values.items():
+        actual = packet_field_value(packet_text, label)
+        if actual is None:
+            continue
+        if actual != expected:
+            if label == "Role":
+                issues.append(LintIssue("warning", rel, f"Delegation packet role must match task owner: {expected}"))
+            elif label == "Phase":
+                issues.append(LintIssue("warning", rel, f"Delegation packet phase must match task phase: {expected}"))
+            else:
+                issues.append(LintIssue("warning", rel, f"Delegation packet {label} must be {expected}"))
+    for field in ["User language", "Ownership / scope", "Required plugins/MCP/skills", "Code permission", "Expected output", "Verification"]:
+        actual = packet_field_value(packet_text, field)
+        if actual is not None and not actual.strip():
+            issues.append(LintIssue("warning", rel, f"Delegation packet field must not be empty: {field}:"))
     return issues
+
+
+def packet_field_value(packet_text: str, label: str) -> str | None:
+    prefix = f"{label}:"
+    lines = packet_text.splitlines()
+    for index, line in enumerate(lines):
+        if not line.startswith(prefix):
+            continue
+        value = line[len(prefix) :].strip()
+        if value:
+            return value.strip("`")
+        for next_line in lines[index + 1 :]:
+            stripped = next_line.strip()
+            if not stripped:
+                continue
+            if any(stripped.startswith(f"{field}:") for field in PACKET_STRUCTURED_FIELDS):
+                return ""
+            return stripped.strip("`")
+        return ""
+    return None
 
 
 def validate_owned_file_conflicts(root: Path, task_paths: list[Path]) -> list[LintIssue]:

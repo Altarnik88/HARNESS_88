@@ -97,7 +97,7 @@ def build_parser() -> argparse.ArgumentParser:
     conductor_delegate_parser.add_argument("--user-language", required=True, help="Language for user-facing questions and approvals.")
     conductor_delegate_parser.add_argument("--owned", nargs="*", default=[], help="Owned files or directories.")
     conductor_delegate_parser.add_argument("--do-not-edit", nargs="*", default=[], help="Denied files or directories.")
-    conductor_delegate_parser.add_argument("--verification", default="python tools/llm_wiki.py task validate --strict", help="Verification command.")
+    conductor_delegate_parser.add_argument("--verification", default="", help="Verification command. Defaults to the route verification.")
     conductor_delegate_parser.add_argument("--created", default="", help="Creation date in YYYY-MM-DD format. Defaults to today.")
     conductor_delegate_parser.add_argument("--json", action="store_true", help="Emit JSON created delegation bundle.")
 

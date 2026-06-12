@@ -128,7 +128,7 @@ For website work, final verification should include the relevant subset of:
 - QA/accessibility review for new or changed user flows.
 - Performance/SEO audit before release.
 - Security/dependency audit when frontend/backend dependencies are present.
-- Final user approval after remediation and before VPS publication instructions.
+- Final user approval after remediation and before publication instructions for the approved target.
 
 ## References
 

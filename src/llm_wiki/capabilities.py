@@ -21,6 +21,7 @@ OPTIONAL_DESIGN_RESOURCE_IDS = {
     "skill.ui-ux-pro-max",
     "library.gsap",
     "plugin.canva",
+    "plugin.creative-production",
 }
 
 
@@ -62,7 +63,7 @@ CAPABILITY_SPECS = [
         name="Node.js",
         kind="local-tool",
         importance="recommended",
-        description="Runs optional frontend checks for the bundled Next.js starter.",
+        description="Runs optional frontend checks after an approved JavaScript/TypeScript scaffold creates a project.",
         detection="command",
         terms=("node",),
         install_hint="Install Node.js >= 20.9.0 when frontend checks or implementation are in scope.",

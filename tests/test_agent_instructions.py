@@ -82,10 +82,12 @@ class AgentInstructionTests(unittest.TestCase):
         tooling = (ROOT / "agents" / "tooling-matrix.md").read_text(encoding="utf-8")
         ux = (ROOT / "agents" / "roles" / "ux-product-design.md").read_text(encoding="utf-8")
         visual = (ROOT / "agents" / "roles" / "visual-design.md").read_text(encoding="utf-8")
+        artifact = (ROOT / "agents" / "roles" / "design-artifact.md").read_text(encoding="utf-8")
         reference = (ROOT / "agents" / "roles" / "reference-research.md").read_text(encoding="utf-8")
         frontend = (ROOT / "agents" / "roles" / "frontend-implementation.md").read_text(encoding="utf-8")
         workflow = (ROOT / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
         delegation = (ROOT / "agents" / "templates" / "delegation-brief.md").read_text(encoding="utf-8")
+        registry = (ROOT / "agents" / "resources" / "tooling-sources.json").read_text(encoding="utf-8")
 
         for needle in [
             "https://github.com/alchaincyf/huashu-design",
@@ -96,8 +98,39 @@ class AgentInstructionTests(unittest.TestCase):
         ]:
             self.assertIn(needle, protocol)
 
+        for needle in [
+            "Creative exploration is a first-class deliverable",
+            "2-4 materially different",
+            "clean, modern, or professional",
+            "approval",
+            "evidence",
+        ]:
+            for text in [protocol, ux, visual, workflow]:
+                self.assertIn(needle, text)
+
+        self.assertIn("plugin.creative-production", registry)
+        self.assertIn("plugin://creative-production@openai-curated-remote", registry)
+        self.assertIn("Creative Production plugin", protocol)
+        self.assertIn("Creative Production", tooling)
+        self.assertIn("exploration boards", artifact)
+        self.assertIn("must not make product, UX, or visual decisions alone", artifact)
+
         for text in [tooling, ux, visual, reference, frontend, workflow, delegation]:
             self.assertIn("agents/protocols/design-resources.md", text)
+
+    def test_default_diagnostics_use_skip_self_test_in_docs(self) -> None:
+        for rel in [
+            "README.md",
+            "START_HERE.md",
+            "AGENT_SITE_TOOLING.md",
+            "src/llm_wiki/templates/site_starter/README.md",
+            "src/llm_wiki/templates/site_starter/START_HERE.md",
+            "src/llm_wiki/templates/site_starter/AGENT_SITE_TOOLING.md",
+        ]:
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            self.assertIn("python tools/llm_wiki.py site doctor --skip-self-test", text, rel)
+        starter_readme = (ROOT / "src" / "llm_wiki" / "templates" / "site_starter" / "README.md").read_text(encoding="utf-8")
+        self.assertIn("Reserve `python tools/llm_wiki.py site self-test` for generator changes", starter_readme)
 
     def test_tooling_onboarding_contract_is_documented(self) -> None:
         protocol = (ROOT / "agents" / "protocols" / "tooling-onboarding.md").read_text(encoding="utf-8")

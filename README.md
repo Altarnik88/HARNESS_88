@@ -48,9 +48,9 @@ HARNESS_88 uses an agent-first operating model:
 - **Product Strategist:** goals, audience, user jobs, acceptance criteria.
 - **Reference Research:** reference discovery, shortlist approval, bounded crawl evidence, screenshot/Figma handoff, and analysis gate support.
 - **IA & Content:** sitemap, slugs, page models, content and metadata briefs.
-- **UX/Product Design:** flows, responsive behavior, interactions, and states.
-- **Visual Design:** visual system, tokens, imagery direction, asset guidance.
-- **Design Artifact:** Figma reference boards and artifact handoff.
+- **UX/Product Design:** divergent flow/interaction exploration, responsive behavior, states, and convergence handoff.
+- **Visual Design:** named visual territories, visual system, tokens, imagery direction, asset guidance, and rejected-direction rationale.
+- **Design Artifact:** Figma reference boards, exploration boards, evidence organization, and artifact handoff.
 - **Frontend Architecture:** routing, component boundaries, implementation slices.
 - **Frontend Implementation:** assigned pages, components, styling, interactions.
 - **Backend/Data:** APIs, catalog/ecommerce/payment/request flows, data models.
@@ -68,7 +68,7 @@ Core local tools:
 - `python tools/llm_wiki.py site references --json` - strict pre-frontend reference analysis gate status.
 - `python tools/llm_wiki.py site gates --json` - delivery, audit, remediation, approval, and publish handoff status.
 - `python tools/llm_wiki.py stack list/status/select` - stack profile discovery and selection.
-- `python tools/llm_wiki.py site doctor` - unified diagnostics for readiness, wiki, task graph, frontend, security, and generated starter checks.
+- `python tools/llm_wiki.py site doctor --skip-self-test` - fast unified diagnostics for readiness, wiki, task graph, frontend, security, and tooling.
 - `python tools/llm_wiki.py quality --skip-frontend` - stack-neutral core quality gate.
 - `python tools/llm_wiki.py rebuild` and `python tools/llm_wiki.py lint` - wiki index and Markdown quality checks.
 - `python tools/llm_wiki.py tools audit` - local tools, Codex skills, plugins, and MCP capability audit.
@@ -82,7 +82,7 @@ Agent routing supports:
 - **Product Design plugin:** product/UI context, design variants, image-to-code when a mockup or reference is selected.
 - **GitHub plugin / `gh-cli` skill:** repository, pull request, issue, and CI workflows.
 - **Reference discovery:** Dribbble, Behance, Awwwards, competitors, and market examples.
-- **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP, and Canva are granted through `agents/protocols/design-resources.md` and tracked in `agents/resources/tooling-sources.json`.
+- **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP, Canva, and Creative Production are granted through `agents/protocols/design-resources.md` and tracked in `agents/resources/tooling-sources.json`.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets, and Remotion when the task and tooling matrix allow them.
 
 The tooling audit is read-only. It reports what appears available, what is missing, and what the agent should ask permission to install, download from GitHub, or connect through Codex plugins/skills. HARNESS_88 must not install or connect anything automatically.
@@ -123,6 +123,8 @@ python tools/llm_wiki.py conductor route --phase reference-analysis
 python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```
+
+Reserve `python tools/llm_wiki.py site self-test` for generator or starter-template changes.
 
 ## Development Flow
 

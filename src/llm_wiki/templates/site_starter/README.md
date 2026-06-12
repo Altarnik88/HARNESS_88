@@ -29,9 +29,11 @@ python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py conductor route --phase reference-analysis
-python tools/llm_wiki.py site doctor
+python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```
+
+Reserve `python tools/llm_wiki.py site self-test` for generator changes.
 
 ## Development Flow
 
@@ -57,4 +59,4 @@ Run `python tools/llm_wiki.py tools audit` after download or environment changes
 
 GitHub-backed source links are tracked in `agents/resources/tooling-sources.json`. If a required resource has no recorded URL, the agent must ask the user to provide or approve the exact repository before downloading it.
 
-Site design resources are defined in `agents/protocols/design-resources.md`, including huashu-design, impeccable, ui-ux-pro-max, GSAP, and Canva.
+Site design resources are defined in `agents/protocols/design-resources.md`, including huashu-design, impeccable, ui-ux-pro-max, GSAP, Canva, and Creative Production.

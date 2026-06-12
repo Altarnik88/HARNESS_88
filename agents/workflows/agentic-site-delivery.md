@@ -44,6 +44,7 @@ Outputs:
 
 - Updated `PRODUCT.md` with product goal, audience, scope, commerce mode, user jobs, and acceptance criteria.
 - Updated `DESIGN.md` with design style, interaction direction, accessibility constraints, and visual reference expectations.
+- `DESIGN.md` records creative exploration status when the brief is open: selected direction, rejected alternatives, evidence, and constraints.
 - Updated `SITE_INTAKE.md` with `Status: approved` and `references_status: approved` when accepted.
 - Updated `STACK.md` with a selected profile or documented custom approach.
 - Explicit statuses:
@@ -57,6 +58,8 @@ Required skills/plugins/MCP:
 
 - Product Design `get-context` for missing product/UI decisions.
 - Context7 only when a stack decision depends on current framework/platform behavior.
+
+Creative exploration is a first-class deliverable. When the brief is open, UX/Product Design and Visual Design should produce 2-4 materially different directions with a named thesis, audience signal, reference evidence, accessibility/responsive/performance cautions, and a recommendation. Do not treat clean, modern, or professional as a sufficient design direction unless those words are made concrete in layout, type, color, imagery, motion, and interaction terms. Exploration is proposal work, not approval; implementation waits for user approval or an approved `DESIGN.md`/wiki decision with evidence.
 
 ## Phase 3: Reference Analysis Gate
 
@@ -73,6 +76,7 @@ Outputs:
 - Desktop and mobile screenshot evidence recorded under `raw/assets/references/` and indexed by `raw/assets/references/manifest.json`.
 - Figma reference artifact in a Figma design file. If the user does not provide a Figma file, create one after confirming Figma access/team.
 - UX/visual analysis summary: page patterns, layout systems, component motifs, typography/color/spacing cues, interaction notes, cautions, and applicability.
+- Creative exploration summary when references do not already imply a clear direction: 2-4 materially different UX or visual directions with evidence and cautions.
 - Visual direction summary carried into `DESIGN.md` or an approved wiki decision.
 - `SITE_REFERENCES.md` updated to `Status: approved` only after the user accepts the reference-analysis evidence.
 
@@ -85,6 +89,7 @@ Rules:
 - Agent-proposed reference discovery must include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`.
 - Reference shortlists must include URL, reason for inclusion, style tags, project applicability, cautions, and an explicit user approval prompt.
 - When examples are agent-proposed, clearly separate direct user preferences from agent suggestions.
+- When design direction remains ambiguous after reference analysis, treat creative exploration as optional-but-expected and keep it approval-gated.
 - Record unresolved reference disagreements as blockers, not assumptions.
 - Bounded crawl excludes login, private, admin, account, checkout/cart, destructive, and form-submission flows unless the user explicitly approves them.
 - Skipped pages and crawl blockers must be recorded with reasons in the screenshot manifest.
@@ -255,7 +260,7 @@ Rules:
 
 ## Phase 11: Final User Approval
 
-Lead role: Conductor.
+Lead role: Conductor coordinates user approval; worker roles own preview, QA evidence, and assigned fixes.
 
 Supporting roles: Frontend Implementation, QA & Accessibility, UX/Product Design.
 
@@ -279,7 +284,7 @@ Lead role: DevOps/Release.
 
 Outputs:
 
-- Step-by-step VPS publication instructions for the selected stack.
+- Step-by-step publication instructions for the approved target and selected stack.
 - Required environment variable names and secret-broker invocation path without secret values.
 - Build, deploy, rollback, backup, monitoring, and update instructions.
 - Maintenance notes for dependency updates and versioned releases.

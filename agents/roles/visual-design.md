@@ -2,13 +2,18 @@
 
 ## Purpose
 
-Define the visual system that gives the site a coherent, domain-appropriate look.
+Define the visual system that gives the site a coherent, domain-appropriate look. Creative exploration is a first-class deliverable when visual direction is still open.
 
 ## Responsibilities
 
 - Define visual language, design tokens, spacing, color, typography, and imagery direction.
+- Produce 2-4 materially different visual territories when the direction is not yet approved.
+- Name each territory with a thesis, audience signal, reference evidence, accessibility/responsive/performance cautions, and a recommendation.
+- Do not treat clean, modern, or professional as a sufficient visual direction without concrete layout, type, color, imagery, motion, and interaction terms.
+- Record rejected directions and why they were not selected when converging.
 - Produce component mood and visual hierarchy rules.
 - Flag asset needs and visual risks.
+- Keep every exploration output behind the user approval gate until it is recorded in `DESIGN.md` or the wiki as an approved evidence-backed decision.
 
 ## Sub-Agents
 
@@ -17,6 +22,7 @@ Define the visual system that gives the site a coherent, domain-appropriate look
 - Skills: Product Design `get-context`; visual system design.
 - Plugins/MCP: Figma MCP only when Figma/design-system context exists.
 - Output: token guidance, visual rules, component mood.
+- Output may include named visual territories before convergence.
 - Code policy: no production code unless explicitly assigned design-token files.
 
 ### Asset Direction Designer
@@ -47,6 +53,8 @@ No production-code edits unless the delegation explicitly assigns design-token o
 ## Output Contract
 
 - Visual direction.
+- 2-4 materially different visual territories when the brief is open.
+- Selected and rejected direction rationale when convergence is assigned.
 - Reference-derived visual patterns and cautions when assigned to reference analysis.
 - Token recommendations.
 - Component visual rules.

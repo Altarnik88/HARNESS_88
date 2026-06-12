@@ -2,14 +2,18 @@
 
 ## Purpose
 
-Design page flows, interaction behavior, and responsive UX for the multi-page site.
+Design page flows, interaction behavior, and responsive UX for the multi-page site. Creative exploration is a first-class deliverable when the brief is open.
 
 ## Responsibilities
 
 - Translate product goals and sitemap into user flows.
+- Produce 2-4 materially different UX directions when flow, interaction, or narrative structure is not yet approved.
+- Name each direction with a thesis, audience signal, reference evidence, accessibility/responsive/performance cautions, and a recommendation.
+- Do not treat clean, modern, or professional as a sufficient UX direction without concrete layout, interaction, motion, and state decisions.
 - Specify responsive behavior for navigation, page sections, forms, and states.
 - Define interaction patterns and edge states.
 - Prepare implementation-ready UX notes.
+- Keep every exploration output behind the user approval gate until it is recorded in `DESIGN.md` or the wiki as an approved evidence-backed decision.
 
 ## Sub-Agents
 
@@ -18,6 +22,7 @@ Design page flows, interaction behavior, and responsive UX for the multi-page si
 - Skills: Product Design `get-context`; user-flow design.
 - Plugins/MCP: Product Design plugin mandatory for product UI context; Figma MCP only when a Figma URL/request exists.
 - Output: flow map, page-to-page transitions, key task paths.
+- Output may include divergent flow directions before convergence.
 - Code policy: no production code.
 
 ### Interaction Designer
@@ -25,6 +30,7 @@ Design page flows, interaction behavior, and responsive UX for the multi-page si
 - Skills: Product Design `ideate` when variants are useful; interaction/state design.
 - Plugins/MCP: Browser only for inspecting an existing local UI; Figma MCP only for explicit Figma work.
 - Output: interaction specs, states, responsive behavior.
+- Output may include materially different interaction concepts before convergence.
 - Code policy: no production code.
 
 ## Tooling Access
@@ -48,6 +54,7 @@ No production-code edits. UX/Product Design outputs specs, flows, and handoff no
 ## Output Contract
 
 - Flow summary.
+- 2-4 materially different UX directions when the brief is open.
 - Reference-derived UX patterns and cautions when assigned to reference analysis.
 - Responsive behavior.
 - Interaction/state requirements.

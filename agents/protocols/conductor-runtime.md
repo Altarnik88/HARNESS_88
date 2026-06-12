@@ -32,6 +32,8 @@ Worker phases include:
 - publish-operate
 - knowledge-closeout
 
+`python tools/llm_wiki.py conductor route --phase <phase>` must return a route packet for every worker phase above. `python tools/llm_wiki.py conductor delegate` must fail before file creation if the owner is empty, `Conductor`, or not valid for the selected route.
+
 ## Delegation Packet Gate
 
 Before any worker phase starts, Conductor creates a task bundle and delegation packet:
@@ -47,6 +49,8 @@ The task must include:
 - `Role owner: <non-Conductor role>`
 
 The packet must include role, task file, progress file, checkpoint file, user language, ownership/scope, allowed tooling, code permission, expected output, verification, and clean-context resume instructions.
+
+The packet separates `Reference/source scope` from `Denied scope`. Source scope says what evidence or inputs are allowed; denied scope says what the worker must not do.
 
 ## Reference Analysis Route
 
@@ -78,4 +82,4 @@ Run before claiming readiness or completion:
 python tools/llm_wiki.py task validate --strict
 ```
 
-The validator rejects open worker-phase tasks owned by Conductor, missing delegation packets, and incomplete packet fields.
+The validator rejects worker-phase tasks owned by Conductor, unknown phases, missing delegation packets, unsafe packet paths, incomplete packet fields, and packet role/phase/path mismatches.

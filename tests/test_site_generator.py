@@ -149,7 +149,7 @@ class SiteGeneratorTests(unittest.TestCase):
                 "Total Agent Audit",
                 "Remediation Plan and Fix Loop",
                 "Final User Approval",
-                "VPS publication instructions",
+                "publication instructions for the approved target",
             ]:
                 self.assertIn(needle, workflow)
             self.assertIn("Do not begin serious frontend implementation", tooling)
@@ -232,9 +232,12 @@ class SiteGeneratorTests(unittest.TestCase):
                 "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
                 "https://github.com/greensock/GSAP/",
                 "plugin://canva@openai-curated-remote",
+                "plugin://creative-production@openai-curated-remote",
             ]:
                 self.assertIn(needle, protocol)
                 self.assertIn(needle, registry)
+            self.assertIn("Creative exploration is a first-class deliverable", protocol)
+            self.assertIn("Registered design resources", protocol)
 
     def test_generated_project_includes_current_mcp_sources_without_node_repl_core(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -269,6 +272,7 @@ class SiteGeneratorTests(unittest.TestCase):
             for text in [start_here, tooling, readme]:
                 self.assertIn("python tools/llm_wiki.py tools audit", text)
                 self.assertIn("agents/resources/tooling-sources.json", text)
+                self.assertIn("python tools/llm_wiki.py site doctor --skip-self-test", text)
             self.assertIn("agents/protocols/tooling-onboarding.md", start_here)
             self.assertIn("agents/protocols/tooling-onboarding.md", tooling)
             self.assertTrue((target / "agents" / "protocols" / "tooling-onboarding.md").exists())

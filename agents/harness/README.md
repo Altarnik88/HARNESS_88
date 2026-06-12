@@ -52,7 +52,7 @@ assigned checkpoint file
 
 `python tools/llm_wiki.py lint --strict` checks both wiki health and harness structure. Harness lint verifies required root files, task statuses, required task sections, and verification evidence for `verified` or `done` task files.
 
-Use `python tools/llm_wiki.py site doctor` for a unified readiness, stack, brief, task, wiki, optional scaffolded frontend, security, and generated-starter self-test report.
+Use `python tools/llm_wiki.py site doctor --skip-self-test` for fast unified readiness, stack, brief, task, wiki, optional scaffolded frontend, security, and tooling diagnostics. Reserve `python tools/llm_wiki.py site self-test` for generator or starter-template changes.
 
 Use `python tools/llm_wiki.py site intake --json` for machine-readable first-run intake and reference approval state.
 

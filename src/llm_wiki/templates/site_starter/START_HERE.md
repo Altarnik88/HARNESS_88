@@ -48,8 +48,10 @@ python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py conductor route --phase reference-analysis
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
-python tools/llm_wiki.py site doctor
+python tools/llm_wiki.py site doctor --skip-self-test
 ```
+
+Reserve `python tools/llm_wiki.py site self-test` for generator changes.
 
 After selecting a profile, update `PRODUCT.md`, `DESIGN.md`, and `STACK.md`, create the first task, and begin development from that task.
 
