@@ -70,6 +70,8 @@ HARNESS_88 использует agent-first модель:
 
 Tooling audit работает read-only. Он показывает, что доступно, чего не хватает, и на что агент должен спросить разрешение: установка локальных tools, скачивание skills из GitHub или подключение Codex plugins/skills. HARNESS_88 не должен ничего устанавливать или подключать автоматически.
 
+Ссылки на GitHub-ресурсы фиксируются в `agents/resources/tooling-sources.json`. Перед любой загрузкой из GitHub точный URL репозитория должен быть записан там и одобрен пользователем. Если URL пустой, агент должен спросить правильную ссылку, а не угадывать ее.
+
 ## Контракты репозитория
 
 - `START_HERE.md`: first-chat инструкции для нового пользователя.
@@ -78,6 +80,7 @@ Tooling audit работает read-only. Он показывает, что до
 - `STACK.md`: контролируемое состояние выбора стека.
 - `PRODUCT.md` и `DESIGN.md`: durable product/design contracts.
 - `agents/`: role docs, delegation protocol, workflows и harness templates.
+- `agents/resources/tooling-sources.json`: реестр источников для GitHub-backed tools, skills и MCP resources.
 - `wiki/`: Markdown-база знаний, поддерживаемая агентами.
 - `src/llm_wiki/` и `tools/llm_wiki.py`: локальный CLI для wiki, task, stack, site и quality workflows.
 - `frontend/`: optional bundled Next.js starter/template, не выбранный стек по умолчанию.

@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "policy": "HARNESS_88 must not install local tools, download Codex skills, connect MCP servers, or connect Codex plugins automatically. If a resource is downloaded from GitHub, the exact repository URL must be recorded here and approved by the user before download.",
+  "resources": {
+    "local.git": {
+      "source_type": "github",
+      "label": "Git",
+      "url": "https://github.com/git/git",
+      "notes": "Official Git source repository. Platform installers may still come from official package managers or git-scm.com after user approval."
+    },
+    "local.node": {
+      "source_type": "github",
+      "label": "Node.js",
+      "url": "https://github.com/nodejs/node",
+      "notes": "Official Node.js source repository. Platform installers may still come from nodejs.org or package managers after user approval."
+    },
+    "local.npm": {
+      "source_type": "github",
+      "label": "npm CLI",
+      "url": "https://github.com/npm/cli",
+      "notes": "Official npm CLI repository."
+    },
+    "local.gh": {
+      "source_type": "github",
+      "label": "GitHub CLI",
+      "url": "https://github.com/cli/cli",
+      "notes": "Official GitHub CLI repository."
+    },
+    "skill.playwright": {
+      "source_type": "github",
+      "label": "Playwright Codex skill",
+      "url": "",
+      "notes": "Record the exact user-approved Codex skill repository URL before downloading a Playwright skill. Do not substitute the framework repository for a skill repository unless the user explicitly approves it."
+    },
+    "skill.gh-cli": {
+      "source_type": "github",
+      "label": "gh-cli Codex skill",
+      "url": "",
+      "notes": "Record the exact user-approved Codex skill repository URL before downloading a gh-cli skill."
+    },
+    "skill.imagegen": {
+      "source_type": "github",
+      "label": "imagegen Codex skill",
+      "url": "",
+      "notes": "Record the exact user-approved Codex skill repository URL before downloading an imagegen skill."
+    },
+    "mcp.serena": {
+      "source_type": "github",
+      "label": "Serena MCP",
+      "url": "",
+      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting Serena from GitHub."
+    },
+    "mcp.context7": {
+      "source_type": "github",
+      "label": "Context7 MCP",
+      "url": "",
+      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting Context7 from GitHub."
+    },
+    "mcp.filesystem": {
+      "source_type": "github",
+      "label": "Filesystem MCP",
+      "url": "",
+      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting a filesystem server from GitHub."
+    },
+    "mcp.sqlite": {
+      "source_type": "github",
+      "label": "SQLite MCP",
+      "url": "",
+      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting a SQLite server from GitHub."
+    },
+    "mcp.node-repl": {
+      "source_type": "github",
+      "label": "node_repl MCP",
+      "url": "",
+      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting node_repl from GitHub."
+    }
+  }
+}

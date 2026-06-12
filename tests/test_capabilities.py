@@ -99,6 +99,67 @@ class CapabilityAuditTests(unittest.TestCase):
         self.assertEqual(code, 0, output)
         self.assertIn("Tooling:", output)
 
+    def test_capability_audit_includes_recorded_resource_links(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "project"
+            registry = root / "agents" / "resources" / "tooling-sources.json"
+            registry.parent.mkdir(parents=True)
+            registry.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "resources": {
+                            "local.gh": {
+                                "source_type": "github",
+                                "label": "GitHub CLI",
+                                "url": "https://github.com/cli/cli",
+                                "notes": "Official GitHub CLI source repository.",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with patch("llm_wiki.capabilities.shutil.which", return_value=None):
+                report = capability_audit(root, codex_home=Path(tmp) / ".codex")
+
+        items = {item["id"]: item for item in report["items"]}
+        action = next(action for action in report["next_actions"] if action["id"] == "local.gh")
+        self.assertEqual(items["local.gh"]["resource_url"], "https://github.com/cli/cli")
+        self.assertEqual(action["resource_url"], "https://github.com/cli/cli")
+        self.assertIn("agents/resources/tooling-sources.json", action["source_registry"])
+
+    def test_capability_audit_blocks_github_download_without_recorded_url(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "project"
+            registry = root / "agents" / "resources" / "tooling-sources.json"
+            registry.parent.mkdir(parents=True)
+            registry.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "resources": {
+                            "skill.playwright": {
+                                "source_type": "github",
+                                "label": "Playwright skill",
+                                "url": "",
+                                "notes": "Record the exact user-approved skill repository before download.",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with patch("llm_wiki.capabilities.shutil.which", return_value=None):
+                report = capability_audit(root, codex_home=Path(tmp) / ".codex")
+
+        action = next(action for action in report["next_actions"] if action["id"] == "skill.playwright")
+        self.assertEqual(action["resource_url"], "")
+        self.assertIn("No approved GitHub URL is recorded", action["prompt"])
+        self.assertIn("agents/resources/tooling-sources.json", action["prompt"])
+
 
 if __name__ == "__main__":
     unittest.main()

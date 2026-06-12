@@ -559,6 +559,8 @@ def print_tools_audit(report: dict[str, object]) -> None:
     for item in report["items"]:
         assert isinstance(item, dict)
         print(f"- {item['status']} [{item['importance']}] {item['name']}: {item['description']}")
+        if item.get("resource_url"):
+            print(f"  Source: {item['resource_url']}")
         if item.get("install_hint"):
             print(f"  Next: {item['install_hint']}")
     actions = report.get("next_actions", [])

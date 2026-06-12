@@ -29,10 +29,13 @@ This clean project starts with the portable, stack-neutral site-development harn
 - For multi-agent website work, read `agents/TEAM.md` before delegation.
 - Real implementation requires a concrete task file in `agents/tasks/` or an equivalent approved plan.
 - Run `python tools/llm_wiki.py tools audit` after download or environment changes. The audit reports missing tools/skills/plugins and asks permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
+- Before downloading any GitHub-backed tool, skill, or MCP resource, confirm its exact URL is recorded in `agents/resources/tooling-sources.json` and approved by the user. If the URL is blank or missing, ask for the correct repository link first.
 
 ## Optional Resources
 
 Project-local design and AI skill packs are intentionally not bundled in this generated starter. Install or copy them only when a task explicitly needs them, then record the decision in the wiki.
+
+Use `agents/resources/tooling-sources.json` as the registry for external source links. A blank GitHub URL means no download is allowed until the user approves the exact repository.
 
 ## Default Checks
 

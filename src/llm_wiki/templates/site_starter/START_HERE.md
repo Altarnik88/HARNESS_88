@@ -49,3 +49,5 @@ Secrets must never be pasted into chat or project files. Use `agents/workflows/s
 ## Tooling Onboarding
 
 After downloading HARNESS_88, run `python tools/llm_wiki.py tools audit` before serious work. The audit reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities. It asks permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
+
+GitHub-backed resource links are recorded in `agents/resources/tooling-sources.json`. Before any GitHub download, the exact repository URL must be present there and approved by the user. If the URL is blank or missing, the agent asks the user for the correct link first.

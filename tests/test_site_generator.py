@@ -49,6 +49,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertTrue((target / "NOTICE" / "THIRD_PARTY.md").exists())
             self.assertTrue((target / "agents" / "harness" / "stack-options.md").exists())
             self.assertTrue((target / "agents" / "protocols" / "wiki-operations.md").exists())
+            self.assertTrue((target / "agents" / "resources" / "tooling-sources.json").exists())
             self.assertTrue((target / "frontend" / "src" / "app" / "page.tsx").exists())
             self.assertTrue((target / "raw" / "sources" / ".gitkeep").exists())
             self.assertTrue((target / "raw" / "assets" / ".gitkeep").exists())
@@ -189,6 +190,7 @@ class SiteGeneratorTests(unittest.TestCase):
 
             for text in [start_here, tooling, readme]:
                 self.assertIn("python tools/llm_wiki.py tools audit", text)
+                self.assertIn("agents/resources/tooling-sources.json", text)
             self.assertIn("asks permission before installing", tooling)
 
     def test_cli_site_init_creates_project(self) -> None:

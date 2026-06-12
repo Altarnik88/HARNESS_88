@@ -31,6 +31,7 @@ Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflo
 - `agents/protocols/conversation-delegation.md` - user-language, reference-discovery, and agent-first delegation protocol.
 - `agents/TEAM.md` - multi-agent and one-agent fallback protocol.
 - `agents/harness/README.md` - task/progress/checkpoint execution model.
+- `agents/resources/tooling-sources.json` - source registry for GitHub-backed tools, skills, and MCP resources.
 - `agents/tooling-matrix.md` - allowed tools by role.
 
 ## Core Rules

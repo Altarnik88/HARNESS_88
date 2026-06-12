@@ -70,6 +70,8 @@ Agent routing supports:
 
 The tooling audit is read-only. It reports what appears available, what is missing, and what the agent should ask permission to install, download from GitHub, or connect through Codex plugins/skills. HARNESS_88 must not install or connect anything automatically.
 
+GitHub-backed resource links live in `agents/resources/tooling-sources.json`. Before any GitHub download, the exact repository URL must be recorded there and approved by the user. If the URL is blank, the agent must ask for the correct link instead of guessing.
+
 ## Repository Contracts
 
 - `START_HERE.md`: first-chat instructions for a new user.
@@ -78,6 +80,7 @@ The tooling audit is read-only. It reports what appears available, what is missi
 - `STACK.md`: controlled stack selection state.
 - `PRODUCT.md` and `DESIGN.md`: durable product and design contracts.
 - `agents/`: role docs, delegation protocol, workflows, and harness templates.
+- `agents/resources/tooling-sources.json`: source registry for GitHub-backed tools, skills, and MCP resources.
 - `wiki/`: LLM-maintained Markdown knowledge base.
 - `src/llm_wiki/` and `tools/llm_wiki.py`: local CLI for wiki, task, stack, site, and quality workflows.
 - `frontend/`: optional bundled Next.js starter/template, not the default selected stack.

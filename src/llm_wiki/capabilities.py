@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
 import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+
+RESOURCE_REGISTRY_REL = Path("agents/resources/tooling-sources.json")
 
 
 @dataclass(frozen=True)
@@ -275,18 +278,52 @@ CAPABILITY_SPECS = [
 def capability_audit(root: Path, codex_home: Path | None = None) -> dict[str, object]:
     codex_home = resolve_codex_home(codex_home)
     installed_names = installed_codex_names(codex_home)
-    items = [capability_item(spec, codex_home, installed_names) for spec in CAPABILITY_SPECS]
+    resource_sources = load_tooling_sources(root)
+    items = [capability_item(spec, codex_home, installed_names, resource_sources.get(spec.id, {})) for spec in CAPABILITY_SPECS]
     summary = capability_summary(items)
     next_actions = build_next_actions(items)
     return {
         "status": "ready" if summary["required_missing"] == 0 and summary["recommended_missing"] == 0 else "needs-setup",
         "root": str(root),
         "codex_home": str(codex_home) if codex_home else "",
-        "setup_policy": "No tools, skills, MCP servers, or plugins are installed automatically. Ask the user for permission before connecting Codex plugins, downloading skills from GitHub, or installing local tools.",
+        "source_registry": RESOURCE_REGISTRY_REL.as_posix(),
+        "setup_policy": "No tools, skills, MCP servers, or plugins are installed automatically. Ask the user for permission before connecting Codex plugins, downloading skills from GitHub, or installing local tools. If a resource is downloaded from GitHub, use the recorded URL in agents/resources/tooling-sources.json; if no URL is recorded, ask the user to provide and approve the exact repository link first.",
         "summary": summary,
         "items": items,
         "next_actions": next_actions,
     }
+
+
+def load_tooling_sources(root: Path) -> dict[str, dict[str, str]]:
+    registry = root / RESOURCE_REGISTRY_REL
+    if not registry.exists():
+        return {}
+    try:
+        payload = json.loads(registry.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    raw_resources = payload.get("resources", {})
+    if isinstance(raw_resources, list):
+        iterable = ((str(item.get("capability_id", "")), item) for item in raw_resources if isinstance(item, dict))
+    elif isinstance(raw_resources, dict):
+        iterable = ((str(key), value) for key, value in raw_resources.items() if isinstance(value, dict))
+    else:
+        return {}
+
+    resources: dict[str, dict[str, str]] = {}
+    for capability_id, raw in iterable:
+        capability_id = capability_id.strip()
+        if not capability_id:
+            continue
+        resources[capability_id] = {
+            "source_type": str(raw.get("source_type", "")).strip(),
+            "label": str(raw.get("label", "")).strip(),
+            "url": str(raw.get("url", "")).strip(),
+            "notes": str(raw.get("notes", "")).strip(),
+            "registry_path": RESOURCE_REGISTRY_REL.as_posix(),
+        }
+    return resources
 
 
 def resolve_codex_home(codex_home: Path | None) -> Path | None:
@@ -318,9 +355,15 @@ def installed_codex_names(codex_home: Path | None) -> set[str]:
     return names
 
 
-def capability_item(spec: CapabilitySpec, codex_home: Path | None, installed_names: set[str]) -> dict[str, object]:
+def capability_item(
+    spec: CapabilitySpec,
+    codex_home: Path | None,
+    installed_names: set[str],
+    resource_source: dict[str, str],
+) -> dict[str, object]:
     available = detect_capability(spec, installed_names)
     status = "available" if available else "missing"
+    install_hint = "" if available else install_hint_with_source(spec, resource_source)
     return {
         "id": spec.id,
         "name": spec.name,
@@ -329,9 +372,29 @@ def capability_item(spec: CapabilitySpec, codex_home: Path | None, installed_nam
         "status": status,
         "description": spec.description,
         "detected_by": detection_label(spec, codex_home, available),
-        "install_hint": "" if available else spec.install_hint,
+        "install_hint": install_hint,
         "requires_permission": not available,
+        "resource_source": resource_source,
+        "resource_url": resource_source.get("url", ""),
+        "source_registry": resource_source.get("registry_path", RESOURCE_REGISTRY_REL.as_posix()),
     }
+
+
+def install_hint_with_source(spec: CapabilitySpec, resource_source: dict[str, str]) -> str:
+    if not is_github_source(resource_source):
+        return spec.install_hint
+    url = resource_source.get("url", "")
+    if url:
+        return f"{spec.install_hint} Recorded GitHub source: {url}."
+    registry = resource_source.get("registry_path", RESOURCE_REGISTRY_REL.as_posix())
+    return (
+        f"{spec.install_hint} No approved GitHub URL is recorded in {registry}; "
+        "record the exact user-approved repository link before any GitHub download."
+    )
+
+
+def is_github_source(resource_source: dict[str, str]) -> bool:
+    return resource_source.get("source_type", "").casefold() == "github"
 
 
 def detect_capability(spec: CapabilitySpec, installed_names: set[str]) -> bool:
@@ -379,13 +442,31 @@ def build_next_actions(items: list[dict[str, object]]) -> list[dict[str, str]]:
     for item in items:
         if item["status"] == "available":
             continue
+        resource_url = str(item.get("resource_url", ""))
+        source_registry = str(item.get("source_registry", RESOURCE_REGISTRY_REL.as_posix()))
+        resource_source = item.get("resource_source", {})
+        is_github = isinstance(resource_source, dict) and str(resource_source.get("source_type", "")).casefold() == "github"
+        if is_github and not resource_url:
+            prompt = (
+                f"No approved GitHub URL is recorded for {item['name']} in {source_registry}. "
+                "Ask the user to provide and approve the exact repository link before any GitHub download."
+            )
+        elif resource_url:
+            prompt = (
+                f"Ask user permission before installing, downloading, or connecting Codex support for {item['name']} "
+                f"using the recorded resource link: {resource_url}."
+            )
+        else:
+            prompt = f"Ask user permission before installing, downloading from GitHub, or connecting Codex support for {item['name']}."
         actions.append(
             {
                 "id": str(item["id"]),
                 "name": str(item["name"]),
                 "importance": str(item["importance"]),
-                "prompt": f"Ask user permission before installing, downloading from GitHub, or connecting Codex support for {item['name']}.",
+                "prompt": prompt,
                 "suggested_action": str(item["install_hint"]),
+                "resource_url": resource_url,
+                "source_registry": source_registry,
             }
         )
     return actions

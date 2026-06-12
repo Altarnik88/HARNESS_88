@@ -46,3 +46,5 @@ python tools/llm_wiki.py quality --skip-frontend
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.
 
 Run `python tools/llm_wiki.py tools audit` after download or environment changes. It reports available and missing local tools, Codex skills, plugins, and MCP-related capabilities, then asks permission before any install, GitHub skill download, or Codex plugin connection.
+
+GitHub-backed source links are tracked in `agents/resources/tooling-sources.json`. If a required resource has no recorded URL, the agent must ask the user to provide or approve the exact repository before downloading it.
