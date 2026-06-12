@@ -16,6 +16,8 @@ from .stack import stack_is_selected
 
 TASK_TITLE_RE = re.compile(r"^#\s+Task:\s*(?P<title>.+?)\s*$", re.MULTILINE)
 CREATED_RE = re.compile(r"^Created:\s*(?P<created>.+?)\s*$", re.MULTILINE)
+PHASE_RE = re.compile(r"^Phase:\s*(?P<phase>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
+DELEGATION_PACKET_RE = re.compile(r"^Delegation packet:\s*(?P<packet>.+?)\s*$", re.MULTILINE)
 OBJECTIVE_RE = re.compile(r"^##\s+Objective\s*$\n(?P<body>.*?)(?=^##\s+|\Z)", re.MULTILINE | re.DOTALL)
 BRIEF_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
 ALLOWED_BRIEF_STATUSES = {"draft", "approved", "needs-review"}
@@ -39,6 +41,8 @@ class TaskRecord:
     role_owner: str
     created: str
     objective: str
+    phase: str = ""
+    delegation_packet: str = ""
 
     def to_json(self) -> dict[str, str]:
         return {
@@ -48,6 +52,8 @@ class TaskRecord:
             "role_owner": self.role_owner,
             "created": self.created,
             "objective": self.objective,
+            "phase": self.phase,
+            "delegation_packet": self.delegation_packet,
         }
 
 
@@ -125,6 +131,8 @@ def create_task(
     do_not_edit: list[str] | None = None,
     verification_command: str = "python tools/llm_wiki.py task validate --strict",
     created: str | None = None,
+    phase: str = "",
+    delegation_packet: str = "",
 ) -> TaskCreateResult:
     if status not in ALLOWED_TASK_STATUSES:
         allowed = ", ".join(sorted(ALLOWED_TASK_STATUSES))
@@ -157,6 +165,8 @@ def create_task(
             owned_files=owned_files or ["none assigned yet"],
             do_not_edit=do_not_edit or ["raw/", "data/wiki.sqlite"],
             verification_command=verification_command,
+            phase=phase,
+            delegation_packet=delegation_packet,
         ),
         encoding="utf-8",
     )
@@ -412,6 +422,8 @@ def parse_task_file(root: Path, path: Path) -> TaskRecord:
         role_owner=match_or_default(ROLE_OWNER_RE, text, "owner", ""),
         created=match_or_default(CREATED_RE, text, "created", ""),
         objective=objective_summary(text),
+        phase=match_or_default(PHASE_RE, text, "phase", ""),
+        delegation_packet=match_or_default(DELEGATION_PACKET_RE, text, "packet", ""),
     )
 
 
@@ -456,14 +468,20 @@ def render_task(
     owned_files: list[str],
     do_not_edit: list[str],
     verification_command: str,
+    phase: str = "",
+    delegation_packet: str = "",
 ) -> str:
     owned = "\n".join(f"- {item}" for item in owned_files)
     denied = "\n".join(f"- {item}" for item in do_not_edit)
+    phase_block = ""
+    if phase:
+        phase_block = f"Phase: {phase}\nDelegation packet: {delegation_packet or 'pending'}\n"
     return f"""# Task: {title}
 
 Status: {status}
 Role owner: {role_owner}
 Created: {created}
+{phase_block}
 
 ## Objective
 

@@ -13,6 +13,7 @@ HARNESS_88 is a stack-neutral autonomous core. The stack state lives in root `ST
 - Serious frontend implementation also waits until `SITE_REFERENCES.md` is approved with bounded crawl, desktop/mobile screenshots, UX/visual analysis, and Figma reference evidence.
 - `PRODUCT.md` and `DESIGN.md` must use explicit statuses: `draft`, `approved`, or `needs-review`. Only `approved` unlocks implementation.
 - The Conductor creates or assigns atomic task files before production implementation.
+- Site-delivery worker tasks are created through `python tools/llm_wiki.py conductor delegate ...` so `Phase` and `Delegation packet` are machine-checkable.
 - Workers update progress and checkpoint files as work moves through preflight, implementation, verification, and review.
 - The Knowledge Steward records durable decisions, outcomes, and unresolved issues in the LLM Wiki.
 - Default-deny tooling from `agents/tooling-matrix.md` still applies to every role and task.
@@ -28,6 +29,7 @@ PRODUCT.md and DESIGN.md or equivalent wiki decisions
 STACK.md
 assigned spec file
 assigned task file
+assigned delegation packet
 assigned progress file
 assigned checkpoint file
 ```

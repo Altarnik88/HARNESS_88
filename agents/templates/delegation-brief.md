@@ -5,6 +5,7 @@ Use this shape when calling `multi_agent_v1.spawn_agent`.
 ```text
 Role: <Role Agent>
 Sub-agent: <Specific sub-agent>
+Phase: <site-delivery phase, for example reference-analysis>
 
 Task file:
 <Path to the assigned task file.>
@@ -62,6 +63,9 @@ Clean-context resume instructions:
 ```
 
 ## Defaults
+
+- For site-delivery worker phases, create this packet under `agents/delegations/` with `python tools/llm_wiki.py conductor delegate ...`.
+- Open worker-phase tasks must include `Phase: <phase>`, `Delegation packet: agents/delegations/<task>.md`, and a non-Conductor `Role owner`.
 
 - If the task involves current framework/library behavior, include Context7 MCP.
 - If the task involves design or UI direction, include Product Design skill guidance plus the relevant design resources from `agents/protocols/design-resources.md`; name why each resource is granted and what to do if it is unavailable.

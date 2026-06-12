@@ -8,6 +8,7 @@ from .cli_security import cmd_security
 from .cli_site import cmd_site
 from .cli_tasks import cmd_task
 from .cli_tools import cmd_tools
+from .conductor_runtime import cmd_conductor
 from .quality import quality_exit_code, run_quality
 from .stack import (
     allowed_profile_text,
@@ -80,6 +81,25 @@ def build_parser() -> argparse.ArgumentParser:
     quality_parser.add_argument("--full", action="store_true", help="Also run slower full checks such as frontend build.")
     quality_parser.add_argument("--skip-frontend", action="store_true", help="Run core checks without optional frontend checks.")
     quality_parser.add_argument("--json", action="store_true", help="Emit JSON quality results.")
+
+    conductor_parser = subparsers.add_parser("conductor", help="Bootstrap and route HARNESS_88 Conductor work.")
+    conductor_subparsers = conductor_parser.add_subparsers(dest="conductor_command", required=True)
+    conductor_start_parser = conductor_subparsers.add_parser("start", help="Print the main-chat Conductor bootstrap packet.")
+    conductor_start_parser.add_argument("--json", action="store_true", help="Emit JSON Conductor packet.")
+    conductor_route_parser = conductor_subparsers.add_parser("route", help="Show required roles and gates for a site-delivery phase.")
+    conductor_route_parser.add_argument("--phase", required=True, help="Site-delivery phase such as reference-analysis.")
+    conductor_route_parser.add_argument("--json", action="store_true", help="Emit JSON route packet.")
+    conductor_delegate_parser = conductor_subparsers.add_parser("delegate", help="Create a delegated task bundle and packet.")
+    conductor_delegate_parser.add_argument("--phase", required=True, help="Site-delivery phase such as reference-analysis.")
+    conductor_delegate_parser.add_argument("--title", required=True, help="Task title.")
+    conductor_delegate_parser.add_argument("--objective", required=True, help="Delegated objective.")
+    conductor_delegate_parser.add_argument("--owner", required=True, help="Non-Conductor role owner.")
+    conductor_delegate_parser.add_argument("--user-language", required=True, help="Language for user-facing questions and approvals.")
+    conductor_delegate_parser.add_argument("--owned", nargs="*", default=[], help="Owned files or directories.")
+    conductor_delegate_parser.add_argument("--do-not-edit", nargs="*", default=[], help="Denied files or directories.")
+    conductor_delegate_parser.add_argument("--verification", default="python tools/llm_wiki.py task validate --strict", help="Verification command.")
+    conductor_delegate_parser.add_argument("--created", default="", help="Creation date in YYYY-MM-DD format. Defaults to today.")
+    conductor_delegate_parser.add_argument("--json", action="store_true", help="Emit JSON created delegation bundle.")
 
     tools_parser = subparsers.add_parser("tools", help="Audit local tools, Codex skills, plugins, and MCP setup.")
     tools_subparsers = tools_parser.add_subparsers(dest="tools_command", required=True)
@@ -420,6 +440,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_events(root, args.limit, args.json)
     if args.command == "quality":
         return cmd_quality(root, args.full, args.skip_frontend, args.json)
+    if args.command == "conductor":
+        return cmd_conductor(args, root)
     if args.command == "tools":
         return cmd_tools(args, root)
     if args.command == "stack":

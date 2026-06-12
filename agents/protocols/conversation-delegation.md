@@ -12,9 +12,12 @@ Use this protocol for user-facing questions, reference discovery, and Conductor 
 ## Agent-First Delegation
 
 - The Conductor works agent-first: it coordinates substantial research, product/design decisions, frontend implementation, backend/data work, QA, performance/SEO, release, and wiki closeout through role agents.
+- The main chat must enter Conductor mode with `python tools/llm_wiki.py conductor start` and visibly state `Conductor online` before site-delivery work.
+- Worker phases must be routed with `python tools/llm_wiki.py conductor route --phase <phase>` and assigned through `python tools/llm_wiki.py conductor delegate ...` before work starts.
 - Micro-actions may stay local, including reading a short file, running a verification command, or editing a small protocol note.
 - If a suitable role, tool grant, skill, plugin, or MCP server is missing, the Conductor first adds or updates the role/tooling contract, then delegates the work.
 - Delegation briefs must name the user language, owned scope, denied scope, allowed tools/skills/plugins/MCP servers, why each is granted, and the fallback if a required resource is unavailable.
+- Open worker-phase tasks require a non-Conductor role owner and `Delegation packet: agents/delegations/<task>.md`.
 - When `multi_agent_v1` is unavailable, use the one-agent fallback from `agents/TEAM.md` and `agents/conductor.md` before production-code changes.
 
 ## Reference Discovery

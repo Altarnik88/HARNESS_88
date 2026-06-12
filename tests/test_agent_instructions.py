@@ -29,6 +29,7 @@ class AgentInstructionTests(unittest.TestCase):
             "agents/protocols/wiki-operations.md",
             "agents/protocols/skill-capture.md",
             "agents/protocols/conversation-delegation.md",
+            "agents/protocols/conductor-runtime.md",
             "agents/protocols/design-resources.md",
             "agents/protocols/tooling-onboarding.md",
         ]:
@@ -40,6 +41,7 @@ class AgentInstructionTests(unittest.TestCase):
         protocol = (ROOT / "agents" / "protocols" / "conversation-delegation.md").read_text(encoding="utf-8")
         team = (ROOT / "agents" / "TEAM.md").read_text(encoding="utf-8")
         conductor = (ROOT / "agents" / "conductor.md").read_text(encoding="utf-8")
+        runtime = (ROOT / "agents" / "protocols" / "conductor-runtime.md").read_text(encoding="utf-8")
         tooling = (ROOT / "agents" / "tooling-matrix.md").read_text(encoding="utf-8")
         delegation = (ROOT / "agents" / "templates" / "delegation-brief.md").read_text(encoding="utf-8")
         workflow = (ROOT / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
@@ -57,8 +59,12 @@ class AgentInstructionTests(unittest.TestCase):
             self.assertIn(needle, protocol)
 
         self.assertIn("Reference Research", team)
+        self.assertIn("Design Artifact", team)
         self.assertIn("agent-first", conductor)
+        self.assertIn("Conductor cannot self-assign worker phases", runtime)
+        self.assertIn("agents/delegations/", runtime)
         self.assertIn("Reference Research", tooling)
+        self.assertIn("Design Artifact", tooling)
         self.assertIn("User language", delegation)
         self.assertIn("Reference/source scope", delegation)
         self.assertIn("If no suitable role or tooling grant exists", team)

@@ -199,6 +199,25 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertIn("primary site language, not the user/chat language", intake)
             self.assertIn("https://dribbble.com/", intake)
 
+    def test_generated_project_includes_conductor_runtime_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+            create_site_project(ROOT, target)
+
+            start_here = (target / "START_HERE.md").read_text(encoding="utf-8")
+            protocol = (target / "agents" / "protocols" / "conductor-runtime.md").read_text(encoding="utf-8")
+            conductor = (target / "agents" / "conductor.md").read_text(encoding="utf-8")
+            team = (target / "agents" / "TEAM.md").read_text(encoding="utf-8")
+            design_artifact = (target / "agents" / "roles" / "design-artifact.md").read_text(encoding="utf-8")
+
+            self.assertIn("python tools/llm_wiki.py conductor start", start_here)
+            self.assertIn("Conductor online", start_here)
+            self.assertIn("Conductor cannot self-assign worker phases", protocol)
+            self.assertIn("agents/delegations/", protocol)
+            self.assertIn("conductor start", conductor)
+            self.assertIn("Design Artifact", team)
+            self.assertIn("Figma reference board", design_artifact)
+
     def test_generated_project_includes_design_resource_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"

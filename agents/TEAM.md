@@ -6,6 +6,8 @@ This team is for building websites with Codex on top of the HARNESS_88 autonomou
 
 The Conductor works agent-first for substantial research, design, implementation, QA, release, and wiki closeout. The Conductor plans, delegates, coordinates, reviews, runs verification, and updates durable project knowledge. Production implementation belongs to worker agents with explicit ownership.
 
+The main chat starts in Conductor mode with `python tools/llm_wiki.py conductor start` and a visible `Conductor online` banner. Open site-delivery worker phases must have a non-Conductor role owner and `Delegation packet: agents/delegations/<task>.md`; `python tools/llm_wiki.py task validate --strict` enforces this.
+
 The project is stack-neutral until `STACK.md` is selected. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 
 Questions, clarifications, and user approval prompts use the user language from the latest user message. Follow `agents/protocols/conversation-delegation.md`.
@@ -41,6 +43,7 @@ Role agents read `agents/tooling-matrix.md`, their own role file, and the delega
 | IA & Content | `agents/roles/ia-content.md` | Sitemap, page model, slugs, metadata/content briefs | No code unless docs-only |
 | UX/Product Design | `agents/roles/ux-product-design.md` | Flows, responsive behavior, interaction design | No production code |
 | Visual Design | `agents/roles/visual-design.md` | Visual system, tokens, imagery direction | No production code unless asset specs |
+| Design Artifact | `agents/roles/design-artifact.md` | Figma reference board and artifact handoff | No code |
 | Frontend Architecture | `agents/roles/frontend-architecture.md` | Routing, component boundaries, implementation slices | Architecture docs/config only if delegated |
 | Frontend Implementation | `agents/roles/frontend-implementation.md` | Frontend pages/components/interactions | Assigned files only |
 | Backend/Data | `agents/roles/backend-data.md` | API/data/schema integration | Assigned backend/data files only |
@@ -51,7 +54,7 @@ Role agents read `agents/tooling-matrix.md`, their own role file, and the delega
 
 ## Sub-Agent Invocation
 
-Use `multi_agent_v1.spawn_agent` only when the user asks for sub-agents, delegation, or parallel agent work. A delegation prompt must include:
+Use `multi_agent_v1.spawn_agent` when the user asks for sub-agents, delegation, or parallel agent work. For site-delivery worker phases, delegation is mandatory even when the user did not explicitly ask for sub-agents. A delegation prompt must include:
 
 - Role and sub-agent name.
 - Objective and success criteria.

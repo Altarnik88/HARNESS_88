@@ -3,6 +3,8 @@
 Task id: YYYY-MM-DD-short-slug
 Status: planned
 Role owner: Conductor
+Phase: core-maintenance
+Delegation packet: not-required
 
 Allowed statuses: planned, ready, in_progress, blocked, review, verified, done
 
@@ -21,6 +23,7 @@ Describe one atomic outcome.
 ## Allowed Tooling
 
 - Use only tooling granted by `agents/tooling-matrix.md` and this task file.
+- For site-delivery worker phases, create this task with `python tools/llm_wiki.py conductor delegate ...` so `Phase` and `Delegation packet` are machine-checkable.
 
 ## Acceptance Checklist
 

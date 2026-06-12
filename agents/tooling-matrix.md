@@ -43,6 +43,7 @@ This is the source of truth for role-level access to skills, plugins, and MCP se
 | `impeccable` | Visual Design, Frontend Implementation, QA & Accessibility, Performance/SEO | UI critique, audit, polish, responsive/a11y/perf design checks |
 | GSAP skills | UX/Product Design, Visual Design, Frontend Implementation, Performance/SEO | Motion specs or assigned motion after stable layout and approved motion intent |
 | `imagegen` | Visual Design | Bitmap assets, variants, mockups; not repo-native SVG/icon systems |
+| Figma reference artifacts | Design Artifact, Reference Research, UX/Product Design, Visual Design | Only for approved reference-analysis artifacts or explicit Figma tasks |
 | `playwright` | Reference Research, Frontend Implementation, QA & Accessibility, Performance/SEO, Conductor | Local verification, public reference screenshot evidence, and screenshots |
 | `gh-cli` | Conductor, DevOps/Release | GitHub tasks; prefer authenticated `gh` over raw GitHub HTTP |
 | `sentry` | Backend/Data, QA & Accessibility, Performance/SEO, DevOps/Release | Read-only, env-token based |
@@ -65,6 +66,7 @@ All other global or plugin skills are denied unless a delegation brief grants th
 | IA & Content | LLM Wiki search, `ui-ux-pro-max` | Documents, Spreadsheets, Data Analytics, Context7 for CMS/routing docs | Documents/Data only when requested | Context7, filesystem read | Docs-only if delegated; no production code | Content model and metadata checklist |
 | UX/Product Design | `product-design:get-context`, Product Design `ideate`, `ui-ux-pro-max`, `huashu-design` | Figma, GSAP specs | Product Design, Figma | filesystem read | No production code | Flow/responsive/accessibility handoff review |
 | Visual Design | `ui-ux-pro-max`, `huashu-design`, `impeccable`, `imagegen` | Figma, Canva, Creative Production, GSAP specs, Remotion | Figma, Canva, Creative Production | filesystem read | No production code except delegated tokens/assets/specs | Visual system and asset checklist |
+| Design Artifact | LLM Wiki search | Figma for approved reference-analysis artifacts | Figma | filesystem read | No code; docs/reference artifact updates only if delegated | Figma reference board URL, manifest consistency, and `python tools/llm_wiki.py site references --json` |
 | Frontend Architecture | Serena discovery, Context7 docs, LLM Wiki context | Product Design context | Browser only for existing UI inspection | Serena, Context7, filesystem read | Docs/config only if delegated | Route/component ownership plan and commands |
 | Frontend Implementation | Serena, Context7, Browser, Playwright, GSAP skills | Product Design `image-to-code`, Figma when implementing from Figma | Browser, Figma conditional | Serena, Context7, filesystem scoped writes | Assigned frontend files only | `npm run lint`/build or task-specific checks plus UI smoke check |
 | Backend/Data | Context7, SQLite read-only | Supabase, Sentry, GitHub read-only issue context, Data Analytics | GitHub read-only, Sentry conditional | Context7, SQLite read-only, Serena, filesystem scoped writes | Assigned backend/data files only | API/data tests or documented inspection |

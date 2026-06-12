@@ -9,6 +9,7 @@ This project is a clean generated site workspace built from the HARNESS_88 auton
 - stack selection state in `STACK.md`;
 - Codex agent roles and harness templates in `agents/`;
 - the canonical site delivery workflow in `agents/workflows/agentic-site-delivery.md`;
+- executable Conductor runtime routing with `python tools/llm_wiki.py conductor start/route/delegate`;
 - the secret-safe backend/deployment contract in `agents/workflows/secret-broker.md`;
 - durable product and design briefs in `PRODUCT.md` and `DESIGN.md`;
 - a local Markdown + SQLite LLM Wiki toolchain under `src/llm_wiki/`.
@@ -19,6 +20,7 @@ No frontend app is bundled. Stack is selected through dialogue from the user's g
 
 ```powershell
 python -m unittest discover -s tests
+python tools/llm_wiki.py conductor start
 python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
@@ -26,6 +28,7 @@ python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
+python tools/llm_wiki.py conductor route --phase reference-analysis
 python tools/llm_wiki.py site doctor
 python tools/llm_wiki.py quality --skip-frontend
 ```
@@ -39,7 +42,7 @@ python tools/llm_wiki.py quality --skip-frontend
 5. Include commerce mode in the brief: no commerce, catalog only, online payment, offline payment, request to manager, or mixed.
 6. Fill in `DESIGN.md` with the visual direction, UX constraints, reference expectations, and component rules, then set `Status: approved`.
 7. Approve user-provided or agent-proposed reference sites and set `references_status: approved` in `SITE_INTAKE.md`; agent-proposed reference searches include Dribbble, Behance, and Awwwards.
-8. Complete `SITE_REFERENCES.md` before serious frontend implementation: bounded crawl, desktop/mobile screenshots, Figma reference artifact, UX/visual analysis, and user approval.
+8. Complete `SITE_REFERENCES.md` before serious frontend implementation: bounded crawl, desktop/mobile screenshots, Figma reference artifact, UX/visual analysis, and user approval. Use `python tools/llm_wiki.py conductor delegate --phase reference-analysis ...` before assigning the worker task.
 9. Ask whether publication should target VPS/VDS or managed hosting, explain pros and cons of each, and recommend the better option from the user's operational, budget, traffic, backend, and maintenance answers.
 10. Create atomic task files with `python tools/llm_wiki.py task create ...`.
 11. Scaffold and implement only from approved intake, approved briefs, selected stack state, approved reference analysis, selected deployment direction, and task ownership.

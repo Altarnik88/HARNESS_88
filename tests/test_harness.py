@@ -35,6 +35,7 @@ REQUIRED_HARNESS_FILES = [
     "agents/harness/acceptance-checklists.md",
     "agents/harness/metrics.md",
     "agents/protocols/design-resources.md",
+    "agents/protocols/conductor-runtime.md",
     "agents/protocols/tooling-onboarding.md",
     "agents/resources/tooling-sources.json",
     "agents/tasks/README.md",

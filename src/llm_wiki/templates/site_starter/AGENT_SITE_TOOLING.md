@@ -23,6 +23,9 @@ This clean project starts with the portable, stack-neutral site-development harn
 - Do not begin serious frontend implementation until `references_status: approved` is set in `SITE_INTAKE.md`, `SITE_REFERENCES.md` is `Status: approved`, and `python tools/llm_wiki.py site references --json` reports complete reference analysis.
 - Reference analysis uses bounded crawl by default: same-origin public sitemap/nav/footer pages, max 50 normalized pages per reference, with login/private/admin/cart/account/form-submit flows excluded unless explicitly approved.
 - Reference evidence must include desktop/mobile screenshots in `raw/assets/references/manifest.json`, UX/visual analysis, and a Figma design reference artifact.
+- The main chat must start site-delivery work through `python tools/llm_wiki.py conductor start` and visibly state `Conductor online`.
+- Conductor cannot self-assign worker phases. Use `python tools/llm_wiki.py conductor route --phase <phase>` and `python tools/llm_wiki.py conductor delegate ...` before reference, design, frontend, backend, QA, release, or wiki closeout worker work.
+- Open worker-phase tasks require a non-Conductor role owner and `Delegation packet: agents/delegations/<task>.md`; `python tools/llm_wiki.py task validate --strict` enforces this.
 - Ask questions in the user's language from the latest user message; `SITE_INTAKE.md` `language` records the site language, not necessarily the conversation language.
 - If references are missing or the user cannot choose them, delegate Reference Research and include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/` in the source scope.
 - For site design work, use `agents/protocols/design-resources.md` to grant huashu-design, impeccable, ui-ux-pro-max, GSAP, or Canva only when the role and task need them.
@@ -57,12 +60,14 @@ The deployment discussion must explicitly compare VPS/VDS vs hosting:
 
 ```powershell
 python -m unittest discover -s tests
+python tools/llm_wiki.py conductor start
 python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack status
+python tools/llm_wiki.py conductor route --phase reference-analysis
 python tools/llm_wiki.py site doctor
 python tools/llm_wiki.py quality --skip-frontend
 ```

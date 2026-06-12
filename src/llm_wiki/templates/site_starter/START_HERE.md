@@ -7,8 +7,9 @@ Use this file after a fresh clone of HARNESS_88. It is a practical first-chat sc
 Open Codex or another coding-agent chat in the root of this repository and start with something like:
 
 ```text
-Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_REFERENCES.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/protocols/tooling-onboarding.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
-Check local tools/skills/plugins, intake, reference analysis, gates, and readiness with python tools/llm_wiki.py tools audit --json, python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site references --json, python tools/llm_wiki.py site gates --json, and python tools/llm_wiki.py task readiness --json.
+Start as HARNESS_88 Conductor. Run python tools/llm_wiki.py conductor start and begin your first response with "Conductor online".
+Read START_HERE.md, AGENTS.md, SITE_INTAKE.md, SITE_REFERENCES.md, SITE_GATES.md, PRODUCT.md, DESIGN.md, STACK.md, agents/protocols/conductor-runtime.md, agents/protocols/tooling-onboarding.md, agents/harness/stack-options.md, and agents/workflows/agentic-site-delivery.md.
+Check local tools/skills/plugins, intake, reference analysis, gates, and readiness with python tools/llm_wiki.py tools audit --json, python tools/llm_wiki.py site intake --json, python tools/llm_wiki.py site references --json, python tools/llm_wiki.py site gates --json, python tools/llm_wiki.py task readiness --json, and python tools/llm_wiki.py conductor route --phase reference-analysis --json.
 The stack is not selected yet. Run a first-run intake for my site, asking questions in my language, including country, site language, site type, style, ecommerce/catalog/payment/request mode, references, content sources, backend/data/admin/integration needs, and deployment expectations. Record accepted answers in SITE_INTAKE.md. Then recommend 2-4 stack/fullstack options with languages, frameworks, services, pros, cons, operational complexity, and best-fit use cases. Ask whether publication should use VPS/VDS vs hosting, explain pros and cons of each, and recommend the better option from my answers. Wait for my approval before updating PRODUCT.md, DESIGN.md, and STACK.md, creating the first task, or beginning the site through the autonomous harness.
 ```
 
@@ -38,11 +39,13 @@ Record machine-checkable intake state in `SITE_INTAKE.md`. `references_status: a
 ## First-Run Checklist
 
 ```powershell
+python tools/llm_wiki.py conductor start
 python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py site intake --json
 python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py task readiness --json
+python tools/llm_wiki.py conductor route --phase reference-analysis
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
 python tools/llm_wiki.py site doctor
@@ -54,7 +57,7 @@ Before selecting a profile, recommend 2-4 stack options with languages, framewor
 
 Ask about VPS/VDS vs hosting, explain pros and cons, then recommend the better publication target from the user's answers.
 
-Follow `agents/workflows/agentic-site-delivery.md` for reference approval, strict reference analysis, frontend preview approval, backend/data work, optional product ingest, total audit, remediation, final user approval, and approved VPS/VDS or managed hosting publish/maintenance handoff. Record machine-checkable reference analysis in `SITE_REFERENCES.md` and delivery state in `SITE_GATES.md`.
+Follow `agents/workflows/agentic-site-delivery.md` and `agents/protocols/conductor-runtime.md` for reference approval, strict reference analysis, frontend preview approval, backend/data work, optional product ingest, total audit, remediation, final user approval, and approved VPS/VDS or managed hosting publish/maintenance handoff. Create `agents/delegations/` packets before worker phases. Record machine-checkable reference analysis in `SITE_REFERENCES.md` and delivery state in `SITE_GATES.md`.
 
 Secrets must never be pasted into chat or project files. Use `agents/workflows/secret-broker.md` as the contract for future backend/deployment secret handling.
 

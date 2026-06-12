@@ -17,6 +17,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 ## Frontend UI
 
 - Scope is respected.
+- Worker-phase task has a non-Conductor role owner and a valid `agents/delegations/` packet.
 - Assigned files only are changed.
 - Approved product and design direction exists before implementation.
 - Approved `SITE_INTAKE.md`, selected stack state, and complete `SITE_REFERENCES.md` exist before implementation.
@@ -43,6 +44,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 ## Backend and Data
 
 - Scope is respected.
+- Worker-phase task has a non-Conductor role owner and a valid `agents/delegations/` packet.
 - Assigned files only are changed.
 - Data contracts, migrations, and derived state are documented.
 - Database and external-service mutations have explicit authorization.
@@ -55,6 +57,7 @@ Use these task-type checklists in task files, delegation briefs, and checkpoints
 ## QA and Accessibility
 
 - Scope is respected.
+- Worker-phase task has a non-Conductor role owner and a valid `agents/delegations/` packet.
 - Assigned files only are changed.
 - Test coverage matches the user-facing risk of the change.
 - Accessibility findings include reproduction steps and impact.

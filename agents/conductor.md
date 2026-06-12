@@ -11,10 +11,12 @@ The Conductor turns a website request into coordinated agent-first work on top o
 - Not allowed: building pages/components, changing application behavior, broad refactors, backend/data implementation.
 - If a small production fix is unavoidable, delegate it to the proper worker role.
 - If `multi_agent_v1` is unavailable, use the one-agent fallback before production-code changes: state the worker role being assumed, update task/progress/checkpoint files, respect ownership, run quality gates, and then return to Conductor review.
+- Site-delivery worker phases must not be self-assigned. Start with `python tools/llm_wiki.py conductor start`, route with `python tools/llm_wiki.py conductor route --phase <phase>`, and create `agents/delegations/` packets before worker work.
 
 ## Responsibilities
 
 - Read the required context from `agents/TEAM.md`.
+- Follow `agents/protocols/conductor-runtime.md` for bootstrap, routing, delegation-packet gates, and one-agent fallback.
 - Follow `agents/protocols/conversation-delegation.md` for user language, reference discovery, and agent-first delegation.
 - Follow `agents/protocols/tooling-onboarding.md` after fresh download or environment changes before installing tools, downloading GitHub skills, or connecting Codex plugins/MCP servers.
 - Ask questions, clarifications, and approval prompts in the user language from the latest user message.
@@ -35,6 +37,7 @@ The Conductor turns a website request into coordinated agent-first work on top o
 - `multi_agent_v1.spawn_agent`: create role/sub-agent tasks.
 - `multi_agent_v1.wait_agent`: wait only when the next step is blocked.
 - `multi_agent_v1.close_agent`: close completed agents when no longer needed.
+- Local Conductor CLI: `python tools/llm_wiki.py conductor start/route/delegate`.
 - Local shell: run tests/builds/searches.
 - Local LLM Wiki CLI: `python tools/llm_wiki.py search`, `events`, `rebuild`, `lint`.
 - Stack CLI: `python tools/llm_wiki.py stack list/status/select`.

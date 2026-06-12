@@ -38,6 +38,7 @@ REQUIRED_HARNESS_FILES = [
     Path("agents") / "harness" / "acceptance-checklists.md",
     Path("agents") / "harness" / "metrics.md",
     Path("agents") / "protocols" / "design-resources.md",
+    Path("agents") / "protocols" / "conductor-runtime.md",
     Path("agents") / "protocols" / "tooling-onboarding.md",
     Path("agents") / "resources" / "tooling-sources.json",
     Path("agents") / "tasks" / "README.md",
@@ -55,10 +56,39 @@ REQUIRED_TASK_SECTIONS = [
 
 STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
 ROLE_OWNER_RE = re.compile(r"^Role owner:\s*(?P<owner>.+?)\s*$", re.MULTILINE)
+PHASE_RE = re.compile(r"^Phase:\s*(?P<phase>[A-Za-z0-9_-]+)\s*$", re.MULTILINE)
+DELEGATION_PACKET_RE = re.compile(r"^Delegation packet:\s*(?P<packet>.+?)\s*$", re.MULTILINE)
 HEADING_RE = re.compile(r"^##\s+(?P<title>.+?)\s*$", re.MULTILINE)
 OWNED_FILES_BLOCK_RE = re.compile(r"Owned files:\s*\n(?P<body>.*?)(?=\n\S|^##\s+|\Z)", re.MULTILINE | re.DOTALL)
 INLINE_OWNED_FILES_RE = re.compile(r"^\s*-\s*Owned files:\s*(?P<value>.+?)\s*$", re.MULTILINE)
 OPEN_TASK_STATUSES = {"planned", "ready", "in_progress", "blocked", "review"}
+WORKER_PHASES = {
+    "first-run-intake",
+    "brief-contracts",
+    "reference-analysis",
+    "sitemap-content",
+    "frontend-architecture",
+    "frontend-build",
+    "backend-data",
+    "catalog-ingest",
+    "total-audit",
+    "remediation",
+    "final-approval",
+    "publish-operate",
+    "knowledge-closeout",
+}
+REQUIRED_DELEGATION_PACKET_FIELDS = [
+    "Role:",
+    "Task file:",
+    "Progress file:",
+    "Checkpoint file:",
+    "User language:",
+    "Ownership / scope:",
+    "Required plugins/MCP/skills:",
+    "Code permission:",
+    "Expected output:",
+    "Verification:",
+]
 
 
 def validate_harness(root: Path) -> list[LintIssue]:
@@ -111,6 +141,7 @@ def validate_task_file(root: Path, task_path: Path) -> list[LintIssue]:
         issues.append(LintIssue("warning", rel, "Verified task lacks verification evidence."))
 
     issues.extend(validate_linked_support_files(root, task_path))
+    issues.extend(validate_delegation_contract(root, task_path, text, status))
     return issues
 
 
@@ -139,6 +170,67 @@ def validate_linked_support_files(root: Path, task_path: Path) -> list[LintIssue
                     f"Linked {label} file must reference task: {task_rel}",
                 )
             )
+    return issues
+
+
+def validate_delegation_contract(root: Path, task_path: Path, text: str, status: str | None) -> list[LintIssue]:
+    phase = task_phase(text)
+    if phase not in WORKER_PHASES or status not in OPEN_TASK_STATUSES:
+        return []
+
+    rel = relative_posix(task_path, root)
+    issues: list[LintIssue] = []
+    owner_match = ROLE_OWNER_RE.search(text)
+    owner = owner_match.group("owner").strip() if owner_match else ""
+    if owner.casefold() == "conductor":
+        issues.append(LintIssue("warning", rel, f"Worker phase {phase} cannot be owned by Conductor. Use a role agent or declared fallback."))
+
+    packet = delegation_packet(text)
+    if not packet or packet.casefold() in {"pending", "none", "n/a"}:
+        issues.append(LintIssue("warning", rel, f"Worker phase {phase} requires a delegation packet under agents/delegations/."))
+        return issues
+
+    packet_path, packet_issue = resolve_delegation_packet(root, packet)
+    if packet_issue is not None:
+        issues.append(LintIssue("warning", rel, packet_issue))
+        return issues
+    assert packet_path is not None
+    if not packet_path.exists():
+        issues.append(LintIssue("warning", rel, f"Missing delegation packet: {packet}"))
+        return issues
+
+    try:
+        packet_text = packet_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        issues.append(LintIssue("warning", relative_posix(packet_path, root), f"Cannot read delegation packet: {exc}"))
+        return issues
+
+    issues.extend(validate_delegation_packet_fields(root, task_path, packet_path, packet_text))
+    return issues
+
+
+def resolve_delegation_packet(root: Path, raw_packet: str) -> tuple[Path | None, str | None]:
+    rel = Path(raw_packet.strip().strip("`"))
+    if rel.is_absolute():
+        return None, f"Delegation packet must be a relative path under agents/delegations/: {raw_packet}"
+    normalized = rel.as_posix()
+    if not normalized.startswith("agents/delegations/") or rel.suffix.lower() != ".md":
+        return None, f"Delegation packet must be under agents/delegations/: {raw_packet}"
+    return root / rel, None
+
+
+def validate_delegation_packet_fields(root: Path, task_path: Path, packet_path: Path, packet_text: str) -> list[LintIssue]:
+    rel = relative_posix(packet_path, root)
+    issues: list[LintIssue] = []
+    for field in REQUIRED_DELEGATION_PACKET_FIELDS:
+        if field not in packet_text:
+            issues.append(LintIssue("warning", rel, f"Delegation packet missing field: {field}"))
+    task_rel = relative_posix(task_path, root)
+    progress_rel = f"agents/tasks/progress/{task_path.name}"
+    checkpoint_rel = f"agents/tasks/checkpoints/{task_path.name}"
+    for required_path in [task_rel, progress_rel, checkpoint_rel]:
+        if required_path not in packet_text:
+            issues.append(LintIssue("warning", rel, f"Delegation packet must reference {required_path}"))
     return issues
 
 
@@ -214,6 +306,16 @@ def normalize_owned_path(value: str) -> str:
 def task_status(text: str) -> str | None:
     match = STATUS_RE.search(text)
     return match.group("status").strip() if match else None
+
+
+def task_phase(text: str) -> str:
+    match = PHASE_RE.search(text)
+    return match.group("phase").strip() if match else ""
+
+
+def delegation_packet(text: str) -> str:
+    match = DELEGATION_PACKET_RE.search(text)
+    return match.group("packet").strip() if match else ""
 
 
 def normalize_heading(value: str) -> str:

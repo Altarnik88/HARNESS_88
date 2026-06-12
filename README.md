@@ -50,6 +50,7 @@ HARNESS_88 uses an agent-first operating model:
 - **IA & Content:** sitemap, slugs, page models, content and metadata briefs.
 - **UX/Product Design:** flows, responsive behavior, interactions, and states.
 - **Visual Design:** visual system, tokens, imagery direction, asset guidance.
+- **Design Artifact:** Figma reference boards and artifact handoff.
 - **Frontend Architecture:** routing, component boundaries, implementation slices.
 - **Frontend Implementation:** assigned pages, components, styling, interactions.
 - **Backend/Data:** APIs, catalog/ecommerce/payment/request flows, data models.
@@ -71,6 +72,7 @@ Core local tools:
 - `python tools/llm_wiki.py quality --skip-frontend` - stack-neutral core quality gate.
 - `python tools/llm_wiki.py rebuild` and `python tools/llm_wiki.py lint` - wiki index and Markdown quality checks.
 - `python tools/llm_wiki.py tools audit` - local tools, Codex skills, plugins, and MCP capability audit.
+- `python tools/llm_wiki.py conductor start/route/delegate` - Conductor bootstrap, phase routing, and delegation-packet creation.
 
 Agent routing supports:
 
@@ -109,6 +111,7 @@ GitHub-backed resource links live in `agents/resources/tooling-sources.json`. Be
 ## First Run
 
 ```powershell
+python tools/llm_wiki.py conductor start
 python tools/llm_wiki.py tools audit --json
 python tools/llm_wiki.py task readiness --json
 python tools/llm_wiki.py site intake --json
@@ -116,6 +119,7 @@ python tools/llm_wiki.py site references --json
 python tools/llm_wiki.py site gates --json
 python tools/llm_wiki.py stack list
 python tools/llm_wiki.py stack status
+python tools/llm_wiki.py conductor route --phase reference-analysis
 python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```

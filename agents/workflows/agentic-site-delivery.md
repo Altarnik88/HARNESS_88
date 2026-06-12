@@ -6,7 +6,7 @@ Move from an ambiguous website request to a verified, user-approved, publishable
 
 This workflow applies to landing pages, multi-page sites, catalog sites, and ecommerce projects. HARNESS_88 itself remains a stack-neutral core; concrete site implementation starts only after approved briefs, approved references, and a selected stack or explicitly approved custom stack.
 
-The Conductor coordinates agent-first work. If no suitable role, skill, plugin, MCP server, or tooling grant exists for a needed task, update the role/tooling contract before delegating.
+The Conductor coordinates agent-first work. The main chat starts with `python tools/llm_wiki.py conductor start` and a visible `Conductor online` banner. Worker phases start only after `python tools/llm_wiki.py conductor route --phase <phase>` and a delegation packet under `agents/delegations/`. If no suitable role, skill, plugin, MCP server, or tooling grant exists for a needed task, update the role/tooling contract before delegating.
 
 ## Phase 1: First-Run Intake
 
@@ -62,6 +62,8 @@ Required skills/plugins/MCP:
 
 Lead roles: Reference Research, UX/Product Design, Visual Design, and QA & Accessibility.
 
+Artifact role: Design Artifact for Figma reference board and manifest handoff.
+
 Outputs:
 
 - User-provided reference sites, screenshots, brand examples, or competitor examples.
@@ -79,6 +81,7 @@ Rules:
 - Do not start serious frontend implementation before references or reference substitutes are approved.
 - Do not start serious frontend implementation until `python tools/llm_wiki.py site references --json` reports `reference_analysis_ready: true`.
 - When references are missing or undecided, Conductor delegates Reference Research instead of selecting examples alone.
+- Conductor must not perform bounded crawl, screenshots, UX/visual analysis, or Figma artifact work itself. Use `python tools/llm_wiki.py conductor route --phase reference-analysis` and create delegation packets before this phase.
 - Agent-proposed reference discovery must include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/`.
 - Reference shortlists must include URL, reason for inclusion, style tags, project applicability, cautions, and an explicit user approval prompt.
 - When examples are agent-proposed, clearly separate direct user preferences from agent suggestions.
