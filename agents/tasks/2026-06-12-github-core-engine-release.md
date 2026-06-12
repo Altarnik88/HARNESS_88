@@ -1,6 +1,6 @@
 # Task: GitHub Core Engine Release
 
-Status: blocked
+Status: verified
 Role owner: Conductor
 Created: 2026-06-12
 
@@ -26,11 +26,6 @@ Owned files:
 - wiki/review.md
 - wiki/log.md
 
-Conditional files:
-
-- frontend/package.json
-- frontend/package-lock.json
-
 Do not edit:
 
 - STACK.md
@@ -45,9 +40,8 @@ Do not edit:
 ## Allowed Tooling
 
 - Use only tooling granted by agents/tooling-matrix.md and this task file.
-- Networked npm checks require explicit approval.
-- Dependency remediation is limited to safe compatible frontend dependency updates.
-- Do not downgrade Next.js and do not add risky dependency overrides.
+- No networked npm checks are required for the core release because no frontend package manifest remains in the repository.
+- Future scaffolded frontend/backend projects must run their own dependency audits after stack approval.
 
 ## Acceptance Checklist
 
@@ -55,7 +49,7 @@ Do not edit:
 - Release notes explain that HARNESS_88 is a core engine/template release, not a completed site.
 - Release notes state that no stack is selected and no site approvals are advanced.
 - Release notes state that no secrets are included or requested.
-- Frontend security audit is clean, or release is explicitly blocked.
+- Core security audit skips cleanly because no frontend package manifest exists.
 - Verification evidence is recorded.
 
 ## Verification
@@ -64,21 +58,17 @@ Command:
 
 ```powershell
 python tools/llm_wiki.py quality --skip-frontend
+python tools/llm_wiki.py security audit --json --no-record --blocking
 python tools/llm_wiki.py task validate --strict
 python tools/llm_wiki.py task evidence --json
-cd frontend
-npm audit --json
-npm run lint
-npm run build
 ```
 
 Expected result:
 
 - Core verification commands exit 0.
-- Frontend lint and build exit 0.
-- `npm audit --json` reports zero unresolved vulnerabilities before release publication.
+- Security audit exits 0 with `status: "skipped"` and `unresolved_count: 0` while no frontend package manifest exists.
 
 ## Progress
 
-- Release preparation is blocked because the full-repo frontend security audit is not clean.
-- Do not tag or publish `v0.1.0` until the blocker is resolved or release scope changes explicitly.
+- Release preparation is verified after removing the bundled frontend starter and confirming no core npm audit target remains.
+- Do not tag or publish `v0.1.0` until the verified branch is merged to `main` and release publication checks are rerun.

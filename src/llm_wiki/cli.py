@@ -282,6 +282,10 @@ def cmd_stack(args: argparse.Namespace, root: Path) -> int:
             print("Available stack profiles:")
             for profile in profiles:
                 print(f"- {profile.name}: {profile.description}")
+                print(f"  Best for: {', '.join(profile.best_for)}")
+                print(f"  Pros: {'; '.join(profile.pros[:2])}")
+                print(f"  Cons: {'; '.join(profile.cons[:2])}")
+                print("  Deployment: compare VPS/VDS and managed hosting during intake before publish handoff.")
         return 0
 
     if args.stack_command == "status":
@@ -306,7 +310,7 @@ def cmd_stack(args: argparse.Namespace, root: Path) -> int:
             print(json.dumps(status, ensure_ascii=False, indent=2))
         else:
             print(f"Selected stack profile: {status['selected_profile']}")
-            print("STACK.md updated. No dependencies were installed and frontend/ was not changed.")
+            print("STACK.md updated. No dependencies were installed and no frontend was scaffolded.")
         return 0
 
     if args.stack_command == "deploy-template":

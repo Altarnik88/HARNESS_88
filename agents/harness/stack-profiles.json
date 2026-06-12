@@ -3,61 +3,217 @@
     "name": "next-static",
     "description": "Next.js App Router + TypeScript + Tailwind for landing pages, marketing sites, and frontend-first sites.",
     "commands": {
-      "install": "cd frontend && npm ci",
-      "dev": "cd frontend && npm run dev",
-      "lint": "cd frontend && npm run lint",
-      "build": "cd frontend && npm run build"
+      "install": "Defined by the approved scaffold task.",
+      "dev": "Defined by the approved scaffold task.",
+      "lint": "Defined by the approved scaffold task.",
+      "build": "Defined by the approved scaffold task."
     },
     "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
-    "ci_policy": "Core CI remains stack-neutral. Run optional frontend CI when frontend/package.json is present and this profile is selected or under review.",
+    "ci_policy": "Core CI remains stack-neutral. Add Next.js lint/build/security checks only after a Next.js project is scaffolded by an approved task.",
     "frontend": true,
     "backend": false,
-    "deploy_notes": "Deploy as a static or frontend-first Next.js site after product/design approval and task verification."
+    "deploy_notes": "Deploy as a static or frontend-first site after stack approval, scaffold verification, product/design approval, and final delivery gates.",
+    "languages": ["TypeScript", "CSS"],
+    "frameworks": ["Next.js App Router", "React", "Tailwind CSS"],
+    "services": ["Static hosting or managed frontend hosting", "Optional CMS or form provider"],
+    "best_for": [
+      "Landing pages",
+      "Marketing sites",
+      "Frontend-first sites with strong SEO needs"
+    ],
+    "pros": [
+      "Strong React ecosystem and SEO support.",
+      "Good path from static pages to richer frontend behavior.",
+      "Large hiring and documentation ecosystem."
+    ],
+    "cons": [
+      "More moving parts than Astro for mostly static content.",
+      "Dependency tree and build tooling need ongoing audit attention.",
+      "Backend features require later service/runtime decisions."
+    ],
+    "scaffold_policy": "No Next.js app is bundled. Scaffold Next.js only after the user approves this profile and an approved scaffold task records the target directory and commands.",
+    "selection_questions": [
+      "Is the site mostly marketing content with a few interactive sections?",
+      "Does the team prefer React and TypeScript?",
+      "Will content updates come from code, a CMS, or a manager workflow?",
+      "Should deployment favor managed hosting simplicity or VPS/VDS control?"
+    ],
+    "deployment_options": [
+      {
+        "name": "VPS/VDS",
+        "best_for": "Teams that need server control, custom runtime processes, reverse proxy rules, or bundled backend services.",
+        "pros": ["Maximum control over runtime, logs, backups, and server configuration.", "Can host frontend, backend, database helpers, queues, or custom services together."],
+        "cons": ["Requires server administration, patching, monitoring, backups, and incident response.", "Higher operational risk for non-technical owners."]
+      },
+      {
+        "name": "Managed hosting",
+        "best_for": "Marketing and frontend-first sites where simple deploys, CDN, previews, and low maintenance matter most.",
+        "pros": ["Fast setup, previews, CDN, HTTPS, and rollback are usually built in.", "Less server maintenance for the client."],
+        "cons": ["Less low-level control than VPS/VDS.", "Provider limits, pricing, and supported runtimes can constrain custom backends."]
+      }
+    ]
   },
   {
     "name": "next-fullstack",
     "description": "Next.js App Router + TypeScript + Tailwind, with backend and data decisions made later, for SaaS or app-like sites.",
     "commands": {
-      "install": "cd frontend && npm ci",
-      "dev": "cd frontend && npm run dev",
-      "lint": "cd frontend && npm run lint",
-      "build": "cd frontend && npm run build"
+      "install": "Defined by the approved scaffold task.",
+      "dev": "Defined by the approved scaffold task.",
+      "lint": "Defined by the approved scaffold task.",
+      "build": "Defined by the approved scaffold task."
     },
     "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
-    "ci_policy": "Core CI remains stack-neutral. Add backend/data checks only after concrete backend decisions are recorded.",
+    "ci_policy": "Core CI remains stack-neutral. Add frontend, backend, database, and integration checks only after concrete service decisions are recorded.",
     "frontend": true,
     "backend": true,
-    "deploy_notes": "Choose hosting, database, auth, and environment handling in a later approved task before release."
+    "deploy_notes": "Choose hosting, database, auth, storage, payment/request flows, environment handling, and backup policy in approved tasks before release.",
+    "languages": ["TypeScript", "CSS", "SQL when a database is approved"],
+    "frameworks": ["Next.js App Router", "React", "Tailwind CSS"],
+    "services": ["Database", "Auth", "Storage", "Email or notification service", "Payment or request workflow when approved"],
+    "best_for": [
+      "SaaS or app-like sites",
+      "Sites with auth, dashboards, or forms backed by data",
+      "Projects that may grow from marketing into product workflows"
+    ],
+    "pros": [
+      "One TypeScript stack can cover UI and server behavior.",
+      "Good fit for auth, dashboards, previews, forms, and incremental product features.",
+      "Many deployment providers support the pattern directly."
+    ],
+    "cons": [
+      "More architecture decisions are required before implementation.",
+      "Operational complexity grows with database, auth, payments, and background work.",
+      "Provider choice can strongly affect cost and maintenance."
+    ],
+    "scaffold_policy": "No fullstack app is bundled. Scaffold Next.js and backend/service wiring only after product, design, data, auth, and deployment decisions are approved in tracked tasks.",
+    "selection_questions": [
+      "Does the site need auth, dashboards, admin tools, or persistent user data?",
+      "Which data objects and workflows must exist at launch?",
+      "Who will operate database backups, secrets, migrations, and monitoring?",
+      "Should deployment favor managed fullstack hosting or VPS/VDS control?"
+    ],
+    "deployment_options": [
+      {
+        "name": "VPS/VDS",
+        "best_for": "Fullstack projects needing custom services, strict server control, private networking, or one-server deployment.",
+        "pros": ["Control over Node runtime, reverse proxy, logs, cron, backups, and service placement.", "Can combine app, backend workers, and supporting services when approved."],
+        "cons": ["Requires DevOps ownership for security patches, uptime, firewall, backups, and monitoring.", "Scaling and rollback need explicit setup."]
+      },
+      {
+        "name": "Managed hosting",
+        "best_for": "Fullstack apps that fit provider runtimes and need easier previews, autoscaling, and managed deploys.",
+        "pros": ["Lower operations burden and faster delivery for common Next.js patterns.", "Preview deployments, HTTPS, logs, and rollback are usually easier."],
+        "cons": ["Backend/runtime limits may affect long-running jobs, websockets, or custom infrastructure.", "Costs and vendor lock-in can grow with traffic and services."]
+      }
+    ]
   },
   {
     "name": "astro-content",
     "description": "Astro for SEO/content-heavy sites, blogs, and documentation.",
     "commands": {
-      "install": "npm ci",
-      "dev": "npm run dev",
-      "lint": "npm run lint",
-      "build": "npm run build"
+      "install": "Defined by the approved scaffold task.",
+      "dev": "Defined by the approved scaffold task.",
+      "lint": "Defined by the approved scaffold task.",
+      "build": "Defined by the approved scaffold task."
     },
     "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
-    "ci_policy": "Core CI remains stack-neutral. Add Astro checks after the Astro project is scaffolded.",
+    "ci_policy": "Core CI remains stack-neutral. Add Astro checks after the Astro project is scaffolded by an approved task.",
     "frontend": true,
     "backend": false,
-    "deploy_notes": "Deploy as static content unless an approved task adds server behavior."
+    "deploy_notes": "Deploy as static content unless an approved task adds server behavior, CMS integration, or form handling.",
+    "languages": ["TypeScript", "Markdown", "CSS"],
+    "frameworks": ["Astro", "Tailwind CSS optional"],
+    "services": ["Static hosting", "Optional CMS", "Optional form provider"],
+    "best_for": [
+      "SEO-heavy content sites",
+      "Blogs and documentation",
+      "Fast brochure or editorial sites"
+    ],
+    "pros": [
+      "Excellent performance for mostly static content.",
+      "Simple deployment and smaller client-side JavaScript by default.",
+      "Content collections fit blogs, docs, and structured pages well."
+    ],
+    "cons": [
+      "Less natural for complex app-like interaction than React-first stacks.",
+      "Backend, auth, and dashboards require extra services or a different profile.",
+      "Some teams may have less Astro experience than React/Next.js."
+    ],
+    "scaffold_policy": "No Astro app is bundled. Scaffold Astro only after the user approves this profile and content/source decisions are recorded.",
+    "selection_questions": [
+      "Is most of the site public content, articles, services, or documentation?",
+      "How often will content change, and who edits it?",
+      "Does the launch need complex logged-in user flows?",
+      "Should deployment be simple managed/static hosting or a VPS/VDS with custom server needs?"
+    ],
+    "deployment_options": [
+      {
+        "name": "VPS/VDS",
+        "best_for": "Static sites that need custom server rules, colocated services, or a client-owned server environment.",
+        "pros": ["Full control over web server, redirects, cache headers, and backups.", "Can host static output beside approved backend services."],
+        "cons": ["More maintenance than static managed hosting.", "Manual deploy, TLS, monitoring, and rollback need setup."]
+      },
+      {
+        "name": "Managed hosting",
+        "best_for": "Static/content sites that need fast CDN delivery, simple deploys, previews, and low maintenance.",
+        "pros": ["Usually the simplest and fastest option for Astro content sites.", "CDN, HTTPS, previews, and rollback are often included."],
+        "cons": ["Less server-level customization.", "Dynamic backend features require external services or another deployment pattern."]
+      }
+    ]
   },
   {
     "name": "sveltekit",
     "description": "SvelteKit for interactive applications.",
     "commands": {
-      "install": "npm ci",
-      "dev": "npm run dev",
-      "lint": "npm run lint",
-      "build": "npm run build"
+      "install": "Defined by the approved scaffold task.",
+      "dev": "Defined by the approved scaffold task.",
+      "lint": "Defined by the approved scaffold task.",
+      "build": "Defined by the approved scaffold task."
     },
     "required_tools": ["python>=3.11", "node>=20.9.0", "npm"],
-    "ci_policy": "Core CI remains stack-neutral. Add SvelteKit checks after the SvelteKit project is scaffolded.",
+    "ci_policy": "Core CI remains stack-neutral. Add SvelteKit checks after the SvelteKit project is scaffolded and adapter/runtime decisions are recorded.",
     "frontend": true,
     "backend": true,
-    "deploy_notes": "Choose adapter and runtime after the product/design brief confirms deployment needs."
+    "deploy_notes": "Choose SvelteKit adapter, server/static mode, database/auth needs, and runtime target after product/design approval.",
+    "languages": ["TypeScript", "Svelte", "CSS"],
+    "frameworks": ["SvelteKit", "Svelte"],
+    "services": ["Adapter-specific hosting", "Optional database/auth/integration services"],
+    "best_for": [
+      "Highly interactive applications",
+      "Lean UI-heavy experiences",
+      "Teams that prefer Svelte's component model"
+    ],
+    "pros": [
+      "Concise components and strong interactive UI ergonomics.",
+      "Can target static or server runtimes through adapters.",
+      "Often less boilerplate than React-heavy alternatives."
+    ],
+    "cons": [
+      "Smaller hiring and ecosystem footprint than React/Next.js.",
+      "Adapter/runtime decisions matter for deployment and backend behavior.",
+      "Some integrations may have less mature examples than React equivalents."
+    ],
+    "scaffold_policy": "No SvelteKit app is bundled. Scaffold SvelteKit only after the user approves this profile and adapter/runtime decisions are recorded.",
+    "selection_questions": [
+      "Is the project primarily an interactive app rather than content-heavy pages?",
+      "Does the team already know or prefer Svelte?",
+      "Should the adapter target static hosting, managed server hosting, or VPS/VDS?",
+      "What backend, auth, or data flows are required at launch?"
+    ],
+    "deployment_options": [
+      {
+        "name": "VPS/VDS",
+        "best_for": "SvelteKit server deployments needing custom Node runtime, server hooks, colocated services, or deeper ops control.",
+        "pros": ["Strong runtime control and flexible adapter/server configuration.", "Can run custom services alongside the app when approved."],
+        "cons": ["Requires explicit server operations, security updates, monitoring, and rollback setup.", "More setup work than managed adapter hosting."]
+      },
+      {
+        "name": "Managed hosting",
+        "best_for": "SvelteKit projects that fit a supported adapter and benefit from previews, CDN, and low-maintenance deploys.",
+        "pros": ["Simpler deploy and maintenance when the adapter matches project needs.", "Preview, HTTPS, logs, and rollback are usually easier."],
+        "cons": ["Provider adapter limits can constrain runtime behavior.", "Long-running or custom server workloads may need a different target."]
+      }
+    ]
   },
   {
     "name": "custom",
@@ -72,6 +228,43 @@
     "ci_policy": "Core CI remains stack-neutral until custom stack checks are explicitly documented.",
     "frontend": false,
     "backend": false,
-    "deploy_notes": "Record deploy notes in STACK.md or an approved task before release."
+    "deploy_notes": "Record deploy notes in STACK.md or an approved task before release.",
+    "languages": ["User-approved"],
+    "frameworks": ["User-approved"],
+    "services": ["User-approved"],
+    "best_for": [
+      "Projects with existing technical constraints",
+      "Teams that already know the required language/framework",
+      "Legacy or provider-specific deployments"
+    ],
+    "pros": [
+      "Can match the client's existing team, hosting, or integration constraints.",
+      "Avoids forcing a default stack that does not fit the project."
+    ],
+    "cons": [
+      "Requires clearer documentation of commands, checks, hosting, and support ownership.",
+      "May need more setup before agents can safely scaffold or verify work."
+    ],
+    "scaffold_policy": "No custom stack is bundled. Record the user's approved language, framework, services, commands, and hosting target before scaffolding.",
+    "selection_questions": [
+      "Which language, framework, database, and hosting constraints are already fixed?",
+      "Who will maintain the stack after launch?",
+      "Which commands prove install, dev, lint, test, build, and deploy readiness?",
+      "Should publication use VPS/VDS, managed hosting, or a provider-specific target?"
+    ],
+    "deployment_options": [
+      {
+        "name": "VPS/VDS",
+        "best_for": "Custom stacks needing root/server control, uncommon runtimes, private services, or client-owned infrastructure.",
+        "pros": ["Most flexible for uncommon runtimes and custom service layouts.", "The client controls server configuration, logs, backups, and network rules."],
+        "cons": ["Requires explicit operations owner and maintenance budget.", "Security, updates, backups, and monitoring are the client's responsibility."]
+      },
+      {
+        "name": "Managed hosting",
+        "best_for": "Custom stacks that fit a managed provider and benefit from lower maintenance.",
+        "pros": ["Lower operational load when the provider supports the chosen stack.", "Managed deploy, HTTPS, logs, scaling, and rollback may be available."],
+        "cons": ["Provider support may not match every custom runtime.", "Limits, pricing, and migration paths must be reviewed before approval."]
+      }
+    ]
   }
 ]

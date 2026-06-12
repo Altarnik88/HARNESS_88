@@ -86,12 +86,12 @@ GitHub-backed resource links live in `agents/resources/tooling-sources.json`. Be
 - `agents/resources/tooling-sources.json`: source registry for GitHub-backed tools, skills, and MCP resources.
 - `wiki/`: LLM-maintained Markdown knowledge base.
 - `src/llm_wiki/` and `tools/llm_wiki.py`: local CLI for wiki, task, stack, site, and quality workflows.
-- `frontend/`: optional bundled Next.js starter/template, not the default selected stack.
+- No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 
 ## Environment
 
 - Python >= 3.11.
-- Node.js/npm are only required for the optional bundled frontend template. The current template uses Next.js 16 and expects Node >= 20.9.0.
+- Node.js/npm are required only after the user approves a JavaScript/TypeScript stack and an approved scaffold task creates that project.
 
 ## First Run
 
@@ -107,25 +107,17 @@ python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```
 
-If you plan to use or verify the optional frontend template:
-
-```powershell
-cd frontend
-npm ci
-npm run lint
-npm run build
-```
-
 ## Development Flow
 
 1. Open a chat in the repository root and follow `START_HERE.md`.
 2. Run first-run intake and record accepted answers in `SITE_INTAKE.md`.
-3. Choose a stack/fullstack profile and record it in `STACK.md`.
+3. Recommend 2-4 stack/fullstack options with languages, frameworks, services, pros, cons, operational complexity, and best-fit use cases; wait for user approval or a custom stack before recording the choice in `STACK.md`.
 4. Fill `PRODUCT.md` and `DESIGN.md`, then set them to `Status: approved` when accepted.
 5. Approve user-provided or agent-proposed references and set `references_status: approved`.
 6. Complete `SITE_REFERENCES.md`: bounded crawl, desktop/mobile screenshots, Figma reference artifact, UX/visual analysis, and explicit user approval.
-7. Create atomic task files with `python tools/llm_wiki.py task create ...`.
-8. Implement only from approved intake, approved briefs, selected stack state, approved reference analysis, and task ownership.
-9. Show frontend previews, run total audit, fix findings through tracked tasks, and get final user approval before publish instructions.
+7. Ask whether publication should target VPS/VDS or managed hosting, explain pros and cons of each, and recommend the better option from the user's operational, budget, traffic, backend, and maintenance answers.
+8. Create atomic task files with `python tools/llm_wiki.py task create ...`.
+9. Scaffold and implement only from approved intake, approved briefs, selected stack state, approved reference analysis, selected deployment direction, and task ownership.
+10. Show frontend previews, run total audit, fix findings through tracked tasks, and get final user approval before publish instructions.
 
 SQLite files under `data/` are generated state. Delete and rebuild them with `python tools/llm_wiki.py rebuild` whenever needed.

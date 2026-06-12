@@ -17,9 +17,10 @@ The stack flow becomes:
 1. Gather the user's site goals, audience, content model, interaction level, data/backend needs, commerce/payment needs, integrations, deployment expectations, team skills, and maintenance constraints.
 2. Recommend several suitable stack options rather than assuming one.
 3. For each option, explain the main language, framework, services, strengths, weaknesses, operational complexity, and best-fit use cases.
-4. Wait for the user to approve one option or propose a custom stack.
-5. Record the approved selection in `STACK.md`.
-6. Scaffold or implement stack-specific code only in a later approved task.
+4. Ask whether publication should use VPS/VDS or managed hosting, explain the pros and cons of each, and recommend the better target from the user's budget, traffic, backend/runtime, operations, and maintenance answers.
+5. Wait for the user to approve one option or propose a custom stack and deployment direction.
+6. Record the approved stack selection in `STACK.md`.
+7. Scaffold or implement stack-specific code only in a later approved task.
 
 ## User-Facing Behavior
 
@@ -33,12 +34,18 @@ When stack selection is needed, HARNESS_88 should present options such as:
 
 Each recommendation should include clear pros and cons for the language, framework, services, hosting, maintainability, performance, SEO, security, and team fit where relevant.
 
+Deployment recommendations must compare:
+
+- VPS/VDS: more control over runtime, logs, backups, reverse proxy, colocated services, and custom server setup; more responsibility for server administration, updates, monitoring, security, backups, and incidents.
+- Managed hosting: faster setup, preview deploys, CDN/HTTPS, rollback, and lower maintenance; less low-level control, provider/runtime limits, possible vendor lock-in, and pricing constraints.
+
 ## Implementation Shape
 
 - Remove root `frontend/` source, dependencies, generated build artifacts, and frontend-specific starter files from the repository.
 - Remove bundled frontend files from `src/llm_wiki/templates/site_starter/`.
 - Update documentation that currently describes `frontend/` as an optional bundled Next.js starter.
 - Update stack profile metadata so profiles are recommendation/scaffolding targets, not references to an existing `frontend/` folder.
+- Add stack/profile metadata and docs for VPS/VDS vs managed hosting recommendation prompts, pros, cons, and approval before publish planning.
 - Update CLI quality/security/doctor behavior so missing `frontend/package.json` is normal for the core, not a problem.
 - Update tests that currently require generated starters to contain `frontend/`.
 - Preserve the existing gates that block serious site implementation until intake, references, product/design, stack selection, tasks, and approvals are recorded.

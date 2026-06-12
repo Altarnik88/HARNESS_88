@@ -58,6 +58,7 @@ class SecurityAuditTests(unittest.TestCase):
             payload = json.loads(output)
             self.assertEqual(payload["status"], "skipped")
             self.assertEqual(payload["unresolved_count"], 0)
+            self.assertIn("No frontend/package.json found", payload["message"])
 
     def test_security_audit_records_unresolved_npm_items_without_blocking(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

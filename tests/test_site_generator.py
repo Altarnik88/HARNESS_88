@@ -51,7 +51,7 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertTrue((target / "agents" / "harness" / "stack-options.md").exists())
             self.assertTrue((target / "agents" / "protocols" / "wiki-operations.md").exists())
             self.assertTrue((target / "agents" / "resources" / "tooling-sources.json").exists())
-            self.assertTrue((target / "frontend" / "src" / "app" / "page.tsx").exists())
+            self.assertFalse((target / "frontend").exists())
             self.assertTrue((target / "raw" / "sources" / ".gitkeep").exists())
             self.assertTrue((target / "raw" / "assets" / ".gitkeep").exists())
             self.assertTrue((target / "wiki" / "index.md").exists())
@@ -78,9 +78,10 @@ class SiteGeneratorTests(unittest.TestCase):
             )
             self.assertNotIn("C:\\Users\\Io", text)
             self.assertNotIn("To get started, edit the " + "page.tsx file.", text)
-            self.assertIn("optional bundled Next.js starter", (target / "README.md").read_text(encoding="utf-8"))
+            self.assertNotIn("optional bundled Next.js starter", (target / "README.md").read_text(encoding="utf-8"))
+            self.assertIn("No frontend app is bundled", (target / "README.md").read_text(encoding="utf-8"))
             self.assertIn("status: unselected", (target / "STACK.md").read_text(encoding="utf-8"))
-            self.assertIn("Project ready", (target / "frontend" / "src" / "app" / "page.tsx").read_text(encoding="utf-8"))
+            self.assertFalse((target / "frontend").exists())
 
     def test_generated_project_readiness_reports_pending_briefs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -155,6 +156,8 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertIn("site references --json", tooling)
             self.assertIn("Never ask the user to paste secrets into chat", tooling)
             self.assertIn("ecommerce/catalog/payment/request mode", start_here)
+            self.assertIn("VPS/VDS vs hosting", start_here)
+            self.assertIn("pros and cons", start_here)
             self.assertIn("site intake --json", start_here)
             self.assertIn("site references --json", start_here)
             self.assertIn("site gates --json", start_here)

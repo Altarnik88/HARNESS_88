@@ -6,6 +6,8 @@ Use this template only after the selected profile is recorded in `STACK.md`, pro
 
 This file does not select a stack, install dependencies, configure credentials, or run deployment commands. Replace placeholders during a later DevOps/Release task.
 
+Before this template is activated, ask the user whether the site should publish to VPS/VDS or managed hosting. Explain pros and cons of each, then recommend the better target from the user's budget, traffic, backend/runtime needs, operations owner, backup expectations, and maintenance constraints.
+
 ## Common Handoff Fields
 
 - Project: `<project-name>`
@@ -19,10 +21,17 @@ This file does not select a stack, install dependencies, configure credentials, 
 - Monitoring/checks: `<health-checks>`
 - Residual risks: `<accepted-or-open-risks>`
 
+## Publication Target Choice
+
+- VPS/VDS pros: maximum control over runtime, reverse proxy, logs, backups, colocated services, and server configuration.
+- VPS/VDS cons: requires server administration, updates, security patches, monitoring, backups, and incident response.
+- Managed hosting pros: faster setup, preview deploys, CDN/HTTPS, rollback, and lower maintenance.
+- Managed hosting cons: less low-level control, provider/runtime limits, pricing constraints, and possible vendor lock-in.
+
 ## Profile: next-static
 
 - Intended use: static or frontend-first Next.js site after approval.
-- Build command placeholder: `cd frontend && npm run build`
+- Build command guidance: use the build command produced by the approved Next.js scaffold task.
 - Publish placeholder: `<static-host-or-node-compatible-target>`
 - Secret handling: use `security secret-plan` only when deployment provider variables are required.
 - Operate handoff: document preview URL, production URL, cache behavior, rollback artifact, and frontend build verification.
@@ -30,7 +39,7 @@ This file does not select a stack, install dependencies, configure credentials, 
 ## Profile: next-fullstack
 
 - Intended use: Next.js with approved backend/data decisions.
-- Build command placeholder: `cd frontend && npm run build`
+- Build command guidance: use the build command produced by the approved Next.js scaffold task.
 - Publish placeholder: `<fullstack-host-or-vps-runtime>`
 - Secret handling: record required environment variable names only; use `security secret-plan` for dry-run evidence before any broker action.
 - Operate handoff: document runtime, database/auth/payment providers, migrations policy, backups, rollback, and health checks.

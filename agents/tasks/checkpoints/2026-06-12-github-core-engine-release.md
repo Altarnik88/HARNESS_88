@@ -4,48 +4,41 @@ Linked task: `agents/tasks/2026-06-12-github-core-engine-release.md`
 
 ## Preflight Checks
 
-- Confirmed current release standard is full repo clean.
 - Confirmed the release target is HARNESS_88 as a stack-neutral site-development engine, not a completed site.
-- Confirmed `core_harness88_improvement_prompt.txt` was untracked and safe to delete because no repo references existed outside the file itself.
+- Confirmed stack, product, design, intake, reference, and delivery approval states must not be advanced for the core release.
+- Confirmed the former full-repo blocker came from the bundled Next.js frontend starter, not the HARNESS_88 core engine.
 
 ## Implementation Evidence
 
-- Deleted the local prompt dump from the worktree.
-- Created draft release notes for `v0.1.0`.
-- Created a release task bundle with status `blocked`.
-- Updated the review queue with the current npm audit blocker.
-- Did not modify stack, product, design, intake, reference, or site gate approval state.
-- Did not update frontend dependencies because no compatible safe update was available.
+- Removed the bundled `frontend/` starter through the no-bundled-frontend stack-selection task.
+- Updated release notes for `v0.1.0` as release-ready core infrastructure.
+- Updated stack/deployment guidance so agents recommend stacks through dialogue and ask about VPS/VDS vs hosting before publish planning.
+- Updated the review queue to close the old Next/PostCSS item for the core release.
+- Did not select a stack or approve site/product/design gates.
+- Did not install tools, skills, plugins, or dependencies.
 
 ## Verification Evidence
 
-- `npm audit --json` in `frontend/` reported:
-  - `next`: moderate, via nested `postcss`.
-  - `postcss`: moderate, advisory `GHSA-qx2v-qp2m-jg93`, range `<8.5.10`.
-- `npm view next version` returned `16.2.9`.
-- `npm view eslint-config-next version` returned `16.2.9`.
-- The npm-proposed fix was `next@9.3.3`, which is a downgrade and rejected by the release plan.
-- `python tools/llm_wiki.py quality --skip-frontend` passed: 147 Python tests OK, wiki rebuild OK, strict lint OK.
-- `python tools/llm_wiki.py task validate --strict` passed with no validation issues.
-- `python tools/llm_wiki.py task evidence --json` passed with no evidence issues; this release task is intentionally `blocked`.
-- `cd frontend; npm run lint` passed.
-- `cd frontend; npm run build` passed.
+- `python -m unittest discover -s tests` exited 0 with 146 tests.
+- `python tools/llm_wiki.py quality --skip-frontend` exited 0: Python tests, wiki rebuild, and strict lint passed.
+- `python tools/llm_wiki.py security audit --json --no-record --blocking` exited 0 with `status: "skipped"` and `unresolved_count: 0` because no `frontend/package.json` exists.
+- `python tools/llm_wiki.py task validate --strict` exited 0 with no validation issues.
 
 ## Review Evidence
 
-- No stack was selected and `STACK.md` was not edited.
-- `PRODUCT.md`, `DESIGN.md`, `SITE_INTAKE.md`, `SITE_REFERENCES.md`, and `SITE_GATES.md` were not moved to approved.
+- `STACK.md` was not edited and remains unselected.
+- `PRODUCT.md`, `SITE_INTAKE.md`, `SITE_REFERENCES.md`, and `SITE_GATES.md` were not moved to approved.
+- `DESIGN.md` remains `Status: draft`; only wording was updated to remove the obsolete bundled frontend reference.
 - No frontend/site implementation was started.
 - No `raw/` files or `data/wiki.sqlite` were edited directly.
-- No tools, skills, plugins, or MCP resources were installed automatically.
 - No secrets were requested or stored.
 
 ## Wiki and Log Updates
 
-- Added a release entry to `wiki/log.md`.
-- Updated `wiki/review.md` with the `v0.1.0` full-repo clean release blocker.
+- Updated `wiki/review.md` with the closed frontend audit blocker and stack/deployment selection decision.
+- Added a `wiki/log.md` decision entry for removing the bundled frontend starter and requiring approved stack/deployment selection.
 
 ## Residual Risk
 
-- Release publication is blocked by unresolved frontend npm audit findings.
-- Do not create tag `v0.1.0` or publish a GitHub release until the full-repo clean release gate passes.
+- None for the core release blocker.
+- Future scaffolded frontend/backend projects must run their own dependency audits after stack approval.

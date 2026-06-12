@@ -23,6 +23,15 @@ class StackProfile:
     frontend: bool
     backend: bool
     deploy_notes: str
+    languages: list[str]
+    frameworks: list[str]
+    services: list[str]
+    best_for: list[str]
+    pros: list[str]
+    cons: list[str]
+    scaffold_policy: str
+    selection_questions: list[str]
+    deployment_options: list[dict[str, object]]
 
     def to_json(self) -> dict[str, object]:
         return {
@@ -34,6 +43,15 @@ class StackProfile:
             "frontend": self.frontend,
             "backend": self.backend,
             "deploy_notes": self.deploy_notes,
+            "languages": self.languages,
+            "frameworks": self.frameworks,
+            "services": self.services,
+            "best_for": self.best_for,
+            "pros": self.pros,
+            "cons": self.cons,
+            "scaffold_policy": self.scaffold_policy,
+            "selection_questions": self.selection_questions,
+            "deployment_options": self.deployment_options,
         }
 
 
@@ -62,7 +80,27 @@ def stack_profile_from_json(row: dict[str, Any]) -> StackProfile:
         frontend=bool(row.get("frontend", False)),
         backend=bool(row.get("backend", False)),
         deploy_notes=str(row.get("deploy_notes", "")),
+        languages=string_list(row, "languages"),
+        frameworks=string_list(row, "frameworks"),
+        services=string_list(row, "services"),
+        best_for=string_list(row, "best_for"),
+        pros=string_list(row, "pros"),
+        cons=string_list(row, "cons"),
+        scaffold_policy=str(row.get("scaffold_policy", "")),
+        selection_questions=string_list(row, "selection_questions"),
+        deployment_options=dict_list(row, "deployment_options"),
     )
+
+
+def string_list(row: dict[str, Any], key: str) -> list[str]:
+    return [str(value) for value in row.get(key, [])]
+
+
+def dict_list(row: dict[str, Any], key: str) -> list[dict[str, object]]:
+    values = row.get(key, [])
+    if not isinstance(values, list):
+        return []
+    return [dict(value) for value in values if isinstance(value, dict)]
 
 
 def profiles_by_name(root: Path | None = None) -> dict[str, StackProfile]:
@@ -165,6 +203,9 @@ def render_selected_stack(profile_name: str, root: Path | None = None) -> str:
     profile = profiles_by_name(root)[profile_name]
     commands = "\n".join(f"- {name}: `{command}`" for name, command in profile.commands.items())
     tools = "\n".join(f"- {tool}" for tool in profile.required_tools)
+    fit = render_markdown_list(profile.best_for)
+    pros = render_markdown_list(profile.pros)
+    cons = render_markdown_list(profile.cons)
     return f"""# Stack Selection
 
 status: selected
@@ -176,6 +217,22 @@ Production implementation may begin only when `PRODUCT.md`, `DESIGN.md`, task ow
 ## Selected Profile
 
 - `{profile.name}`: {profile.description}
+
+## Fit
+
+{fit}
+
+## Pros
+
+{pros}
+
+## Cons
+
+{cons}
+
+## Scaffold Policy
+
+{profile.scaffold_policy}
 
 ## Commands
 
@@ -201,5 +258,11 @@ See `agents/harness/stack-options.md` and `agents/harness/stack-profiles.json`.
 
 - This file records the stack choice only.
 - No dependencies were installed.
-- No frontend files were changed automatically.
+- No frontend, backend, or service files were scaffolded automatically.
 """
+
+
+def render_markdown_list(values: list[str]) -> str:
+    if not values:
+        return "- None recorded."
+    return "\n".join(f"- {value}" for value in values)

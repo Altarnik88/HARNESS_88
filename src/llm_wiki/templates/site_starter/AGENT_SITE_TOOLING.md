@@ -9,13 +9,15 @@ This clean project starts with the portable, stack-neutral site-development harn
 - Intake state: `SITE_INTAKE.md` starts draft and must record accepted first-run intake decisions before production implementation.
 - Reference analysis state: `SITE_REFERENCES.md` starts draft and must record bounded crawl, screenshots, Figma, UX/visual analysis, and user approval before serious frontend implementation.
 - Delivery gate state: `SITE_GATES.md` starts draft and must record preview approval, backend/data readiness, audit, remediation, final approval, and publish handoff before release.
-- Optional frontend template: `frontend/` contains a bundled Next.js starter/template.
+- No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 - Canonical LLM Wiki: `wiki/`
 - Generated SQLite state: `data/wiki.sqlite`
 
 ## Hard Rules
 
 - Do not begin website implementation until `STACK.md` has a selected profile or the user explicitly confirms a custom approach.
+- Before stack selection, recommend 2-4 stack options with languages, frameworks, services, pros, cons, operational complexity, and best-fit use cases; wait for user approval.
+- Before publish/operate planning, ask whether the site should publish to VPS/VDS or managed hosting, explain pros and cons of each, and recommend the better option from the user's operations, budget, traffic, backend, and maintenance answers.
 - Do not begin website implementation until `SITE_INTAKE.md` has `Status: approved`.
 - Do not begin website implementation until `PRODUCT.md` and `DESIGN.md` have `Status: approved`, or equivalent approved wiki decisions define the product and design direction.
 - Do not begin serious frontend implementation until `references_status: approved` is set in `SITE_INTAKE.md`, `SITE_REFERENCES.md` is `Status: approved`, and `python tools/llm_wiki.py site references --json` reports complete reference analysis.
@@ -41,6 +43,15 @@ This clean project starts with the portable, stack-neutral site-development harn
 Project-local design and AI skill packs are intentionally not bundled in this generated starter. Install or copy them only when a task explicitly needs them, then record the decision in the wiki.
 
 Use `agents/resources/tooling-sources.json` as the registry for external source links. A blank GitHub URL means no download is allowed until the user approves the exact repository.
+
+## Stack Scaffolding
+
+HARNESS_88 does not include a prebuilt frontend. After intake and stack recommendation, scaffold stack-specific files only in an approved task for the selected profile or custom stack.
+
+The deployment discussion must explicitly compare VPS/VDS vs hosting:
+
+- VPS/VDS: more control over runtime, logs, backups, reverse proxy, and custom services; more server administration, patching, monitoring, and incident response.
+- Managed hosting: faster setup, previews, CDN/HTTPS, and lower maintenance; less low-level control, provider limits, and possible vendor lock-in.
 
 ## Default Checks
 

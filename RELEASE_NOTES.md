@@ -1,34 +1,36 @@
 # HARNESS_88 Release Notes
 
-## v0.1.0 - Draft, blocked
+## v0.1.0 - Release ready
 
-Status: blocked pending frontend security remediation.
+Status: verified for release preparation.
 
-HARNESS_88 v0.1.0 is intended to publish the project as a stack-neutral core engine and template infrastructure for building sites from scratch. It is not a completed site, and it does not select a stack, approve a product brief, approve a design brief, or begin frontend/site implementation.
+HARNESS_88 v0.1.0 publishes the project as a stack-neutral core engine and template infrastructure for building sites from scratch. It is not a completed site, does not select a stack, does not approve a product brief, does not approve a design brief, and does not begin frontend/site implementation.
 
-### Intended release contents
+### Release contents
 
 - Core HARNESS_88 workflow, task, wiki, gate, and diagnostics tooling.
 - Stack-neutral onboarding and approval gates for new site projects.
-- Optional bundled Next.js starter/template under `frontend/`.
+- Dialog-driven stack recommendation metadata with languages, frameworks, services, pros, cons, scaffold policy, and selection questions.
+- Deployment recommendation guidance that asks the client about VPS/VDS vs hosting, explains pros and cons, and recommends a publication target from the client's answers.
+- Generated site starters that contain no prebuilt frontend app and no preselected stack.
 - Secret handling guidance that records variable names and provider metadata only; no secret values are requested, stored, or committed.
 
-### Required before publishing
+### New project flow
 
-- `git status --short` must be clean.
-- `python tools/llm_wiki.py quality --skip-frontend` must pass.
-- `python tools/llm_wiki.py task validate --strict` must pass.
-- `python tools/llm_wiki.py task evidence --json` must report no evidence issues.
-- `npm audit --json` in `frontend/` must report zero unresolved vulnerabilities.
-- `npm run lint` and `npm run build` in `frontend/` must pass.
+- New projects start with intake, stack recommendation, explicit stack approval, references, product/design approvals, and tracked tasks.
+- Stack-specific frontend/backend files are scaffolded only after the user approves a stack profile or custom stack and an approved task records the target directory and commands.
+- Publication planning waits until VPS/VDS or managed hosting is discussed, tradeoffs are explained, a target is recommended, and final delivery gates are recorded.
 
-### Current blocker
+### Verification
 
-The full-repo release gate is blocked by a moderate npm audit finding in the optional bundled Next.js starter/template:
+- `python -m unittest discover -s tests` passed with 146 tests.
+- `python tools/llm_wiki.py quality --skip-frontend` passed: Python tests, wiki rebuild, and strict lint all succeeded.
+- `python tools/llm_wiki.py security audit --json --no-record --blocking` exited 0 with `status: "skipped"` and `unresolved_count: 0` because no `frontend/package.json` exists in the core repository.
+- `python tools/llm_wiki.py task validate --strict` passed.
 
-- `next@16.2.9` includes nested `postcss@8.4.31`.
-- The advisory requires `postcss >=8.5.10`.
-- `npm audit` reports the path through `next` and suggests a downgrade to `next@9.3.3`, which is not acceptable for this release.
-- `npm view next version` and `npm view eslint-config-next version` currently return `16.2.9`, so there is no compatible patch/minor update available in the npm registry at the time of this check.
+### Security and secrets
 
-Do not publish `v0.1.0` as a full-repo clean release until a compatible Next.js update removes the vulnerable nested PostCSS dependency, or until the release scope is changed explicitly.
+- No frontend app is bundled or preselected.
+- No npm dependency audit target remains in the core repository until a stack-specific project is scaffolded by an approved task.
+- Future scaffolded frontends or backends must run their own dependency audit after stack approval.
+- No secrets are included or requested.

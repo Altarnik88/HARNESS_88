@@ -68,7 +68,12 @@ class StackNeutralDocsTests(unittest.TestCase):
         self.assertIn("start_here.md", combined)
         self.assertIn("stack.md", combined)
         self.assertIn("autonomous core", combined)
-        self.assertIn("optional bundled next.js starter", combined)
+        self.assertIn("no frontend app is bundled", combined)
+        self.assertIn("stack is selected through dialogue", combined)
+        self.assertIn("vps/vds vs hosting", combined)
+        self.assertIn("pros and cons", combined)
+        self.assertNotIn("optional bundled next.js starter", combined)
+        self.assertNotIn("frontend/`: optional bundled", combined)
         self.assertNotIn("frontend stack: next.js app router", combined)
         self.assertNotIn("a next.js frontend in `frontend/`", combined)
 

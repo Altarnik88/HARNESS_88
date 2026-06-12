@@ -6,7 +6,7 @@ This file is the durable design contract for website or product UI work. Agents 
 
 Allowed statuses: `draft`, `approved`, `needs-review`.
 
-Start new projects from `START_HERE.md`. The optional bundled Next.js starter/template in `frontend/` is not a selected design or stack decision.
+Start new projects from `START_HERE.md`. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 
 ## Design Goal
 

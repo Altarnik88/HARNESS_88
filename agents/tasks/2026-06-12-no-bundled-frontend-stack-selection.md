@@ -1,6 +1,6 @@
 # Task: No Bundled Frontend Stack Selection
 
-Status: planned
+Status: verified
 Role owner: Conductor
 Created: 2026-06-12
 
@@ -65,6 +65,9 @@ Do not edit:
 - Scope is respected.
 - Verification command is run.
 - Completion evidence is recorded.
+- Bundled `frontend/` source and generated-starter frontend template are removed.
+- Stack profiles expose recommendation tradeoffs and deployment options.
+- First-run docs require asking about VPS/VDS vs hosting with pros, cons, and a recommendation.
 
 ## Verification
 
@@ -80,4 +83,7 @@ Expected result:
 
 ## Progress
 
-- No work has started.
+- Removed the bundled frontend starter.
+- Added dialog-driven stack and deployment recommendation metadata.
+- Verification evidence is recorded in the linked progress and checkpoint files.
+- Verification evidence: `python tools/llm_wiki.py quality --skip-frontend` exited 0.

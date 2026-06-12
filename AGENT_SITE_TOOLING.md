@@ -9,13 +9,15 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Intake state: `SITE_INTAKE.md` starts draft and must record accepted first-run intake decisions before production implementation.
 - Reference analysis state: `SITE_REFERENCES.md` starts draft and must record bounded crawl, screenshots, Figma, UX/visual analysis, and user approval before serious frontend implementation.
 - Delivery gate state: `SITE_GATES.md` starts draft and must record preview approval, backend/data readiness, audit, remediation, final approval, and publish handoff before release.
-- Optional frontend template: `frontend/` contains a bundled Next.js starter/template.
+- No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 - Canonical LLM Wiki: `wiki/`
 - Generated SQLite state: `data/wiki.sqlite`
 
 ## Hard Rules
 
 - Do not begin website implementation until `STACK.md` has a selected profile or the user explicitly confirms a custom approach.
+- Before stack selection, recommend 2-4 stack options with languages, frameworks, services, pros, cons, operational complexity, and best-fit use cases; wait for user approval.
+- Before publish/operate planning, ask whether the site should publish to VPS/VDS or managed hosting, explain pros and cons of each, and recommend the better option from the user's operations, budget, traffic, backend, and maintenance answers.
 - Do not begin website implementation until `SITE_INTAKE.md` has `Status: approved`.
 - Do not begin website implementation until `PRODUCT.md` and `DESIGN.md` have `Status: approved`, or equivalent approved wiki decisions define the product and design direction.
 - Do not begin serious frontend implementation until `references_status: approved` is set in `SITE_INTAKE.md`, `SITE_REFERENCES.md` is `Status: approved`, and `python tools/llm_wiki.py site references --json` reports complete reference analysis.
@@ -36,16 +38,14 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Run `python tools/llm_wiki.py tools audit` after download or environment changes. The audit reports missing tools/skills/plugins and asks permission before installing local tools, downloading skills from GitHub, or connecting Codex plugins.
 - Before downloading any GitHub-backed tool, skill, or MCP resource, confirm its exact URL is recorded in `agents/resources/tooling-sources.json` and approved by the user. If the URL is blank or missing, ask for the correct repository link first.
 
-## Optional Frontend Template
+## Stack Scaffolding
 
-The `frontend/` directory is provided as an optional bundled Next.js starter/template. It is useful when the selected profile is compatible with Next.js, but HARNESS_88 does not assume it is selected.
+HARNESS_88 does not include a prebuilt frontend. After intake and stack recommendation, scaffold stack-specific files only in an approved task for the selected profile or custom stack.
 
-Install frontend dependencies only when frontend checks or implementation are in scope:
+The deployment discussion must explicitly compare VPS/VDS vs hosting:
 
-```powershell
-cd frontend
-npm ci
-```
+- VPS/VDS: more control over runtime, logs, backups, reverse proxy, and custom services; more server administration, patching, monitoring, and incident response.
+- Managed hosting: faster setup, previews, CDN/HTTPS, and lower maintenance; less low-level control, provider limits, and possible vendor lock-in.
 
 ## Default Checks
 
@@ -63,17 +63,9 @@ python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```
 
-Optional frontend checks:
+Optional stack-specific checks after approved scaffolding:
 
 ```powershell
-cd frontend
-npm ci
-npm run lint
-npm run build
-```
-
-Optional frontend security review:
-
-```powershell
+python tools/llm_wiki.py quality
 python tools/llm_wiki.py security audit --json --no-record
 ```

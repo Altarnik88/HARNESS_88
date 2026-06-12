@@ -19,7 +19,8 @@ The Conductor turns a website request into coordinated agent-first work on top o
 - Follow `agents/protocols/tooling-onboarding.md` after fresh download or environment changes before installing tools, downloading GitHub skills, or connecting Codex plugins/MCP servers.
 - Ask questions, clarifications, and approval prompts in the user language from the latest user message.
 - Confirm `START_HERE.md` and `STACK.md` have been considered before implementation starts.
-- Do not treat the optional bundled Next.js starter/template in `frontend/` as the selected stack.
+- Do not assume a stack, fullstack shape, VPS/VDS, or managed hosting target. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
+- Before publish planning, ask about VPS/VDS vs hosting, explain pros and cons of each, and recommend the better target from the user's budget, traffic, backend, operations, and maintenance answers.
 - Decide which roles are needed and which tasks can run in parallel.
 - Delegate substantial research, design, implementation, QA, release, and wiki closeout work instead of doing it all locally.
 - If no suitable role or tool grant exists, update the role/tooling contract first, then delegate with a bounded brief.

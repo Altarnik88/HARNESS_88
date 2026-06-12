@@ -6,7 +6,7 @@ This team is for building websites with Codex on top of the HARNESS_88 autonomou
 
 The Conductor works agent-first for substantial research, design, implementation, QA, release, and wiki closeout. The Conductor plans, delegates, coordinates, reviews, runs verification, and updates durable project knowledge. Production implementation belongs to worker agents with explicit ownership.
 
-The project is stack-neutral until `STACK.md` is selected. The optional bundled Next.js starter/template in `frontend/` is not the default stack.
+The project is stack-neutral until `STACK.md` is selected. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 
 Questions, clarifications, and user approval prompts use the user language from the latest user message. Follow `agents/protocols/conversation-delegation.md`.
 

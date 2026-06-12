@@ -14,4 +14,5 @@ Read these files before site design or implementation work:
 - `wiki/index.md`
 - recent entries in `wiki/log.md`
 
-Do not start frontend implementation until a product/design brief, frontend stack, and selected visual direction are recorded in the wiki.
+Do not start frontend implementation until a product/design brief, selected stack, deployment direction, and selected visual direction are recorded in the wiki.
+No frontend app is bundled. Stack is selected through dialogue, and deployment planning must compare VPS/VDS vs hosting with pros and cons before recommending a publication target.

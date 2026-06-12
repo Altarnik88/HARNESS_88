@@ -17,6 +17,17 @@ from llm_wiki.quality import build_quality_steps, resolve_command, run_quality
 
 
 class QualityGateTests(unittest.TestCase):
+    def test_no_frontend_manifest_runs_core_steps_only_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+
+            steps = build_quality_steps(root, full=True)
+
+            self.assertEqual(
+                [step.name for step in steps],
+                ["python-tests", "wiki-rebuild", "wiki-lint-strict"],
+            )
+
     def test_default_steps_include_frontend_lint_when_manifest_exists(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

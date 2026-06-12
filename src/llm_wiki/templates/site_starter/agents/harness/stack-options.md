@@ -1,8 +1,8 @@
 # Stack Options
 
-These are selection profiles, not pre-scaffolded projects. Choose one during the first project chat, then record the choice in `STACK.md`.
+These are selection profiles, not pre-scaffolded projects. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 
-Detailed machine-readable profile metadata lives in `agents/harness/stack-profiles.json`.
+Detailed machine-readable profile metadata lives in `agents/harness/stack-profiles.json`, including languages, frameworks, services, best-fit cases, pros, cons, selection questions, scaffold policy, and deployment options.
 
 ## Profiles
 
@@ -15,4 +15,6 @@ Detailed machine-readable profile metadata lives in `agents/harness/stack-profil
 ## Rules
 
 - Do not scaffold every profile.
-- Do not treat the bundled `frontend/` directory as the selected stack.
+- Do not scaffold any stack until the user approves a profile or proposes a custom stack.
+- Ask the user to choose between VPS/VDS vs hosting before publish planning.
+- Explain pros and cons of VPS/VDS and managed hosting, then recommend a target from the user's budget, traffic, backend/runtime, operations, and maintenance answers.

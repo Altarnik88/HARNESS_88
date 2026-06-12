@@ -75,3 +75,10 @@ Append durable project events using:
 - Path: `RELEASE_NOTES.md`
 - Path: `agents/tasks/2026-06-12-github-core-engine-release.md`
 - Path: `wiki/review.md`
+
+## [2026-06-12] decision | Removed bundled frontend starter and added stack/deployment selection flow
+- Path: `frontend/`
+- Path: `src/llm_wiki/templates/site_starter/frontend/`
+- Path: `agents/harness/stack-profiles.json`
+- Path: `START_HERE.md`
+- Path: `wiki/review.md`

@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Remove the prebuilt Next.js `frontend/` starter and make stack selection a dialog-driven recommendation flow with explicit user approval before scaffolding.
+**Goal:** Remove the prebuilt Next.js `frontend/` starter and make stack/deployment selection a dialog-driven recommendation flow with explicit user approval before scaffolding or publish planning.
 
-**Architecture:** HARNESS_88 remains a Python CLI and Markdown-template core. Stack profiles become recommendation/scaffolding metadata, generated projects contain no frontend app, and quality/security tooling treats missing `frontend/package.json` as normal core state.
+**Architecture:** HARNESS_88 remains a Python CLI and Markdown-template core. Stack profiles become recommendation/scaffolding metadata with VPS/VDS vs managed hosting options, generated projects contain no frontend app, and quality/security tooling treats missing `frontend/package.json` as normal core state.
 
 **Tech Stack:** Python 3.11+, `unittest`, Markdown project contracts, JSON stack metadata, local `tools/llm_wiki.py` CLI.
 
@@ -326,6 +326,8 @@ In `agents/harness/stack-profiles.json`, add the new fields to every profile. Us
 - `sveltekit` scaffold policy: `No SvelteKit app is bundled. Scaffold SvelteKit only after the user approves this profile and adapter/runtime decisions are recorded.`
 - `custom` scaffold policy: `No custom stack is bundled. Record the user's approved language, framework, services, commands, and hosting target before scaffolding.`
 
+Add `deployment_options` to every profile with two entries named `VPS/VDS` and `Managed hosting`. Each entry must include `best_for`, `pros`, and `cons` so the agent can ask the client where to publish, explain tradeoffs, and recommend a target from budget, traffic, backend/runtime, operations, backup, and maintenance answers.
+
 Set `commands` for each non-custom profile to non-executing guidance strings:
 
 ```json
@@ -380,6 +382,7 @@ In `START_HERE.md` and `src/llm_wiki/templates/site_starter/START_HERE.md`, make
 
 ```markdown
 Recommend 2-4 stack options with languages, frameworks, services, pros, cons, operational complexity, and best-fit use cases. Wait for the user to approve one option or propose a custom stack before running `python tools/llm_wiki.py stack select next-static` or the approved profile name.
+Ask about VPS/VDS vs hosting, explain pros and cons, then recommend the better publication target from the user's answers.
 ```
 
 - [ ] **Step 3: Update tooling docs**
@@ -684,6 +687,6 @@ Expected: all gates pass before merge/tag/GitHub release.
 
 ## Self-Review Notes
 
-- Spec coverage: removes root and generated `frontend/`, updates stack recommendation metadata, preserves approval gates, updates release evidence, and verifies no protected site approval files changed.
+- Spec coverage: removes root and generated `frontend/`, updates stack and deployment recommendation metadata, preserves approval gates, updates release evidence, and verifies no protected site approval files changed.
 - Incomplete-instruction scan: no incomplete fields are left for implementers; each variable command is either a literal command or an inactive guidance string intentionally recorded in stack metadata.
 - Type consistency: new `StackProfile` fields are named consistently across JSON, dataclass parsing, CLI output, and JSON output.

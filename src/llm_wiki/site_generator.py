@@ -37,7 +37,6 @@ COPY_PATHS = [
     "agents/templates",
     "agents/tooling-matrix.md",
     "agents/workflows",
-    "frontend",
     "src/llm_wiki",
     "tests",
     "tools/llm_wiki.py",

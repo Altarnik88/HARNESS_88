@@ -6,9 +6,9 @@ This file is the compact project contract for Codex agents. Keep `AGENTS.md` and
 
 HARNESS_88 is a stack-neutral autonomous core for site-development work.
 
-New users start from `START_HERE.md`, complete `SITE_INTAKE.md`, choose a stack/fullstack profile, and record it in `STACK.md`.
+New users start from `START_HERE.md`, complete `SITE_INTAKE.md`, compare stack/fullstack options, approve one option or a custom stack, and record it in `STACK.md`.
 
-Do not assume Next.js or fullstack has already been selected. The `frontend/` directory is an optional bundled Next.js starter/template, not the default stack.
+Do not assume Next.js, fullstack, VPS/VDS, or managed hosting has already been selected. No frontend app is bundled. Stack is selected through dialogue from the user's goals, site type, content model, backend/data needs, integrations, deployment expectations, and maintenance constraints.
 
 Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflow gate. Their draft/unselected state blocks concrete site implementation, not core engineering work on HARNESS_88 itself.
 

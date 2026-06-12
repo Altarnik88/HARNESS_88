@@ -34,6 +34,9 @@ class StackCliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         for profile in ["next-static", "next-fullstack", "astro-content", "sveltekit", "custom"]:
             self.assertIn(profile, output)
+        self.assertIn("Pros:", output)
+        self.assertIn("Cons:", output)
+        self.assertIn("Deployment:", output)
 
     def test_stack_list_json_includes_profile_metadata(self) -> None:
         code, output = self.run_cli("--root", str(ROOT), "stack", "list", "--json")
@@ -41,10 +44,37 @@ class StackCliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         profiles = {row["name"]: row for row in json.loads(output)}
         next_static = profiles["next-static"]
-        for key in ["commands", "required_tools", "ci_policy", "frontend", "backend", "deploy_notes"]:
+        for key in [
+            "commands",
+            "required_tools",
+            "ci_policy",
+            "frontend",
+            "backend",
+            "deploy_notes",
+            "languages",
+            "frameworks",
+            "services",
+            "best_for",
+            "pros",
+            "cons",
+            "scaffold_policy",
+            "selection_questions",
+            "deployment_options",
+        ]:
             self.assertIn(key, next_static)
         self.assertTrue(next_static["frontend"])
         self.assertFalse(next_static["backend"])
+        self.assertIn("TypeScript", next_static["languages"])
+        self.assertTrue(next_static["pros"])
+        self.assertTrue(next_static["cons"])
+        self.assertIn("approved scaffold task", next_static["scaffold_policy"].casefold())
+        deployment_options = {row["name"].casefold(): row for row in next_static["deployment_options"]}
+        self.assertIn("vps/vds", deployment_options)
+        self.assertIn("managed hosting", deployment_options)
+        self.assertTrue(deployment_options["vps/vds"]["pros"])
+        self.assertTrue(deployment_options["vps/vds"]["cons"])
+        self.assertTrue(deployment_options["managed hosting"]["pros"])
+        self.assertTrue(deployment_options["managed hosting"]["cons"])
 
     def test_stack_status_reads_stack_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -75,6 +105,7 @@ class StackCliTests(unittest.TestCase):
             self.assertIn("status: selected", text)
             self.assertIn("selected_profile: next-static", text)
             self.assertFalse((frontend / "node_modules").exists())
+            self.assertIn("No dependencies were installed and no frontend was scaffolded", output)
 
     def test_unknown_stack_profile_prints_clear_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

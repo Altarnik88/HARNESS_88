@@ -40,7 +40,7 @@ assigned checkpoint file
 - `site-gates-template.md` captures machine-checkable delivery gates from frontend preview approval through publish/operate handoff.
 - `spec-template.md` turns an approved product/design brief into implementation decisions.
 - `task-template.md` defines one atomic unit of work with owner, scope, tooling, and evidence.
-- `stack-options.md` summarizes selectable stack/fullstack profiles. `stack-profiles.json` defines the CLI-readable profile metadata. Neither file scaffolds those stacks.
+- `stack-options.md` summarizes selectable stack/fullstack profiles. `stack-profiles.json` defines the CLI-readable profile metadata, tradeoffs, selection questions, scaffold policy, and deployment options. Neither file scaffolds those stacks.
 - `progress-template.md` records current state for clean handoff.
 - `checkpoint-template.md` records preflight, implementation, verification, review, wiki/log updates, and risk.
 - `acceptance-checklists.md` provides task-type checklists.
@@ -50,7 +50,7 @@ assigned checkpoint file
 
 `python tools/llm_wiki.py lint --strict` checks both wiki health and harness structure. Harness lint verifies required root files, task statuses, required task sections, and verification evidence for `verified` or `done` task files.
 
-Use `python tools/llm_wiki.py site doctor` for a unified readiness, stack, brief, task, wiki, frontend, security, and generated-starter self-test report.
+Use `python tools/llm_wiki.py site doctor` for a unified readiness, stack, brief, task, wiki, optional scaffolded frontend, security, and generated-starter self-test report.
 
 Use `python tools/llm_wiki.py site intake --json` for machine-readable first-run intake and reference approval state.
 
@@ -62,6 +62,8 @@ Use `python tools/llm_wiki.py quality --skip-frontend` as the default core compl
 
 Use `python tools/llm_wiki.py site self-test` when generator changes need proof that a clean starter passes its own core checks.
 
-Use `python tools/llm_wiki.py quality` when optional frontend lint should be included. Use `python tools/llm_wiki.py quality --full` when a full optional frontend build should be part of handoff evidence. If frontend dependencies are missing, install them with `cd frontend && npm ci`.
+Use `python tools/llm_wiki.py quality` when an approved scaffolded stack includes frontend lint checks. Use `python tools/llm_wiki.py quality --full` when a full scaffolded frontend build should be part of handoff evidence.
 
-Use `python tools/llm_wiki.py security audit --json --no-record` for non-mutating optional frontend security review. Omit `--no-record` to record unresolved audit items in `wiki/review.md`; add `--blocking` only when a task or CI policy explicitly requires unresolved items to fail.
+Use `python tools/llm_wiki.py security audit --json --no-record` for non-mutating dependency security review when a scaffolded frontend package manifest exists. Omit `--no-record` to record unresolved audit items in `wiki/review.md`; add `--blocking` only when a task or CI policy explicitly requires unresolved items to fail.
+
+No frontend app is bundled. Stack is selected through dialogue, and deployment planning compares VPS/VDS vs hosting with pros and cons before recommending a publication target.
