@@ -106,6 +106,25 @@ class AgentInstructionTests(unittest.TestCase):
         for text in [conductor, tooling, start_here]:
             self.assertIn("agents/protocols/tooling-onboarding.md", text)
 
+    def test_mcp_source_registry_links_are_current_and_node_repl_is_not_core(self) -> None:
+        registry = (ROOT / "agents" / "resources" / "tooling-sources.json").read_text(encoding="utf-8")
+        capabilities = (ROOT / "src" / "llm_wiki" / "capabilities.py").read_text(encoding="utf-8")
+        tooling = (ROOT / "agents" / "tooling-matrix.md").read_text(encoding="utf-8")
+        frontend = (ROOT / "agents" / "roles" / "frontend-implementation.md").read_text(encoding="utf-8")
+
+        for needle in [
+            "https://github.com/upstash/context7",
+            "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+            "https://github.com/microsoft/playwright-mcp",
+            "https://github.com/oraios/serena",
+            "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
+        ]:
+            self.assertIn(needle, registry)
+
+        for text in [registry, capabilities, tooling, frontend]:
+            self.assertNotIn("node_repl", text)
+            self.assertNotIn("node-repl", text)
+
 
 if __name__ == "__main__":
     unittest.main()

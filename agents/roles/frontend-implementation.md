@@ -44,7 +44,6 @@ Build assigned frontend pages, components, styling, and interactions for the mul
 - Use Serena MCP for symbol-level discovery in existing code.
 - Use Browser plugin for local UI verification after significant frontend changes.
 - Use Playwright skill for flow automation and screenshots.
-- Use node_repl only for JS/browser automation or compact JS checks; do not use it as a replacement for repo test/build commands.
 - Use GSAP only for assigned motion after stable layout, approved motion intent, task ownership, and a verification command.
 - Use Product Design image-to-code only when implementing from a screenshot/mockup/reference image.
 

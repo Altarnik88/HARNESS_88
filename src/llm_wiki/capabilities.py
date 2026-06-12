@@ -203,16 +203,6 @@ CAPABILITY_SPECS = [
         install_hint="Ask permission to connect SQLite MCP in read-only mode when database inspection is needed.",
     ),
     CapabilitySpec(
-        id="mcp.node-repl",
-        name="node_repl MCP",
-        kind="mcp-server",
-        importance="optional",
-        description="Supports compact JavaScript checks and browser automation helpers when delegated.",
-        detection="codex-plugin",
-        terms=("node-repl", "node_repl"),
-        install_hint="Ask permission to connect node_repl only for delegated JavaScript/browser checks.",
-    ),
-    CapabilitySpec(
         id="skill.imagegen",
         name="imagegen skill",
         kind="codex-skill",

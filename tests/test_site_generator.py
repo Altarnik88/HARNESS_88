@@ -197,6 +197,27 @@ class SiteGeneratorTests(unittest.TestCase):
                 self.assertIn(needle, protocol)
                 self.assertIn(needle, registry)
 
+    def test_generated_project_includes_current_mcp_sources_without_node_repl_core(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+            create_site_project(ROOT, target)
+
+            registry = (target / "agents" / "resources" / "tooling-sources.json").read_text(encoding="utf-8")
+            capabilities = (target / "src" / "llm_wiki" / "capabilities.py").read_text(encoding="utf-8")
+            tooling = (target / "agents" / "tooling-matrix.md").read_text(encoding="utf-8")
+
+            for needle in [
+                "https://github.com/upstash/context7",
+                "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+                "https://github.com/microsoft/playwright-mcp",
+                "https://github.com/oraios/serena",
+                "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
+            ]:
+                self.assertIn(needle, registry)
+            for text in [registry, capabilities, tooling]:
+                self.assertNotIn("node_repl", text)
+                self.assertNotIn("node-repl", text)
+
     def test_generated_project_includes_tooling_audit_onboarding(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"

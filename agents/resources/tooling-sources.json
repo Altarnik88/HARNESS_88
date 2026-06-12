@@ -58,9 +58,9 @@
     },
     "skill.playwright": {
       "source_type": "github",
-      "label": "Playwright Codex skill",
-      "url": "",
-      "notes": "Record the exact user-approved Codex skill repository URL before downloading a Playwright skill. Do not substitute the framework repository for a skill repository unless the user explicitly approves it."
+      "label": "Playwright MCP",
+      "url": "https://github.com/microsoft/playwright-mcp",
+      "notes": "Official Playwright MCP server repository for browser automation and UI verification."
     },
     "skill.gh-cli": {
       "source_type": "github",
@@ -77,32 +77,26 @@
     "mcp.serena": {
       "source_type": "github",
       "label": "Serena MCP",
-      "url": "",
-      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting Serena from GitHub."
+      "url": "https://github.com/oraios/serena",
+      "notes": "Serena MCP repository for symbol-level code discovery."
     },
     "mcp.context7": {
       "source_type": "github",
       "label": "Context7 MCP",
-      "url": "",
-      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting Context7 from GitHub."
+      "url": "https://github.com/upstash/context7",
+      "notes": "Context7 MCP repository for current library/framework documentation lookup."
     },
     "mcp.filesystem": {
       "source_type": "github",
       "label": "Filesystem MCP",
-      "url": "",
-      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting a filesystem server from GitHub."
+      "url": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+      "notes": "Model Context Protocol filesystem server source path."
     },
     "mcp.sqlite": {
       "source_type": "github",
       "label": "SQLite MCP",
-      "url": "",
-      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting a SQLite server from GitHub."
-    },
-    "mcp.node-repl": {
-      "source_type": "github",
-      "label": "node_repl MCP",
-      "url": "",
-      "notes": "Record the exact user-approved MCP repository URL before downloading or connecting node_repl from GitHub."
+      "url": "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
+      "notes": "Archived Model Context Protocol SQLite reference server source path."
     }
   }
 }
