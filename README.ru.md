@@ -2,18 +2,20 @@
 
 [English](README.md) | [Русский](README.ru.md)
 
-HARNESS_88 - это stack-neutral автономное ядро для агентной разработки сайтов. Проект помогает превратить неопределенный запрос на сайт в управляемую работу агентной команды: сбор вводных, выбор стека, согласование продукта и дизайна, поиск референсов, владение задачами, фиксация прогресса, проверки качества, исправление замечаний, финальное одобрение пользователя и handoff к публикации/поддержке.
+HARNESS_88 - это stack-neutral автономное ядро для агентной разработки сайтов. Это не готовый сайт, не встроенное frontend-приложение и не выбранный по умолчанию Next.js/fullstack/hosting вариант. Задача ядра - превратить расплывчатый запрос на сайт в управляемую систему доставки: задать правильные вопросы, сохранить решения, рекомендовать стек, скоординировать профильных агентов, проверить работу и не выпускать сайт до явного одобрения пользователя.
 
 Начинайте свежие копии проекта с [START_HERE.md](START_HERE.md).
 
 ## Какие проблемы решает
 
-- Не дает агентам начинать разработку сайта без выбранного стека, утвержденного продукта, дизайна и референсов.
-- Превращает расплывчатый запрос на сайт в контролируемый workflow с долговременными решениями и approval gates.
-- Делит работу между профильными ролями вместо сценария, где один ассистент сам исследует, проектирует, пишет код, тестирует и выпускает сайт.
-- Сохраняет решения по продукту, дизайну, стеку, reference analysis, задачам, аудиту и публикации в файлах проекта, которые переживают сброс контекста.
-- Снижает хаос во frontend-разработке: референсы должны быть утверждены, а большие сайты режутся на задачи с раздельным владением файлами.
-- Поддерживает каталоги, ecommerce, онлайн-оплату, офлайн-оплату и заявки менеджеру через явные решения в intake.
+- Не дает агентам начинать код раньше времени, пока не утверждены цель сайта, стек, продуктовый контракт, дизайн, референсы и reference analysis.
+- Превращает запрос в стиле "сделай сайт" в повторяемый workflow с видимыми решениями, approval gates и понятными точками handoff.
+- Убирает хаос выбора стека: агент обязан предложить 2-4 конкретных варианта, объяснить плюсы, минусы, сложность поддержки и дождаться явного решения пользователя.
+- Сохраняет решения по продукту, дизайну, стеку, референсам, задачам, аудиту и публикации в файлах проекта, которые переживают сброс контекста и передачу между агентами.
+- Заменяет перегруженного "одного ассистента на все" профильными ролями: продукт, референсы, UX, визуальный дизайн, frontend, backend/data, QA, SEO, release и проектная память.
+- Усиливает работу с референсами: перед серьезной frontend-разработкой нужны утвержденные примеры, bounded page inventory, desktop/mobile screenshot evidence, UX/visual analysis и Figma reference artifact.
+- Делает большие сайты управляемыми через task-файлы, progress, checkpoints, review evidence, verification evidence и отдельные remediation-задачи.
+- Держит публикацию под контролем: frontend preview approval, audit evidence, final user approval и handoff по VPS/VDS или managed hosting.
 - Держит секреты вне файлов проекта, а runtime outputs считает generated state.
 
 ## Как работает
@@ -26,6 +28,17 @@ HARNESS_88 разделяет работу над ядром и реализац
 - Доставка отслеживается через `SITE_GATES.md`: approval frontend-превью, backend/data readiness, total audit, remediation, финальное одобрение пользователя и publish handoff.
 - Агенты задают вопросы на языке пользователя, а поле `language` в `SITE_INTAKE.md` описывает основной язык сайта.
 - Если у пользователя нет референсов, Reference Research предлагает варианты из Dribbble, Behance, Awwwards и релевантных конкурентов до начала frontend-работ.
+
+## Что делает ядро по шагам
+
+1. Проводит read-only аудит локальных tools, Codex skills, plugins и MCP-related capabilities. Оно показывает, что доступно, чего не хватает, и спрашивает разрешение перед любой установкой, загрузкой или подключением.
+2. Проводит site intake: цель, аудитория, страна, язык сайта, тип сайта, модель контента, catalog/ecommerce/payment/request потребности, backend/data/admin/integration потребности и launch constraints.
+3. Рекомендует 2-4 stack/fullstack варианта с языками, frameworks, сервисами, плюсами, минусами, операционной сложностью, scaffold policy и best-fit сценариями. `STACK.md` обновляется только после явного approval или custom stack.
+4. Записывает принятые продуктовые и дизайн-решения в `PRODUCT.md` и `DESIGN.md`, затем ждет approval перед реализацией.
+5. Получает approval пользовательских референсов или делегирует reference discovery. Утвержденные референсы должны пройти bounded analysis со screenshots, UX/visual findings и Figma reference artifact до серьезной frontend-работы.
+6. Создает tracked task files, progress files и checkpoints, чтобы каждый implementation slice имел владельца, evidence, review, verification и handoff trail.
+7. Scaffold и сборка stack-specific frontend/backend-файлов начинаются только после approved intake, selected stack, approved product/design briefs, approved references и task ownership.
+8. Проводит previews, quality checks, audit/remediation loops, final user approval и publish/operate handoff: объясняет VPS/VDS vs managed hosting и рекомендует подходящий target по ответам пользователя.
 
 ## Агентная команда
 
@@ -86,12 +99,12 @@ Tooling audit работает read-only. Он показывает, что до
 - `agents/resources/tooling-sources.json`: реестр источников для GitHub-backed tools, skills и MCP resources.
 - `wiki/`: Markdown-база знаний, поддерживаемая агентами.
 - `src/llm_wiki/` и `tools/llm_wiki.py`: локальный CLI для wiki, task, stack, site и quality workflows.
-- `frontend/`: optional bundled Next.js starter/template, не выбранный стек по умолчанию.
+- Frontend-приложение не поставляется в составе ядра. Stack выбирается через диалог из целей сайта, типа проекта, content model, backend/data needs, integrations, deployment expectations и maintenance constraints.
 
 ## Окружение
 
 - Python >= 3.11.
-- Node.js/npm нужны только для optional bundled frontend template. Текущий template использует Next.js 16 и ожидает Node >= 20.9.0.
+- Node.js/npm нужны только после того, как пользователь утвердит JavaScript/TypeScript стек, а approved scaffold task создаст соответствующий проект.
 
 ## Первый запуск
 
@@ -107,25 +120,17 @@ python tools/llm_wiki.py site doctor --skip-self-test
 python tools/llm_wiki.py quality --skip-frontend
 ```
 
-Если нужно использовать или проверить optional frontend template:
-
-```powershell
-cd frontend
-npm ci
-npm run lint
-npm run build
-```
-
 ## Рабочий процесс
 
 1. Откройте чат в корне репозитория и следуйте `START_HERE.md`.
 2. Проведите first-run intake и запишите принятые ответы в `SITE_INTAKE.md`.
-3. Выберите stack/fullstack profile и запишите его в `STACK.md`.
+3. Получите 2-4 stack/fullstack рекомендации с языками, frameworks, сервисами, плюсами, минусами, операционной сложностью и best-fit сценариями; дождитесь approval или custom stack перед записью в `STACK.md`.
 4. Заполните `PRODUCT.md` и `DESIGN.md`, затем поставьте `Status: approved`, когда решения приняты.
 5. Утвердите пользовательские или агентские референсы и поставьте `references_status: approved`.
 6. Заполните `SITE_REFERENCES.md`: bounded crawl, desktop/mobile screenshots, Figma reference artifact, UX/visual analysis и explicit user approval.
-7. Создайте атомарные task-файлы через `python tools/llm_wiki.py task create ...`.
-8. Реализуйте только из approved intake, approved briefs, selected stack state, approved reference analysis и task ownership.
-9. Покажите frontend previews, проведите total audit, исправьте findings через tracked tasks и получите финальное одобрение пользователя до publish instructions.
+7. Спросите, публикация планируется на VPS/VDS или managed hosting; объясните плюсы/минусы и рекомендуйте вариант по операционным, бюджетным, traffic, backend и maintenance ответам пользователя.
+8. Создайте атомарные task-файлы через `python tools/llm_wiki.py task create ...`.
+9. Реализуйте только из approved intake, approved briefs, selected stack state, approved reference analysis, selected deployment direction и task ownership.
+10. Покажите frontend previews, проведите total audit, исправьте findings через tracked tasks и получите финальное одобрение пользователя до publish instructions.
 
 SQLite-файлы в `data/` являются generated state. Их можно удалить и пересобрать через `python tools/llm_wiki.py rebuild`.

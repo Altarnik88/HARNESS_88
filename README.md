@@ -2,18 +2,20 @@
 
 [English](README.md) | [Русский](README.ru.md)
 
-HARNESS_88 is a stack-neutral autonomous core for agent-driven website delivery. It helps turn an ambiguous website request into coordinated agent-team work: intake, stack selection, product and design approval, reference discovery, task ownership, progress tracking, quality checks, remediation, final user approval, and publish/operate handoff.
+HARNESS_88 is a stack-neutral autonomous core for agent-driven website delivery. It is not a finished website, not a bundled frontend app, and not a default Next.js/fullstack/hosting choice. Its job is to turn a vague website request into a controlled delivery system: ask the right questions, preserve decisions, recommend a stack, coordinate specialist agents, verify work, and keep publication gated until the user approves it.
 
 Start fresh clones with [START_HERE.md](START_HERE.md).
 
 ## What It Solves
 
-- Prevents agents from starting site implementation before stack, product, design, references, and strict reference analysis are approved.
-- Turns one vague website request into a controlled workflow with durable decisions and approval gates.
-- Splits work across specialist roles instead of letting one assistant design, build, test, and release everything alone.
-- Keeps product, design, stack, reference analysis, task, audit, and publish decisions in project files that survive context resets.
-- Reduces chaotic frontend work by requiring approved references and disjoint implementation ownership.
-- Supports catalog, ecommerce, online payment, offline payment, and manager-request flows through explicit intake decisions.
+- Stops agents from coding too early, before the site goal, stack, product contract, design direction, references, and reference analysis are approved.
+- Turns a vague request like "build me a site" into a repeatable workflow with visible decisions, approval gates, and handoff points.
+- Prevents stack chaos by forcing a recommendation step with 2-4 concrete options, tradeoffs, operational complexity, and explicit user approval.
+- Preserves product, design, stack, reference analysis, task, audit, and publish decisions in files that survive context resets and agent handoffs.
+- Replaces one overloaded assistant with specialist roles for product, references, UX, visual design, frontend, backend/data, QA, SEO, release, and project memory.
+- Reduces weak reference work by requiring approved examples, bounded page inventory, desktop/mobile screenshot evidence, UX/visual analysis, and a Figma reference artifact before serious frontend work.
+- Gives larger sites clear ownership through tracked task files, progress files, checkpoints, review evidence, and remediation tasks.
+- Keeps publish work gated by preview approval, audit evidence, final user approval, and a VPS/VDS or managed-hosting handoff.
 - Keeps secrets out of project files and treats runtime outputs as generated state.
 
 ## How It Works
@@ -26,6 +28,17 @@ HARNESS_88 separates core engineering from concrete site implementation.
 - Delivery is tracked through `SITE_GATES.md`: frontend preview approval, backend/data readiness, total audit, remediation, final user approval, and publish handoff.
 - Agents ask questions in the user's language, while `SITE_INTAKE.md` `language` records the site's primary language.
 - If the user has no references, Reference Research proposes examples from Dribbble, Behance, Awwwards, and relevant competitors before frontend work starts.
+
+## What The Core Does Step By Step
+
+1. Audits local tools, Codex skills, plugins, and MCP-related capabilities in read-only mode. It reports gaps and asks before any install, download, or connector setup.
+2. Runs site intake: goal, audience, country, site language, site type, content model, catalog/ecommerce/payment/request needs, backend/data/admin/integration needs, and launch constraints.
+3. Recommends 2-4 stack or fullstack options with languages, frameworks, services, pros, cons, operational complexity, scaffold policy, and best-fit use cases. It waits for explicit approval or a custom stack before updating `STACK.md`.
+4. Records accepted product and design decisions in `PRODUCT.md` and `DESIGN.md`, then waits for approval before implementation.
+5. Gets user approval for reference sites or delegates reference discovery. Approved references must pass bounded analysis with screenshots, UX/visual findings, and a Figma reference artifact before serious frontend work.
+6. Creates tracked task files, progress files, and checkpoints so each implementation slice has an owner, evidence, review, verification, and handoff trail.
+7. Scaffolds and builds stack-specific frontend/backend files only after intake, stack, product, design, references, and task ownership are approved.
+8. Runs previews, quality checks, audit/remediation loops, final user approval, and a publish/operate handoff that explains VPS/VDS versus managed hosting and recommends the better target from the user's answers.
 
 ## Agent Team
 
