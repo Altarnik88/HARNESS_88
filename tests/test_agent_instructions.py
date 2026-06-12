@@ -29,6 +29,7 @@ class AgentInstructionTests(unittest.TestCase):
             "agents/protocols/wiki-operations.md",
             "agents/protocols/skill-capture.md",
             "agents/protocols/conversation-delegation.md",
+            "agents/protocols/design-resources.md",
         ]:
             self.assertIn(rel, text)
             self.assertTrue((ROOT / rel).exists())
@@ -62,6 +63,28 @@ class AgentInstructionTests(unittest.TestCase):
         self.assertIn("update the role file and this matrix before delegating", tooling)
         self.assertIn("stop and update that contract before delegating", delegation)
         self.assertIn("primary site language, not the user/chat language", intake)
+
+    def test_design_resources_contract_is_documented(self) -> None:
+        protocol = (ROOT / "agents" / "protocols" / "design-resources.md").read_text(encoding="utf-8")
+        tooling = (ROOT / "agents" / "tooling-matrix.md").read_text(encoding="utf-8")
+        ux = (ROOT / "agents" / "roles" / "ux-product-design.md").read_text(encoding="utf-8")
+        visual = (ROOT / "agents" / "roles" / "visual-design.md").read_text(encoding="utf-8")
+        reference = (ROOT / "agents" / "roles" / "reference-research.md").read_text(encoding="utf-8")
+        frontend = (ROOT / "agents" / "roles" / "frontend-implementation.md").read_text(encoding="utf-8")
+        workflow = (ROOT / "agents" / "workflows" / "agentic-site-delivery.md").read_text(encoding="utf-8")
+        delegation = (ROOT / "agents" / "templates" / "delegation-brief.md").read_text(encoding="utf-8")
+
+        for needle in [
+            "https://github.com/alchaincyf/huashu-design",
+            "https://github.com/pbakaus/impeccable",
+            "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+            "https://github.com/greensock/GSAP/",
+            "plugin://canva@openai-curated-remote",
+        ]:
+            self.assertIn(needle, protocol)
+
+        for text in [tooling, ux, visual, reference, frontend, workflow, delegation]:
+            self.assertIn("agents/protocols/design-resources.md", text)
 
 
 if __name__ == "__main__":

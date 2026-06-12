@@ -30,6 +30,7 @@ Design page flows, interaction behavior, and responsive UX for the multi-page si
 ## Tooling Access
 
 - Tooling source of truth: `agents/tooling-matrix.md`.
+- Design-resource protocol: `agents/protocols/design-resources.md`.
 - Default deny: use only UX/Product Design tooling listed in the matrix or explicitly granted in the delegation brief.
 - Use Product Design `get-context` before UX decisions.
 - Use Product Design `ideate` for visual/interaction alternatives.

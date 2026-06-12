@@ -66,6 +66,7 @@ HARNESS_88 использует agent-first модель:
 - **Product Design plugin:** product/UI context, design variants, image-to-code при выбранном mockup/reference.
 - **GitHub plugin / `gh-cli` skill:** repository, pull request, issue и CI workflows.
 - **Reference discovery:** Dribbble, Behance, Awwwards, конкуренты и market examples.
+- **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP и Canva выдаются через `agents/protocols/design-resources.md` и фиксируются в `agents/resources/tooling-sources.json`.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets и Remotion, когда задача и tooling matrix это разрешают.
 
 Tooling audit работает read-only. Он показывает, что доступно, чего не хватает, и на что агент должен спросить разрешение: установка локальных tools, скачивание skills из GitHub или подключение Codex plugins/skills. HARNESS_88 не должен ничего устанавливать или подключать автоматически.

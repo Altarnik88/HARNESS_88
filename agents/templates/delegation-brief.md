@@ -25,6 +25,7 @@ Context to read:
 - AGENTS.md
 - agents/TEAM.md
 - agents/protocols/conversation-delegation.md
+- agents/protocols/design-resources.md
 - agents/tooling-matrix.md
 - agents/roles/<role>.md
 - <task-specific files>
@@ -63,7 +64,7 @@ Clean-context resume instructions:
 ## Defaults
 
 - If the task involves current framework/library behavior, include Context7 MCP.
-- If the task involves design or UI direction, include Product Design skill guidance.
+- If the task involves design or UI direction, include Product Design skill guidance plus the relevant design resources from `agents/protocols/design-resources.md`; name why each resource is granted and what to do if it is unavailable.
 - If the task involves missing or undecided references, assign Reference Research and include Dribbble, Behance, and Awwwards in the source scope.
 - If the task changes frontend UI, require Browser or Playwright verification.
 - If the task touches GitHub, require GitHub plugin or `gh-cli` skill.

@@ -82,6 +82,7 @@ Required skills/plugins/MCP:
 
 - Browser or web search only when current public references are needed.
 - Product Design `ideate` for visual variants after the brief is clear.
+- Design resources from `agents/protocols/design-resources.md` when reference research feeds UX, visual direction, critique, or motion decisions.
 - Figma only when a Figma URL or explicit Figma workflow is requested.
 
 ## Phase 4: Sitemap, Content Model, and User Journeys
@@ -117,6 +118,7 @@ Required skills/plugins/MCP:
 
 - Serena MCP for symbol-level repo discovery.
 - Context7 MCP for current framework docs.
+- `agents/protocols/design-resources.md` for planning UX, visual, Canva, and GSAP specialist briefs.
 
 ## Phase 6: Frontend Build and Approval Loop
 
@@ -143,6 +145,7 @@ Rules:
 Required skills/plugins/MCP:
 
 - Context7 MCP for framework/library APIs.
+- Design resources from `agents/protocols/design-resources.md` for UX/visual/motion specialists when their delegation brief grants them.
 - Browser plugin after significant UI changes.
 - Playwright skill for flow checks.
 - Product Design image-to-code only when implementing from a mockup/screenshot.

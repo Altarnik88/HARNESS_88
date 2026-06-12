@@ -29,6 +29,7 @@ Root `PRODUCT.md`, `DESIGN.md`, and `STACK.md` describe the site-project workflo
 - `agents/protocols/wiki-operations.md` - wiki invariants, ingest, query, and lint workflow.
 - `agents/protocols/skill-capture.md` - when repeated behavior should become a reusable Codex skill.
 - `agents/protocols/conversation-delegation.md` - user-language, reference-discovery, and agent-first delegation protocol.
+- `agents/protocols/design-resources.md` - design resource grants for UX, visual, motion, and Canva work.
 - `agents/TEAM.md` - multi-agent and one-agent fallback protocol.
 - `agents/harness/README.md` - task/progress/checkpoint execution model.
 - `agents/resources/tooling-sources.json` - source registry for GitHub-backed tools, skills, and MCP resources.

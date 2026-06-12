@@ -26,6 +26,36 @@
       "url": "https://github.com/cli/cli",
       "notes": "Official GitHub CLI repository."
     },
+    "skill.huashu-design": {
+      "source_type": "github",
+      "label": "huashu-design",
+      "url": "https://github.com/alchaincyf/huashu-design",
+      "notes": "HTML-native design skill for high-fidelity prototypes, design directions, demos, animations, and design review."
+    },
+    "skill.impeccable": {
+      "source_type": "github",
+      "label": "impeccable",
+      "url": "https://github.com/pbakaus/impeccable",
+      "notes": "Design-language resource for critique, UI audit, polish, and higher-quality agent design output."
+    },
+    "skill.ui-ux-pro-max": {
+      "source_type": "github",
+      "label": "ui-ux-pro-max-skill",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "notes": "AI skill for UI/UX design intelligence, specs, and multi-platform product design reasoning."
+    },
+    "library.gsap": {
+      "source_type": "github",
+      "label": "GSAP",
+      "url": "https://github.com/greensock/GSAP/",
+      "notes": "GreenSock Animation Platform repository. Use only for approved motion specs or assigned frontend animation implementation."
+    },
+    "plugin.canva": {
+      "source_type": "codex-plugin",
+      "label": "Canva plugin",
+      "url": "plugin://canva@openai-curated-remote",
+      "notes": "Codex Canva plugin resource for mood boards, editable design assets, presentation/deck handoff, campaign visuals, and social assets when delegated."
+    },
     "skill.playwright": {
       "source_type": "github",
       "label": "Playwright Codex skill",

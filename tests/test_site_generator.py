@@ -179,6 +179,24 @@ class SiteGeneratorTests(unittest.TestCase):
             self.assertIn("primary site language, not the user/chat language", intake)
             self.assertIn("https://dribbble.com/", intake)
 
+    def test_generated_project_includes_design_resource_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "clean-site"
+            create_site_project(ROOT, target)
+
+            protocol = (target / "agents" / "protocols" / "design-resources.md").read_text(encoding="utf-8")
+            registry = (target / "agents" / "resources" / "tooling-sources.json").read_text(encoding="utf-8")
+
+            for needle in [
+                "https://github.com/alchaincyf/huashu-design",
+                "https://github.com/pbakaus/impeccable",
+                "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+                "https://github.com/greensock/GSAP/",
+                "plugin://canva@openai-curated-remote",
+            ]:
+                self.assertIn(needle, protocol)
+                self.assertIn(needle, registry)
+
     def test_generated_project_includes_tooling_audit_onboarding(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "clean-site"

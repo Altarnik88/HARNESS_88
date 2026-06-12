@@ -63,6 +63,10 @@ class CapabilityAuditTests(unittest.TestCase):
             "mcp.filesystem",
             "mcp.sqlite",
             "mcp.node-repl",
+            "skill.huashu-design",
+            "skill.impeccable",
+            "skill.ui-ux-pro-max",
+            "library.gsap",
             "skill.imagegen",
             "plugin.sentry",
             "plugin.remotion",
@@ -159,6 +163,21 @@ class CapabilityAuditTests(unittest.TestCase):
         self.assertEqual(action["resource_url"], "")
         self.assertIn("No approved GitHub URL is recorded", action["prompt"])
         self.assertIn("agents/resources/tooling-sources.json", action["prompt"])
+
+    def test_design_resource_sources_are_registered(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = capability_audit(ROOT, codex_home=Path(tmp))
+
+        items = {item["id"]: item for item in report["items"]}
+        expected_urls = {
+            "skill.huashu-design": "https://github.com/alchaincyf/huashu-design",
+            "skill.impeccable": "https://github.com/pbakaus/impeccable",
+            "skill.ui-ux-pro-max": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+            "library.gsap": "https://github.com/greensock/GSAP/",
+            "plugin.canva": "plugin://canva@openai-curated-remote",
+        }
+        for capability_id, url in expected_urls.items():
+            self.assertEqual(items[capability_id]["resource_url"], url)
 
 
 if __name__ == "__main__":

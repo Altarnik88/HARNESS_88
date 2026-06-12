@@ -24,8 +24,10 @@ Add competitors, local-market examples, and domain-specific sites when useful.
 ## Tooling Access
 
 - Tooling source of truth: `agents/tooling-matrix.md`.
+- Design-resource protocol: `agents/protocols/design-resources.md`.
 - Default deny: use only Reference Research tooling listed in the matrix or explicitly granted in the delegation brief.
 - Use Browser or web search in read-only mode for current public examples.
+- Use design resources as method/inspiration sources only when delegated; keep them separate from project-specific reference URLs that need user approval.
 - Use Product Design `get-context` when the reference search depends on unclear product or UI intent.
 - Use Product Design `ideate` only after the brief is clear and visual variants are requested.
 - Do not perform external write actions, sign in to external services, scrape private content, or store secrets.

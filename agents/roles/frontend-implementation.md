@@ -37,6 +37,7 @@ Build assigned frontend pages, components, styling, and interactions for the mul
 ## Tooling Access
 
 - Tooling source of truth: `agents/tooling-matrix.md`.
+- Design-resource protocol: `agents/protocols/design-resources.md`.
 - Default deny: use only Frontend Implementation tooling listed in the matrix or explicitly granted in the delegation brief.
 - Use Context7 MCP for current React/Next/Vite/Tailwind/etc. docs when relevant.
 - For `frontend/`, also check local Next.js docs under `node_modules/next/dist/docs/` before code that depends on Next APIs or conventions.
@@ -44,7 +45,7 @@ Build assigned frontend pages, components, styling, and interactions for the mul
 - Use Browser plugin for local UI verification after significant frontend changes.
 - Use Playwright skill for flow automation and screenshots.
 - Use node_repl only for JS/browser automation or compact JS checks; do not use it as a replacement for repo test/build commands.
-- Use GSAP skills only for assigned motion after stable layout and approved motion intent.
+- Use GSAP only for assigned motion after stable layout, approved motion intent, task ownership, and a verification command.
 - Use Product Design image-to-code only when implementing from a screenshot/mockup/reference image.
 
 ## Code Policy

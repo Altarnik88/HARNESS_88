@@ -66,6 +66,7 @@ Agent routing supports:
 - **Product Design plugin:** product/UI context, design variants, image-to-code when a mockup or reference is selected.
 - **GitHub plugin / `gh-cli` skill:** repository, pull request, issue, and CI workflows.
 - **Reference discovery:** Dribbble, Behance, Awwwards, competitors, and market examples.
+- **Design resources:** huashu-design, impeccable, ui-ux-pro-max, GSAP, and Canva are granted through `agents/protocols/design-resources.md` and tracked in `agents/resources/tooling-sources.json`.
 - **Optional specialist plugins:** Figma, Canva, Creative Production, imagegen, Sentry, Supabase, Data Analytics, Documents, Spreadsheets, and Remotion when the task and tooling matrix allow them.
 
 The tooling audit is read-only. It reports what appears available, what is missing, and what the agent should ask permission to install, download from GitHub, or connect through Codex plugins/skills. HARNESS_88 must not install or connect anything automatically.

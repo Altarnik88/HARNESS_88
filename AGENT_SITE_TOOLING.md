@@ -20,6 +20,7 @@ HARNESS_88 starts as a portable, stack-neutral autonomous core. New users should
 - Do not begin serious frontend implementation until reference sites, screenshots, or approved agent-proposed reference examples are recorded and `references_status: approved` is set in `SITE_INTAKE.md`.
 - Ask questions in the user's language from the latest user message; `SITE_INTAKE.md` `language` records the site language, not necessarily the conversation language.
 - If references are missing or the user cannot choose them, delegate Reference Research and include `https://dribbble.com/`, `https://www.behance.net/`, and `https://www.awwwards.com/` in the source scope.
+- For site design work, use `agents/protocols/design-resources.md` to grant huashu-design, impeccable, ui-ux-pro-max, GSAP, or Canva only when the role and task need them.
 - Use agent-first delegation for substantial research, design, implementation, QA, release, and wiki closeout. If no suitable role or tooling grant exists, update the role/tooling contract before delegating.
 - Do not publish or provide final deployment instructions until `SITE_GATES.md` records completed audit/remediation/final approval gates and publish/operate handoff is complete.
 - Keep secrets in environment variables only.

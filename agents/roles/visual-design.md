@@ -29,6 +29,7 @@ Define the visual system that gives the site a coherent, domain-appropriate look
 ## Tooling Access
 
 - Tooling source of truth: `agents/tooling-matrix.md`.
+- Design-resource protocol: `agents/protocols/design-resources.md`.
 - Default deny: use only Visual Design tooling listed in the matrix or explicitly granted in the delegation brief.
 - Use `ui-ux-pro-max`, `huashu-design`, and `impeccable` for visual systems, directions, critique, and polish.
 - Product Design plugin for design context and variants.
